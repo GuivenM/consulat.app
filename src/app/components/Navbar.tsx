@@ -62,19 +62,12 @@ export function Navbar() {
               )}>
                 <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
               </div>
-              <div className="flex flex-col">
-                <span className={cn(
-                  "font-black text-xl leading-none tracking-tight transition-colors",
-                  scrolled ? "text-slate-900" : "text-white"
-                )}>
-                  Consulat
-                </span>
-                <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-widest mt-0.5 transition-colors",
-                  scrolled ? "text-brand-green-600" : "text-white/80"
-                )}>
-                  Congo · Bénin
-                </span>
+              <div className="h-8 sm:h-9 md:h-11">
+                <img
+                  src={scrolled ? "/logo-consulat-texte.png" : "/logo-consulat-texte-blanc.png"}
+                  alt="Le Consulat Honoraire de la République du Congo au Bénin"
+                  className="h-full w-auto object-contain"
+                />
               </div>
             </Link>
 

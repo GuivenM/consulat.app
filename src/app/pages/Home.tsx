@@ -80,8 +80,8 @@ export function Home() {
         {/* Background Image with Parallax-like fix */}
         <div className="absolute inset-0 z-0">
           <ImageWithFallback 
-            src="/file.jpg"
-            alt="Hero Background"
+            src="/hero-consulat.jpeg"
+            alt="Communauté congolaise du Consulat Honoraire au Bénin"
             className="w-full h-full object-cover scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-brand-green-950/95 via-brand-green-900/80 to-slate-900/40" />
