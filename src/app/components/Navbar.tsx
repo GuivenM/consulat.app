@@ -61,7 +61,7 @@ export function Navbar() {
                 "w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:rotate-6 bg-white p-1.5",
                 scrolled ? "ring-1 ring-slate-100" : "ring-1 ring-white/40"
               )}>
-                <img src="/logo-consulat.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
+                <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className={cn(

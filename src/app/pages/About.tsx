@@ -30,7 +30,7 @@ export function About() {
       <div className="bg-slate-900 pt-32 pb-20 rounded-b-[3rem] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-green-900/50 to-slate-900/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-           <img src="/logo-consulat.png" alt="Consulat Honoraire du Congo au Bénin" className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white p-2 shadow-xl" />
+           <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white p-2 shadow-xl" />
            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Le Consulat</h1>
            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
              {/* TODO : texte de présentation à valider avec le consulat */}
