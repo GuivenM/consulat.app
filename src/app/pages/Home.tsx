@@ -6,41 +6,41 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { api, ApiError } from '../../lib/api';
 import { Actualite } from '../admin/types';
 
-// "Membres Actifs" et "Partenaires" sont calculés en direct via l'API
-// (voir useEffect plus bas). "Années d'Actions" et "Vies Impactées" n'ont pas
-// d'équivalent mesurable dans l'app — modifie les valeurs ci-dessous à la main
-// quand tu as les vrais chiffres.
+// "Ressortissants inscrits" est calculé en direct via l'API (voir useEffect
+// plus bas). "Services consulaires" est un fait connu du cahier des charges
+// (carte consulaire + laissez-passer) : à mettre à jour si l'offre évolue.
 const STATS_EDITORIALES = {
-  anneesActions: "10+",
-  viesImpactees: "10k+",
+  servicesConsulaires: "2",
 };
 
+// Reprend 4 des grandes rubriques du site (voir le sitemap validé) — les liens
+// pointent vers /about en attendant que ces pages dédiées existent.
 const axes = [
   {
-    title: "Solidarité",
+    title: "Services consulaires",
     icon: <Users className="w-8 h-8" />,
-    desc: "Un réseau d'entraide puissant pour chaque Congolais.",
+    desc: "Registre consulaire, carte consulaire, laissez-passer et informations pratiques.",
     color: "from-brand-gold-400 to-orange-500",
     bg: "bg-brand-gold-50"
   },
   {
-    title: "Éducation",
-    icon: <GraduationCap className="w-8 h-8" />,
-    desc: "Programmes de mentorat et bourses d'excellence.",
+    title: "Diplomatie économique",
+    icon: <Handshake className="w-8 h-8" />,
+    desc: "Relations Congo–Bénin, coopération et opportunités d'affaires.",
     color: "from-brand-green-400 to-brand-green-600",
     bg: "bg-brand-green-50"
   },
   {
-    title: "Culture",
+    title: "Culture & Patrimoine",
     icon: <Globe className="w-8 h-8" />,
-    desc: "Rayonnement de l'identité congolaise au Bénin.",
+    desc: "Histoire, musique, danse et littérature congolaises.",
     color: "from-brand-gold-400 to-brand-gold-600",
     bg: "bg-brand-gold-50"
   },
   {
-    title: "Partenariats",
-    icon: <Handshake className="w-8 h-8" />,
-    desc: "Collaborations stratégiques institutionnelles.",
+    title: "Diaspora",
+    icon: <GraduationCap className="w-8 h-8" />,
+    desc: "Vie de la communauté congolaise au Bénin et ses talents.",
     color: "from-brand-red-400 to-brand-red-600",
     bg: "bg-brand-red-50"
   }
@@ -97,7 +97,7 @@ export function Home() {
               className="flex flex-col md:flex-row gap-2 items-start md:items-center mb-6"
             >
               <div className="h-1 w-20 bg-brand-gold-400 rounded-full"></div>
-              <span className="text-brand-gold-400 font-bold tracking-widest uppercase text-sm">Solidarité – Réﬂexion – Action</span>
+              <span className="text-brand-gold-400 font-bold tracking-widest uppercase text-sm">Service – Proximité – Intégrité</span>
             </motion.div>
             
             <motion.h1 
@@ -106,7 +106,7 @@ export function Home() {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tight"
             >
-              La Diaspora Congolaise <br/>
+              La République du Congo <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green-400 via-brand-green-200 to-white">
                 au cœur du Bénin.
               </span>
@@ -118,8 +118,8 @@ export function Home() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-lg md:text-2xl text-slate-300 mb-12 max-w-2xl leading-relaxed font-light"
             >
-              Nous bâtissons une communauté forte, intégrée et influente. 
-              Rejoignez le mouvement de la jeunesse qui ose et qui agit.
+              Le Consulat Honoraire de la République du Congo au Bénin accompagne les ressortissants congolais
+              dans leurs démarches consulaires et renforce les liens entre nos deux pays.
             </motion.p>
             
             <motion.div 
@@ -156,21 +156,11 @@ export function Home() {
               <div className="text-3xl font-bold text-white mb-1">
                 {stats ? stats.membres_actifs : <Loader2 className="w-6 h-6 animate-spin" />}
               </div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Membres Actifs</div>
+              <div className="text-xs text-slate-400 uppercase tracking-wide">Ressortissants inscrits</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white mb-1">{STATS_EDITORIALES.anneesActions}</div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Années d'Actions</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {stats ? stats.partenaires_actifs : <Loader2 className="w-6 h-6 animate-spin" />}
-              </div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Partenaires</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white mb-1">{STATS_EDITORIALES.viesImpactees}</div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Vies Impactées</div>
+              <div className="text-3xl font-bold text-white mb-1">{STATS_EDITORIALES.servicesConsulaires}</div>
+              <div className="text-xs text-slate-400 uppercase tracking-wide">Services consulaires</div>
             </div>
           </div>
         </motion.div>
@@ -197,7 +187,7 @@ export function Home() {
                  className="relative rounded-[1.5rem] shadow-2xl w-full object-cover aspect-[4/3]"
                />
                <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-xl border border-slate-100 hidden md:block">
-                 <p className="font-serif italic text-xl text-slate-800">"Unis pour réussir"</p>
+                 <p className="font-serif italic text-xl text-slate-800">"Service et proximité"</p>
                </div>
             </motion.div>
 
@@ -210,16 +200,13 @@ export function Home() {
             >
               <h2 className="text-sm font-bold text-brand-green-600 uppercase tracking-widest mb-4">Qui sommes-nous ?</h2>
               <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                Une organisation apolitique au service de l'<span className="text-brand-gold-500">Excellence</span>.
+                Un service public de proximité pour la <span className="text-brand-gold-500">communauté congolaise</span>.
               </h3>
               <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                {/* TODO : cette section "Qui sommes-nous" et les stats (membres actifs, partenaires...)
-                    sont encore celles d'une association et doivent être réécrites pour la page
-                    Accueil du consulat (hero, mot du Consul, bloc "nos services"). */}
                 Porté par le Consulat Honoraire de la République du Congo au Bénin, ce site est un espace de services et d'information pour la communauté congolaise.
               </p>
               <p className="text-lg text-slate-600 mb-10 leading-relaxed">
-                Nous offrons un cadre structuré où chaque membre peut s'intégrer, se former et contribuer au rayonnement de notre culture et de nos compétences.
+                Inscription au registre consulaire, carte consulaire, laissez-passer, informations pratiques : nous accompagnons chaque ressortissant dans ses démarches, où qu'il se trouve au Bénin.
               </p>
               
               <Link to="/about" className="inline-flex items-center gap-2 text-brand-green-800 font-bold border-b-2 border-brand-green-800 pb-1 hover:text-brand-green-600 hover:border-brand-green-600 transition-all">
@@ -236,9 +223,9 @@ export function Home() {
       <section className="py-24 bg-slate-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Nos Piliers Stratégiques</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Nos domaines d'action</h2>
             <p className="text-slate-600 text-lg">
-              Une approche holistique pour accompagner la jeunesse congolaise dans toutes les étapes de sa vie au Bénin.
+              Un accompagnement complet de la communauté congolaise au Bénin, de l'administratif à la culture.
             </p>
           </div>
 
@@ -261,7 +248,7 @@ export function Home() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-3 relative z-10">{axis.title}</h3>
                 <p className="text-slate-500 mb-8 relative z-10 group-hover:text-slate-600">{axis.desc}</p>
                 
-                <Link to="/actions" className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 text-slate-400 group-hover:bg-brand-green-600 group-hover:border-transparent group-hover:text-white transition-all">
+                <Link to="/about" className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 text-slate-400 group-hover:bg-brand-green-600 group-hover:border-transparent group-hover:text-white transition-all">
                   <ArrowRight size={16} />
                 </Link>
               </motion.div>
@@ -277,7 +264,7 @@ export function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
             <div>
-              <h2 className="text-4xl font-bold text-slate-900 mb-2">Actualités & Events</h2>
+              <h2 className="text-4xl font-bold text-slate-900 mb-2">Actualités & Médiathèque</h2>
               <div className="h-1.5 w-24 bg-brand-green-500 rounded-full"></div>
             </div>
             <Link to="/news" className="px-6 py-3 rounded-full border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors">
@@ -357,10 +344,10 @@ export function Home() {
             className="max-w-4xl mx-auto"
           >
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tight">
-              Prêt à impacter votre avenir ?
+              Besoin d'un service consulaire ?
             </h2>
             <p className="text-xl text-brand-green-100 mb-12 max-w-2xl mx-auto font-light">
-              Rejoignez une communauté d'élite. Ensemble, transformons les défis en opportunités.
+              Inscrivez-vous au registre consulaire pour déposer une demande de carte consulaire ou de laissez-passer, et suivre son avancement.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

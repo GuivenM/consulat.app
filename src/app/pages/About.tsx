@@ -20,9 +20,7 @@ export function About() {
   }, []);
 
   // Le bureau renvoyé par l'API est déjà trié par rang (Président en premier,
-  // etc.) — on s'appuie sur ce tri plutôt que de supposer un nombre fixe de
-  // membres ou un "Président" toujours présent.
-  const president = bureau[0];
+  // etc.) — utilisé plus bas pour la liste de l'équipe.
 
   return (
     <div className="bg-white min-h-screen">
@@ -30,29 +28,25 @@ export function About() {
       <div className="bg-slate-900 pt-32 pb-20 rounded-b-[3rem] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-green-900/50 to-slate-900/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-           <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white p-2 shadow-xl" />
+           <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-24 h-24 mx-auto mb-4" />
+           <div className="inline-block h-12 mb-6">
+             <img src="/logo-consulat-texte-blanc.png" alt="Le Consulat Honoraire de la République du Congo au Bénin" className="h-full w-auto object-contain" />
+           </div>
            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Le Consulat</h1>
            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-             {/* TODO : texte de présentation à valider avec le consulat */}
-             Découvrez les missions et l'organisation du Consulat Honoraire de la République du Congo au Bénin.
+             Découvrez les missions et l'organisation du Consulat Honoraire de la République du Congo au Bénin,
+             au service de la communauté congolaise au Bénin.
            </p>
         </div>
       </div>
 
-      {/*
-        TODO : le contenu ci-dessous (mission/vision/valeurs, "histoire" du président,
-        équipe) est encore celui d'une association de jeunesse (AJDCB) et doit être
-        réécrit pour coller aux pages "Le Consulat" (missions, organisation) et
-        "Le Consul Honoraire" (biographie, vision de Dr. Fidèle Elenga) du sitemap.
-        Non réécrit ici pour éviter d'inventer du contenu officiel non validé.
-      */}
       <div className="container mx-auto px-4 md:px-6 py-24">
         {/* Mission Vision Values - Modern Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32 -mt-32 relative z-20">
           {[
-            { title: "Vision", desc: "Faire de la diaspora congolaise au Bénin un modèle d'unité, de solidarité et d'intégration réussie.", color: "bg-brand-green-600", text: "text-white" },
-            { title: "Mission", desc: "Fédérer les jeunes Congolais du Bénin, favoriser leur épanouissement et valoriser leurs talents.", color: "bg-white", text: "text-slate-900" },
-            { title: "Valeurs", desc: "Unité, Solidarité, Réflexion et Action.", color: "bg-brand-gold-400", text: "text-brand-green-950" }
+            { title: "Vision", desc: "Faire du Consulat un pont de confiance entre la République du Congo et sa diaspora, au service d'une communauté congolaise unie et bien intégrée au Bénin.", color: "bg-brand-green-600", text: "text-white" },
+            { title: "Mission", desc: "Accompagner les ressortissants congolais du Bénin dans leurs démarches consulaires et représenter les intérêts de la République du Congo.", color: "bg-white", text: "text-slate-900" },
+            { title: "Valeurs", desc: "Service, Intégrité, Proximité et Solidarité.", color: "bg-brand-gold-400", text: "text-brand-green-950" }
           ].map((card, i) => (
             <motion.div
               key={i}
@@ -67,35 +61,20 @@ export function About() {
           ))}
         </div>
 
-        {/* Story Section */}
-        <div className="max-w-4xl mx-auto mb-32">
-          <div className="flex gap-4 mb-8">
-            <span className="text-8xl font-serif text-brand-green-100 leading-none -mt-8">"</span>
-            <p className="text-2xl md:text-3xl font-light text-slate-800 leading-relaxed text-center">
-              {/* TODO : citation à remplacer par un contenu validé (mot du Consul, vision) */}
-              Une conviction simple guide son action : <span className="font-bold text-brand-green-600">une communauté organisée</span> est une force de transformation irrésistible.
-            </p>
+        {/* Statement Section */}
+        <div className="max-w-4xl mx-auto mb-32 text-center">
+          <p className="text-2xl md:text-3xl font-light text-slate-800 leading-relaxed mb-8">
+            Une conviction guide son action : <span className="font-bold text-brand-green-600">une communauté organisée</span> et bien accompagnée est une force pour ses membres comme pour ses deux pays.
+          </p>
+          <div>
+            <div className="font-bold text-slate-900">Dr. Fidèle Elenga</div>
+            <div className="text-sm text-slate-500 uppercase tracking-widest">Consul Honoraire de la République du Congo au Bénin</div>
           </div>
-          {president && (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-200 rounded-full mx-auto mb-4 overflow-hidden">
-                {president.photo_url ? (
-                  <Zoomable src={president.photo_url} alt={president.nom_complet} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-500 font-bold">
-                    {president.prenom[0]}{president.nom[0]}
-                  </div>
-                )}
-              </div>
-              <div className="font-bold text-slate-900">{president.nom_complet}</div>
-              <div className="text-sm text-slate-500 uppercase tracking-widest">{president.poste} du Consulat</div>
-            </div>
-          )}
         </div>
 
         {/* Team Grid */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Bureau Exécutif National</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">L'équipe du Consulat</h2>
 
           {loading && (
             <div className="flex justify-center py-12 text-slate-400">

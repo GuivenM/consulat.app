@@ -31,10 +31,13 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-4">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-white rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-black/20 p-1">
+              <div className="w-10 h-10 flex items-center justify-center">
                 <img src="/logo-consulat-mark.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
               </div>
-              <span className="font-bold text-2xl text-white tracking-tight">Consulat</span>
+              <div className="h-9 hidden sm:block">
+                <img src="/logo-consulat-texte-blanc.png" alt="Le Consulat Honoraire de la République du Congo au Bénin" className="h-full w-auto object-contain" />
+              </div>
+              <span className="font-bold text-2xl text-white tracking-tight sm:hidden">Consulat</span>
             </Link>
             <p className="text-slate-500 mb-8 leading-relaxed max-w-sm">
               Le Consulat Honoraire de la République du Congo au Bénin. <br/>
