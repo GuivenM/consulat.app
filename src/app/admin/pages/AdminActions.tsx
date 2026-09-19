@@ -230,7 +230,7 @@ export function AdminActions() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Actions</h1>
           <p className="text-slate-500 text-sm mt-0.5">
-            Projets et réalisations de l'AJDCB, par commission.
+            Projets et réalisations, par catégorie.
           </p>
         </div>
         {canWrite && (

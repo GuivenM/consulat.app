@@ -1,9 +1,9 @@
-// Client HTTP léger pour l'API AJDCB (Laravel + Sanctum, auth par token Bearer).
+// Client HTTP léger pour l'API Consulat (Laravel + Sanctum, auth par token Bearer).
 // L'URL de base vient de VITE_API_URL (voir .env.example). En dev, elle pointe
 // généralement vers http://localhost:8000/api.
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8000/api';
-const TOKEN_KEY = 'ajdcb_admin_token';
+const TOKEN_KEY = 'consulat_admin_token';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);

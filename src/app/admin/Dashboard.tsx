@@ -125,7 +125,7 @@ export function Dashboard() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Tableau de bord</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Bonjour {user?.prenom}, voici l'activité de l'AJDCB.</p>
+          <p className="text-slate-500 text-sm mt-0.5">Bonjour {user?.prenom}, voici l'activité du consulat.</p>
         </div>
         <span className="text-xs text-slate-400 hidden sm:block">
           {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}

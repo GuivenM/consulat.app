@@ -119,46 +119,48 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /*
-   * Palette de marque AJDCB, extraite du logo (poignée de main bordeaux,
-   * soleil doré, texte vert forêt). Utilisée à la place de emerald/amber
-   * dans tout le site : bg-brand-green-600, text-brand-gold-500,
-   * border-brand-red-700, etc.
+   * Palette de marque Consulat, basée sur les couleurs du drapeau béninois
+   * présentes dans le logo fourni (vert #009739, jaune #FFD100, rouge #EF3340).
+   * Utilisée à la place de emerald/amber dans tout le site :
+   * bg-brand-green-600, text-brand-gold-500, border-brand-red-700, etc.
+   * TODO : le "500" est la couleur exacte du drapeau ; à ajuster si le
+   * consulat fournit une charte graphique plus précise (Pantone officiels).
    */
-  --color-brand-green-50: #f6f9f6;
-  --color-brand-green-100: #e9f1eb;
-  --color-brand-green-200: #cde5d2;
-  --color-brand-green-300: #a8d2b1;
-  --color-brand-green-400: #79b986;
-  --color-brand-green-500: #509a60;
-  --color-brand-green-600: #3f794b;
-  --color-brand-green-700: #355f3e;
-  --color-brand-green-800: #2c4f33;
-  --color-brand-green-900: #233e28;
-  --color-brand-green-950: #16271a;
+  --color-brand-green-50: #f2faf5;
+  --color-brand-green-100: #e0f3e7;
+  --color-brand-green-200: #bde4cc;
+  --color-brand-green-300: #94d3ac;
+  --color-brand-green-400: #52b878;
+  --color-brand-green-500: #009739;
+  --color-brand-green-600: #008231;
+  --color-brand-green-700: #006d29;
+  --color-brand-green-800: #005821;
+  --color-brand-green-900: #004219;
+  --color-brand-green-950: #002d11;
 
-  --color-brand-gold-50: #faf9f4;
-  --color-brand-gold-100: #f4f0e6;
-  --color-brand-gold-200: #efe1c3;
-  --color-brand-gold-300: #e2cb97;
-  --color-brand-gold-400: #d3af5f;
-  --color-brand-gold-500: #b88f33;
-  --color-brand-gold-600: #907028;
-  --color-brand-gold-700: #705924;
-  --color-brand-gold-800: #5d491e;
-  --color-brand-gold-900: #493a18;
-  --color-brand-gold-950: #2e250f;
+  --color-brand-gold-50: #fffdf2;
+  --color-brand-gold-100: #fff9e0;
+  --color-brand-gold-200: #fff3bd;
+  --color-brand-gold-300: #ffec94;
+  --color-brand-gold-400: #ffe052;
+  --color-brand-gold-500: #ffd100;
+  --color-brand-gold-600: #dbb400;
+  --color-brand-gold-700: #b89600;
+  --color-brand-gold-800: #947900;
+  --color-brand-gold-900: #705c00;
+  --color-brand-gold-950: #4d3f00;
 
-  --color-brand-red-50: #faf5f4;
-  --color-brand-red-100: #f4e8e6;
-  --color-brand-red-200: #eec9c4;
-  --color-brand-red-300: #e1a199;
-  --color-brand-red-400: #d16e61;
-  --color-brand-red-500: #b54435;
-  --color-brand-red-600: #8e352a;
-  --color-brand-red-700: #6e2e26;
-  --color-brand-red-800: #5b261f;
-  --color-brand-red-900: #481e19;
-  --color-brand-red-950: #2e1310;
+  --color-brand-red-50: #fef5f5;
+  --color-brand-red-100: #fde7e8;
+  --color-brand-red-200: #fbcacd;
+  --color-brand-red-300: #f8a9af;
+  --color-brand-red-400: #f4747d;
+  --color-brand-red-500: #ef3340;
+  --color-brand-red-600: #ce2c37;
+  --color-brand-red-700: #ac252e;
+  --color-brand-red-800: #8b1e25;
+  --color-brand-red-900: #69161c;
+  --color-brand-red-950: #480f13;
 }
 
 @layer base {

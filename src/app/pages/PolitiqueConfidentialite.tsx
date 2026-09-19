@@ -21,38 +21,40 @@ export function PolitiqueConfidentialite() {
         <h1 className="text-4xl font-bold text-slate-900 mb-8">Politique de confidentialité</h1>
 
         <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-10">
+          {/* TODO : adresse et détails à confirmer avec le consulat */}
           <Section title="Responsable du traitement">
             <p>
-              L'Association des Jeunes de la Diaspora Congolaise au Bénin (AJDCB), siège au 3<sup>ème</sup> Arrondissement
-              de Cotonou (Akpakpa / Ayélawadjè), est responsable du traitement des données personnelles collectées via ce site.
+              Le Consulat Honoraire de la République du Congo au Bénin, à Cotonou, est responsable du traitement des données
+              personnelles collectées via ce site.
             </p>
           </Section>
 
           <Section title="Données que nous collectons">
-            <p>Selon les formulaires que vous utilisez, nous pouvons collecter :</p>
+            <p>Selon les démarches que vous effectuez, nous pouvons collecter :</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Nom, prénom, email, téléphone (formulaire de contact, adhésion) ;</li>
-              <li>Informations complémentaires liées à votre profil de membre (niveau d'étude, motivation, compétences, disponibilité, etc.) si vous soumettez une demande d'adhésion ;</li>
-              <li>Adresse email (inscription à la newsletter) ;</li>
-              <li>Identifiants de connexion, si vous créez un compte sur l'espace membre ;</li>
-              <li>Informations nécessaires au traitement d'un paiement de cotisation.</li>
+              <li>Nom, prénom, email, téléphone (formulaire de contact, inscription au registre consulaire) ;</li>
+              <li>Données du registre consulaire : état civil, localisation (jusqu'au niveau quartier), copie de pièce d'identité ou de passeport ;</li>
+              <li>Documents fournis à l'appui d'une demande de carte consulaire ou de laissez-passer (photos d'identité, copie de pièces) ;</li>
+              <li>Identifiants de connexion, si vous créez un compte sur l'espace consulaire ;</li>
+              <li>Informations nécessaires au traitement du paiement des frais de dossier.</li>
             </ul>
           </Section>
 
+          {/* TODO : prestataire de paiement pas encore choisi pour les frais de dossier (carte consulaire, laissez-passer) */}
           <Section title="Paiement en ligne">
             <p>
-              Les paiements de cotisation sont traités par notre prestataire <strong>FedaPay</strong>. L'AJDCB ne collecte ni ne
-              conserve aucune donnée de carte bancaire ou de moyen de paiement — celles-ci transitent directement entre vous et
-              FedaPay, selon sa propre politique de confidentialité.
+              Le paiement des frais de dossier (carte consulaire, laissez-passer) sera traité par un prestataire de paiement
+              tiers. Le consulat ne collecte ni ne conserve aucune donnée de carte bancaire ou de moyen de paiement — celles-ci
+              transiteront directement entre vous et ce prestataire, selon sa propre politique de confidentialité.
             </p>
           </Section>
 
           <Section title="Pourquoi nous utilisons ces données">
             <ul className="list-disc pl-5 space-y-1">
-              <li>Traiter votre demande d'adhésion ou de contact ;</li>
-              <li>Gérer le registre des membres et le suivi des cotisations ;</li>
-              <li>Vous envoyer notre newsletter si vous y êtes inscrit(e) ;</li>
-              <li>Vous donner accès à l'espace membre ;</li>
+              <li>Traiter votre inscription au registre consulaire et vos demandes de carte consulaire ou de laissez-passer ;</li>
+              <li>Vous informer de l'état d'avancement de votre dossier (dossier prêt, changement de statut) ;</li>
+              <li>Répondre à vos demandes de contact ;</li>
+              <li>Vous donner accès à l'espace consulaire ;</li>
               <li>Assurer le bon fonctionnement et la sécurité du site.</li>
             </ul>
             <p>Nous ne vendons ni ne louons vos données personnelles à des tiers, et ne les partageons qu'avec les prestataires strictement nécessaires au fonctionnement du site (hébergement, paiement).</p>
@@ -60,10 +62,9 @@ export function PolitiqueConfidentialite() {
 
           <Section title="Durée de conservation">
             <p>
-              Vos données sont conservées pour la durée nécessaire aux finalités décrites ci-dessus (gestion de votre adhésion,
-              relation avec l'association), et au maximum jusqu'à votre demande de suppression ou votre désinscription. Une durée
-              de conservation précise par type de donnée sera publiée sur cette page dès qu'elle aura été formellement fixée par
-              le Bureau Exécutif.
+              Vos données sont conservées pour la durée nécessaire aux finalités décrites ci-dessus (gestion de votre inscription
+              au registre et de vos demandes), et au maximum jusqu'à votre demande de suppression. Une durée de conservation
+              précise par type de donnée sera publiée sur cette page dès qu'elle aura été formellement fixée par le consulat.
             </p>
           </Section>
 
@@ -79,7 +80,7 @@ export function PolitiqueConfidentialite() {
             <p>
               Conformément à la loi n° 2017-20 portant Code du numérique en République du Bénin, vous disposez d'un droit d'accès,
               de rectification, d'opposition et de suppression de vos données personnelles. Pour l'exercer, contactez-nous à{' '}
-              <a href="mailto:contact@ajdcb.org" className="text-brand-green-600 hover:underline">contact@ajdcb.org</a>.
+              <a href="mailto:contact@consulat-congo-benin.org" className="text-brand-green-600 hover:underline">contact@consulat-congo-benin.org</a>.
             </p>
             <p>
               Vous pouvez également adresser une réclamation à l'Autorité de Protection des Données Personnelles (APDP) du Bénin,
@@ -90,7 +91,7 @@ export function PolitiqueConfidentialite() {
           <Section title="Contact">
             <p className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-brand-green-600 shrink-0" />
-              <a href="mailto:contact@ajdcb.org" className="text-brand-green-600 hover:underline">contact@ajdcb.org</a>
+              <a href="mailto:contact@consulat-congo-benin.org" className="text-brand-green-600 hover:underline">contact@consulat-congo-benin.org</a>
               {' '}— ou via notre <Link to="/contact" className="text-brand-green-600 hover:underline">page de contact</Link>.
             </p>
           </Section>

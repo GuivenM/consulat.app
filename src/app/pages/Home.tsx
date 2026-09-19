@@ -128,10 +128,10 @@ export function Home() {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="flex flex-col sm:flex-row gap-6 items-start"
             >
-              <Link to="/join" className="group relative px-8 py-4 bg-brand-green-600 text-white font-bold text-lg rounded-full overflow-hidden shadow-2xl transition-all hover:scale-105 active:scale-95">
+              <Link to="/membre/login" className="group relative px-8 py-4 bg-brand-green-600 text-white font-bold text-lg rounded-full overflow-hidden shadow-2xl transition-all hover:scale-105 active:scale-95">
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 <span className="relative flex items-center gap-2">
-                  Rejoindre l'AJDCB <ArrowRight size={20} />
+                  Accéder à l'espace consulaire <ArrowRight size={20} />
                 </span>
               </Link>
               <Link to="/about" className="flex items-center gap-4 px-8 py-4 text-white font-medium hover:text-brand-green-300 transition-colors group">
@@ -193,7 +193,7 @@ export function Home() {
                <div className="absolute -inset-4 bg-gradient-to-tr from-brand-green-100 to-brand-gold-100 rounded-[2rem] rotate-3 opacity-70"></div>
                <ImageWithFallback 
                  src="/us.jpeg" 
-                 alt="AJDCB Community" 
+                 alt="Communauté congolaise au Bénin" 
                  className="relative rounded-[1.5rem] shadow-2xl w-full object-cover aspect-[4/3]"
                />
                <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-xl border border-slate-100 hidden md:block">
@@ -213,7 +213,10 @@ export function Home() {
                 Une organisation apolitique au service de l'<span className="text-brand-gold-500">Excellence</span>.
               </h3>
               <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                Créée par de jeunes Congolais établis au Bénin, l’AJDCB est plus qu'une association : c'est un écosystème de croissance.
+                {/* TODO : cette section "Qui sommes-nous" et les stats (membres actifs, partenaires...)
+                    sont encore celles d'une association et doivent être réécrites pour la page
+                    Accueil du consulat (hero, mot du Consul, bloc "nos services"). */}
+                Porté par le Consulat Honoraire de la République du Congo au Bénin, ce site est un espace de services et d'information pour la communauté congolaise.
               </p>
               <p className="text-lg text-slate-600 mb-10 leading-relaxed">
                 Nous offrons un cadre structuré où chaque membre peut s'intégrer, se former et contribuer au rayonnement de notre culture et de nos compétences.
@@ -361,8 +364,8 @@ export function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/join" className="px-10 py-5 bg-white text-brand-green-900 font-bold text-lg rounded-full shadow-2xl hover:bg-brand-green-50 hover:scale-105 transition-all duration-300">
-                Devenir membre
+              <Link to="/membre/login" className="px-10 py-5 bg-white text-brand-green-900 font-bold text-lg rounded-full shadow-2xl hover:bg-brand-green-50 hover:scale-105 transition-all duration-300">
+                S'inscrire au registre
               </Link>
               <Link to="/contact" className="px-10 py-5 bg-transparent border border-white/30 text-white font-bold text-lg rounded-full hover:bg-white/10 transition-all duration-300">
                 Nous contacter

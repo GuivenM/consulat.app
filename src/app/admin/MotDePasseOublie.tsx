@@ -33,10 +33,10 @@ export function MotDePasseOublie() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 p-2">
-            <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+            <img src="/logo-consulat-mark.png" alt="Consulat" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-white text-2xl font-bold text-center">Mot de passe oublié</h1>
-          <p className="text-slate-400 text-sm mt-1 text-center">Espace administration AJDCB</p>
+          <p className="text-slate-400 text-sm mt-1 text-center">Espace administration Consulat</p>
         </div>
 
         <div className="bg-white rounded-3xl p-8 shadow-2xl border border-white/10">
@@ -69,7 +69,7 @@ export function MotDePasseOublie() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="vous@ajdcb.org"
+                      placeholder="vous@consulat-congo-benin.org"
                       className="pl-9"
                     />
                   </div>

@@ -67,7 +67,7 @@ export function MemberEvenements() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900 mb-1">Événements</h1>
-      <p className="text-slate-500 mb-6">Événements à venir de l'AJDCB.</p>
+      <p className="text-slate-500 mb-6">Événements à venir du consulat.</p>
 
       {evenements.length === 0 && (
         <p className="text-slate-400 text-sm">Aucun événement à venir pour le moment.</p>

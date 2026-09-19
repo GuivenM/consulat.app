@@ -270,7 +270,7 @@ export function AdminMembres() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Membres</h1>
           <p className="text-slate-500 text-sm mt-0.5">
-            Bureau exécutif, commissions et membres actifs de l'AJDCB.
+            Registre des ressortissants inscrits.
           </p>
         </div>
         {canWrite && (

@@ -33,10 +33,10 @@ export function MotDePasseOublieMembre() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-4 p-2 shadow-sm">
-            <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+            <img src="/logo-consulat-mark.png" alt="Consulat" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-slate-900 text-2xl font-bold text-center">Mot de passe oublié</h1>
-          <p className="text-slate-500 text-sm mt-1 text-center">Espace membre AJDCB</p>
+          <p className="text-slate-500 text-sm mt-1 text-center">Espace consulaire</p>
         </div>
 
         <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">

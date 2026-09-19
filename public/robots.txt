@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /member
+Disallow: /membre
 
-Sitemap: https://ajdcb.org/sitemap.xml
+# TODO : remplacer par le vrai nom de domaine du consulat une fois connu
+Sitemap: https://consulat-congo-benin.example/sitemap.xml

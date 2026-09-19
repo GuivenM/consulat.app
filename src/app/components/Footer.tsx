@@ -32,17 +32,19 @@ export function Footer() {
           <div className="lg:col-span-4">
             <Link to="/" className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-white rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-black/20 p-1">
-                <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+                <img src="/logo-consulat.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
               </div>
-              <span className="font-bold text-2xl text-white tracking-tight">AJDCB</span>
+              <span className="font-bold text-2xl text-white tracking-tight">Consulat</span>
             </Link>
             <p className="text-slate-500 mb-8 leading-relaxed max-w-sm">
-              L’Association des Jeunes de la Diaspora Congolaise au Bénin. <br/>
-              Fédérer, intégrer et valoriser la jeunesse congolaise pour un avenir d'excellence.
+              Le Consulat Honoraire de la République du Congo au Bénin. <br/>
+              {/* TODO : texte de présentation officiel à valider avec le consulat */}
+              Registre consulaire, cartes consulaires, laissez-passer et services d'information pour la communauté congolaise au Bénin.
             </p>
             <div className="flex gap-4">
+              {/* TODO : remplacer par les vrais comptes sociaux du consulat une fois connus */}
               {[
-                { Icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61582856854028', label: 'Facebook' },
+                { Icon: Facebook, href: null, label: 'Facebook (bientôt)' },
                 { Icon: Instagram, href: null, label: 'Instagram (bientôt)' },
                 { Icon: Youtube, href: null, label: 'YouTube (bientôt)' },
               ].map(({ Icon, href, label }, i) =>
@@ -77,7 +79,7 @@ export function Footer() {
             <ul className="space-y-4">
               {[
                 { label: 'Accueil', to: '/' },
-                { label: 'L’AJDCB', to: '/about' },
+                { label: 'Le Consulat', to: '/about' },
                 { label: 'Nos Actions', to: '/actions' },
                 { label: 'Guide', to: '/guide' },
                 { label: 'Actualités', to: '/news' },
@@ -99,8 +101,6 @@ export function Footer() {
               {[
                 { label: 'Mentions légales', to: '/mentions-legales' },
                 { label: 'Politique de confidentialité', to: '/confidentialite' },
-                { label: 'Statuts (PDF)', to: '/documents/Statuts_AJDCB.pdf', external: true },
-                { label: 'Règlement (PDF)', to: '/documents/Reglement_Interieur_AJDCB.pdf', external: true },
               ].map(({ label, to, external }, i) => (
                 <li key={i}>
                   {external ? (
@@ -153,20 +153,20 @@ export function Footer() {
               </form>
             )}
             
+            {/* TODO : adresse et email officiels du consulat à confirmer */}
             <div className="space-y-3 text-sm">
                <div className="flex items-center gap-3">
-                 <MapPin size={16} className="text-brand-green-600" /> Akpakpa / Ayélawadjè, Cotonou
+                 <MapPin size={16} className="text-brand-green-600" /> Cotonou, Bénin
                </div>
                <div className="flex items-center gap-3">
-                 <Mail size={16} className="text-brand-green-600" /> contact@ajdcb.org
+                 <Mail size={16} className="text-brand-green-600" /> contact@consulat-congo-benin.org
                </div>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-          <p>&copy; {new Date().getFullYear()} AJDCB. Tous droits réservés.</p>
-          <p>Designed with excellence for the Youth.</p>
+          <p>&copy; {new Date().getFullYear()} Consulat Honoraire de la République du Congo au Bénin. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

@@ -30,14 +30,22 @@ export function About() {
       <div className="bg-slate-900 pt-32 pb-20 rounded-b-[3rem] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-green-900/50 to-slate-900/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-           <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white p-2 shadow-xl" />
-           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">L’AJDCB</h1>
+           <img src="/logo-consulat.png" alt="Consulat Honoraire du Congo au Bénin" className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white p-2 shadow-xl" />
+           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Le Consulat</h1>
            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-             Découvrez l'histoire, la vision et l'équipe qui porte les ambitions de la jeunesse congolaise au Bénin.
+             {/* TODO : texte de présentation à valider avec le consulat */}
+             Découvrez les missions et l'organisation du Consulat Honoraire de la République du Congo au Bénin.
            </p>
         </div>
       </div>
 
+      {/*
+        TODO : le contenu ci-dessous (mission/vision/valeurs, "histoire" du président,
+        équipe) est encore celui d'une association de jeunesse (AJDCB) et doit être
+        réécrit pour coller aux pages "Le Consulat" (missions, organisation) et
+        "Le Consul Honoraire" (biographie, vision de Dr. Fidèle Elenga) du sitemap.
+        Non réécrit ici pour éviter d'inventer du contenu officiel non validé.
+      */}
       <div className="container mx-auto px-4 md:px-6 py-24">
         {/* Mission Vision Values - Modern Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32 -mt-32 relative z-20">
@@ -64,7 +72,8 @@ export function About() {
           <div className="flex gap-4 mb-8">
             <span className="text-8xl font-serif text-brand-green-100 leading-none -mt-8">"</span>
             <p className="text-2xl md:text-3xl font-light text-slate-800 leading-relaxed text-center">
-              L’AJDCB est née d’une conviction simple : <span className="font-bold text-brand-green-600">une jeunesse organisée</span> est une force de transformation irrésistible.
+              {/* TODO : citation à remplacer par un contenu validé (mot du Consul, vision) */}
+              Une conviction simple guide son action : <span className="font-bold text-brand-green-600">une communauté organisée</span> est une force de transformation irrésistible.
             </p>
           </div>
           {president && (
@@ -79,7 +88,7 @@ export function About() {
                 )}
               </div>
               <div className="font-bold text-slate-900">{president.nom_complet}</div>
-              <div className="text-sm text-slate-500 uppercase tracking-widest">{president.poste} de l'AJDCB</div>
+              <div className="text-sm text-slate-500 uppercase tracking-widest">{president.poste} du Consulat</div>
             </div>
           )}
         </div>

@@ -237,7 +237,7 @@ export function AdminPartenaires() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Partenaires</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Institutions, ONG et entreprises partenaires de l'AJDCB.</p>
+          <p className="text-slate-500 text-sm mt-0.5">Institutions, ONG et entreprises partenaires.</p>
         </div>
         {canWrite && (
           <Button onClick={openCreate} className="bg-brand-green-600 hover:bg-brand-green-700">

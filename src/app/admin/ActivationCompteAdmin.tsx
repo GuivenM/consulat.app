@@ -65,7 +65,7 @@ export function ActivationCompteAdmin() {
           </div>
           <h1 className="text-slate-900 text-2xl font-bold text-center">Activez votre accès administrateur</h1>
           <p className="text-slate-500 text-sm mt-1 text-center">
-            Choisissez votre mot de passe pour finaliser votre accès à l'espace admin AJDCB.
+            Choisissez votre mot de passe pour finaliser votre accès à l'espace admin du consulat.
           </p>
         </div>
 

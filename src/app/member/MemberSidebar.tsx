@@ -1,12 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Wallet, CalendarDays, UserCircle, AlertTriangle } from 'lucide-react';
+import { Home, CalendarDays, UserCircle } from 'lucide-react';
 import { useMemberAuth } from '../context/MemberAuthContext';
 import { cn } from '../components/Navbar';
 
 const navItems = [
   { label: 'Accueil', path: '/membre', icon: Home, end: true },
-  { label: 'Mes cotisations', path: '/membre/cotisations', icon: Wallet },
   { label: 'Événements', path: '/membre/evenements', icon: CalendarDays },
   { label: 'Mon profil', path: '/membre/profil', icon: UserCircle },
 ];
@@ -35,12 +34,6 @@ export function MemberSidebar() {
           <p className="font-bold text-slate-900 mt-2">{membre.nom_complet}</p>
           {(membre.poste || membre.commission) && (
             <p className="text-sm text-slate-500">{membre.poste || membre.commission}</p>
-          )}
-
-          {membre.en_attente_paiement && (
-            <p className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5 mt-3">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> Cotisation initiale en attente
-            </p>
           )}
         </div>
       </NavLink>

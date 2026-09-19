@@ -65,7 +65,7 @@ export function ActivationCompte() {
           </div>
           <h1 className="text-slate-900 text-2xl font-bold text-center">Activez votre espace membre</h1>
           <p className="text-slate-500 text-sm mt-1 text-center">
-            Bienvenue à l'AJDCB ! Choisissez votre mot de passe pour finaliser votre compte.
+            Bienvenue au Consulat ! Choisissez votre mot de passe pour finaliser votre compte.
           </p>
         </div>
 

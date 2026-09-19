@@ -45,7 +45,7 @@ export function News() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Journal</h1>
-            <p className="text-xl text-slate-500">L'actualité de l'AJDCB et de la communauté.</p>
+            <p className="text-xl text-slate-500">L'actualité du consulat et de la communauté.</p>
           </div>
 
           <div className="flex gap-2 mt-6 md:mt-0 flex-wrap">

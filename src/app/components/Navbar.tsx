@@ -28,13 +28,17 @@ export function Navbar() {
 
   const navLinks = [
     { name: 'Accueil', path: '/' },
-    { name: 'L’AJDCB', path: '/about' },
+    { name: 'Le Consulat', path: '/about' },
     { name: 'Nos Actions', path: '/actions' },
     { name: 'Guide', path: '/guide' },
     { name: 'Actualités', path: '/news' },
-    { name: 'Adhésion', path: '/join' },
     { name: 'Contacts', path: '/contact' },
   ];
+  // Note : cette liste correspond encore à l'ancienne arborescence AJDCB.
+  // Elle doit être remplacée par les 11 pages du sitemap du consulat
+  // (Accueil, Le Consulat, Le Consul Honoraire, Services consulaires,
+  // Congo-Bénin & Diplomatie économique, Culture & Patrimoine, Diaspora,
+  // Actualités & Médiathèque, Agenda, FAQ, Contact) dans une prochaine passe.
 
   return (
     <>
@@ -57,20 +61,20 @@ export function Navbar() {
                 "w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:rotate-6 bg-white p-1.5",
                 scrolled ? "ring-1 ring-slate-100" : "ring-1 ring-white/40"
               )}>
-                <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+                <img src="/logo-consulat.png" alt="Consulat Honoraire du Congo au Bénin" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className={cn(
                   "font-black text-xl leading-none tracking-tight transition-colors",
                   scrolled ? "text-slate-900" : "text-white"
                 )}>
-                  AJDCB
+                  Consulat
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold uppercase tracking-widest mt-0.5 transition-colors",
                   scrolled ? "text-brand-green-600" : "text-white/80"
                 )}>
-                  Bénin
+                  Congo · Bénin
                 </span>
               </div>
             </Link>
@@ -92,7 +96,7 @@ export function Navbar() {
                 </NavLink>
               ))}
               <Link
-                to="/join"
+                to="/membre/login"
                 className={cn(
                   "ml-4 px-6 py-2.5 rounded-full text-sm font-bold shadow-lg transition-all transform hover:-translate-y-0.5 hover:shadow-xl active:scale-95",
                   scrolled 
@@ -100,7 +104,7 @@ export function Navbar() {
                     : "bg-white text-brand-green-900 hover:bg-gray-100"
                 )}
               >
-                Rejoindre
+                Espace consulaire
               </Link>
             </div>
 
@@ -154,8 +158,8 @@ export function Navbar() {
                 transition={{ delay: 0.5 }}
                 className="mt-8 grid grid-cols-2 gap-4"
               >
-                 <Link to="/join" className="py-4 bg-brand-green-600 text-white text-center font-bold rounded-2xl shadow-lg active:scale-95 transition-transform">
-                   Adhérer
+                 <Link to="/membre/login" className="py-4 bg-brand-green-600 text-white text-center font-bold rounded-2xl shadow-lg active:scale-95 transition-transform">
+                   Espace consulaire
                  </Link>
                  <Link to="/contact" className="py-4 bg-slate-100 text-slate-900 text-center font-bold rounded-2xl active:scale-95 transition-transform">
                    Contact

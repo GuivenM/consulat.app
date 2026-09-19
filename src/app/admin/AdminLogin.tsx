@@ -42,10 +42,10 @@ export function AdminLogin() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 p-2">
-            <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+            <img src="/logo-consulat-mark.png" alt="Consulat" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-white text-2xl font-bold">Espace Administration</h1>
-          <p className="text-slate-400 text-sm mt-1">AJDCB — Association des Jeunes de la Diaspora Congolaise au Bénin</p>
+          <p className="text-slate-400 text-sm mt-1">Consulat Honoraire de la République du Congo au Bénin</p>
         </div>
 
         <form
@@ -70,7 +70,7 @@ export function AdminLogin() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="vous@ajdcb.org"
+                  placeholder="vous@consulat-congo-benin.org"
                   className="pl-9"
                 />
               </div>
@@ -123,7 +123,7 @@ export function AdminLogin() {
         </form>
 
         <p className="text-center text-slate-500 text-xs mt-6">
-          Accès réservé au Bureau Exécutif et aux modérateurs de l'AJDCB.
+          Accès réservé au personnel autorisé du consulat.
         </p>
       </div>
     </div>

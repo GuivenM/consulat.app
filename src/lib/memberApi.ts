@@ -5,7 +5,7 @@
 // ferait que se connecter à l'un déconnecterait l'autre.
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8000/api';
-const TOKEN_KEY = 'ajdcb_membre_token';
+const TOKEN_KEY = 'consulat_membre_token';
 
 export function getMembreToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);

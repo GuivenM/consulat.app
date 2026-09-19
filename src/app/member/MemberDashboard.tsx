@@ -64,7 +64,7 @@ export function MemberDashboard() {
       <div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-5">
           <h1 className="text-lg font-bold text-slate-900">Bonjour {membre?.prenom} 👋</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Voici les dernières actualités de l'AJDCB.</p>
+          <p className="text-slate-500 text-sm mt-0.5">Voici les dernières actualités du consulat.</p>
         </div>
 
         {loadingFeed && (

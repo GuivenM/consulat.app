@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  UserPlus,
   Mail,
   Newspaper,
   Activity,
   Users,
-  Wallet,
   CalendarDays,
   BookOpen,
   Handshake,
@@ -35,14 +33,10 @@ const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'moderateur'];
 
 const navItems: NavItem[] = [
   { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: ['super_admin', 'admin', 'moderateur', 'tresorier'] },
-  { label: 'Adhésions', path: '/admin/adhesions', icon: UserPlus, roles: STAFF_ROLES },
   { label: 'Messages', path: '/admin/messages', icon: Mail, roles: STAFF_ROLES },
   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
   { label: 'Actions', path: '/admin/actions', icon: Activity, roles: STAFF_ROLES },
   { label: 'Membres', path: '/admin/membres', icon: Users, roles: STAFF_ROLES },
-  // Cotisations : réservé aux rôles ayant besoin des données financières.
-  // Le moderateur ne le voit plus (il n'en a jamais eu l'usage), le tresorier l'a.
-  { label: 'Cotisations', path: '/admin/cotisations', icon: Wallet, roles: ['super_admin', 'admin', 'tresorier'] },
   { label: 'Événements', path: '/admin/evenements', icon: CalendarDays, roles: STAFF_ROLES },
   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },
@@ -54,12 +48,11 @@ export function AdminLayout() {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { adhesionsEnAttente, messagesNonLus, loading, items, total } = useAdminNotifications();
+  const { messagesNonLus, loading, items, total } = useAdminNotifications();
 
   const visibleNavItems = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
   const navBadges: Record<string, number> = {
-    '/admin/adhesions': adhesionsEnAttente,
     '/admin/messages': messagesNonLus,
   };
 
@@ -72,10 +65,10 @@ export function AdminLayout() {
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-5 py-6">
         <div className="w-9 h-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center p-1.5 shrink-0">
-          <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+          <img src="/logo-consulat-mark.png" alt="Consulat" className="w-full h-full object-contain" />
         </div>
         <div className="min-w-0">
-          <p className="text-white font-bold text-sm leading-tight truncate">AJDCB Admin</p>
+          <p className="text-white font-bold text-sm leading-tight truncate">Consulat Admin</p>
           <p className="text-slate-400 text-xs truncate">Espace de gestion</p>
         </div>
       </div>
@@ -173,7 +166,7 @@ export function AdminLayout() {
           <button onClick={() => setMobileOpen(true)} className="text-white">
             <Menu className="w-6 h-6" />
           </button>
-          <span className="text-white font-bold text-sm">AJDCB Admin</span>
+          <span className="text-white font-bold text-sm">Consulat Admin</span>
           <NotificationBell dark loading={loading} items={items} total={total} />
         </header>
 

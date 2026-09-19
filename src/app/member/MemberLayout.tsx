@@ -20,9 +20,9 @@ export function MemberLayout() {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/membre" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center p-1.5 shrink-0">
-              <img src="/logo-mark-ajdcb.png" alt="AJDCB" className="w-full h-full object-contain" />
+              <img src="/logo-consulat-mark.png" alt="Consulat" className="w-full h-full object-contain" />
             </div>
-            <span className="font-bold text-sm text-slate-900">Espace Membre AJDCB</span>
+            <span className="font-bold text-sm text-slate-900">Espace Consulaire</span>
           </Link>
 
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-600">

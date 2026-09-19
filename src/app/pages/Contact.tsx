@@ -56,14 +56,15 @@ export function Contact() {
               Parlons de <br/> <span className="text-brand-green-600">votre projet.</span>
             </motion.h1>
             <p className="text-xl text-slate-500 mb-12">
-              Que vous souhaitiez adhérer, devenir partenaire ou simplement poser une question, notre équipe est à votre écoute.
+              Que vous ayez une question sur nos services consulaires, souhaitiez devenir partenaire ou simplement nous contacter, notre équipe est à votre écoute.
             </p>
 
+            {/* TODO : coordonnées à remplacer par celles, réelles, du consulat (adresse, email, téléphone) */}
             <div className="space-y-8 mb-12">
               {[
-                { icon: <MapPin />, title: "Siège Social", desc: "3e Arrondissement de Cotonou (Akpakpa / Ayélawadjè)" },
-                { icon: <Mail />, title: "Email", desc: "contact@ajdcb.org" },
-                { icon: <Phone />, title: "Téléphone", desc: "+229 01 66 24 62 68 / +229 01 58 70 70 57" }
+                { icon: <MapPin />, title: "Adresse", desc: "Cotonou, Bénin" },
+                { icon: <Mail />, title: "Email", desc: "contact@consulat-congo-benin.org" },
+                { icon: <Phone />, title: "Téléphone", desc: "+229 00 00 00 00" }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-6">
                   <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-900">
