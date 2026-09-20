@@ -23,6 +23,9 @@ import { ProtectedRoute } from './admin/ProtectedRoute';
 import { Dashboard } from './admin/Dashboard';
 import { AdminMessages } from './admin/pages/AdminMessages';
 import { AdminMembres } from './admin/pages/AdminMembres';
+import { AdminRegistre } from './admin/pages/AdminRegistre';
+import { AdminConfiguration } from './admin/pages/AdminConfiguration';
+import { AdminCarte } from './admin/pages/AdminCarte';
 import { AdminEvenements } from './admin/pages/AdminEvenements';
 import { AdminActualites } from './admin/pages/AdminActualites';
 import { AdminGuide } from './admin/pages/AdminGuide';
@@ -79,6 +82,9 @@ export default function App() {
               <Route index element={<Dashboard />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="membres" element={<AdminMembres />} />
+              <Route path="registre" element={<AdminRegistre />} />
+              <Route path="configuration" element={<AdminConfiguration />} />
+              <Route path="carte" element={<AdminCarte />} />
               <Route path="evenements" element={<AdminEvenements />} />
               <Route path="actualites" element={<AdminActualites />} />
               <Route path="guide" element={<AdminGuide />} />

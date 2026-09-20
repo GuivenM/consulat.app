@@ -328,3 +328,101 @@ export interface Message {
   created_at: string;
   updated_at: string;
 }
+
+// ===== Registre consulaire (ressortissants) =====
+
+export type StatutRessortissant = 'actif' | 'inactif' | 'suspendu';
+
+export interface Ressortissant {
+  id: number;
+  numero_registre: string | null;
+  nom: string;
+  prenom: string;
+  nom_complet: string;
+  sexe: string | null;
+  photo_url: string | null;
+  telephone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  ville: string | null;
+  quartier: string | null;
+  statut: StatutRessortissant;
+  inscription_verifiee: boolean;
+  created_at: string;
+  // Champs additionnels renvoyés uniquement par la fiche détaillée (show)
+  date_naissance?: string | null;
+  lieu_naissance?: string | null;
+  nationalite?: string | null;
+  profession?: string | null;
+  situation_matrimoniale?: string | null;
+  type_piece?: string | null;
+  numero_piece?: string | null;
+  date_expiration_piece?: string | null;
+  adresse?: string | null;
+  commune?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  date_arrivee?: string | null;
+  contact_urgence_nom?: string | null;
+  contact_urgence_telephone?: string | null;
+  motif_inactivation?: string | null;
+  derniere_connexion?: string | null;
+  demandes?: RessortissantDemandeResume[];
+}
+
+export interface RessortissantDemandeResume {
+  id: number;
+  numero_dossier: string;
+  type: string;
+  statut: string;
+  statut_label: string;
+  date_depot: string | null;
+}
+
+// ===== Configuration : tarifs & pièces requises =====
+
+export type DelaiDemande = '3_jours' | '24h' | 'meme_jour';
+
+export interface Tarif {
+  id: number;
+  entity_id: number;
+  type_demande: string;
+  delai: DelaiDemande;
+  montant: number;
+  devise: string;
+  delai_heures: number | null;
+  est_actif: boolean;
+}
+
+export interface DocumentTypeRequis {
+  id: number;
+  entity_id: number;
+  type_demande: string;
+  code_document: string;
+  label: string;
+  aide: string | null;
+  ordre: number;
+  nombre_requis: number;
+  formats_acceptes: string;
+  taille_max_ko: number;
+  obligatoire: boolean;
+  est_actif: boolean;
+}
+
+// ===== Carte interactive (vue admin) =====
+
+export interface QuartierAgregat {
+  ville: string;
+  quartier: string;
+  total: number;
+}
+
+export interface PointCarte {
+  id: number;
+  nom_complet: string;
+  ville: string | null;
+  quartier: string | null;
+  statut: StatutRessortissant;
+  latitude: number;
+  longitude: number;
+}

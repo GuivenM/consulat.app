@@ -14,6 +14,9 @@ import {
   X,
   ShieldCheck,
   History,
+  BookUser,
+  Settings,
+  Map as MapIcon,
 } from 'lucide-react';
 import { useAuth, AdminRole } from '../context/AuthContext';
 import { cn } from '../components/Navbar';
@@ -37,6 +40,9 @@ const navItems: NavItem[] = [
   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
   { label: 'Actions', path: '/admin/actions', icon: Activity, roles: STAFF_ROLES },
   { label: 'Membres', path: '/admin/membres', icon: Users, roles: STAFF_ROLES },
+  { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
+  { label: 'Carte', path: '/admin/carte', icon: MapIcon, roles: ['super_admin', 'admin', 'agent'] },
+  { label: 'Configuration', path: '/admin/configuration', icon: Settings, roles: ['super_admin', 'admin'] },
   { label: 'Événements', path: '/admin/evenements', icon: CalendarDays, roles: STAFF_ROLES },
   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },

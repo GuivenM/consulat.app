@@ -1,0 +1,1207 @@
+diff --git a/package-lock.json b/package-lock.json
+index d407219..dc00f97 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -46,6 +46,7 @@
+         "date-fns": "3.6.0",
+         "embla-carousel-react": "8.6.0",
+         "input-otp": "1.4.2",
++        "leaflet": "^1.9.4",
+         "lucide-react": "0.487.0",
+         "motion": "12.23.24",
+         "next-themes": "0.4.6",
+@@ -53,6 +54,7 @@
+         "react-dnd": "16.0.1",
+         "react-dnd-html5-backend": "16.0.1",
+         "react-hook-form": "7.55.0",
++        "react-leaflet": "^4.2.1",
+         "react-popper": "2.3.0",
+         "react-resizable-panels": "2.1.7",
+         "react-responsive-masonry": "2.7.1",
+@@ -67,6 +69,7 @@
+       },
+       "devDependencies": {
+         "@tailwindcss/vite": "4.1.12",
++        "@types/leaflet": "^1.9.22",
+         "@vitejs/plugin-react": "4.7.0",
+         "tailwindcss": "4.1.12",
+         "vite": "6.3.5"
+@@ -2613,6 +2616,17 @@
+       "integrity": "sha512-/RVXdLvJxLg4QKvMoM5WlwNR9ViO9z8B/qPcc+C0Sa/teJY7QG7kJ441DwzOjMYEY7GmU4dj5EcGHIkKZiQZCA==",
+       "license": "MIT"
+     },
++    "node_modules/@react-leaflet/core": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/@react-leaflet/core/-/core-2.1.0.tgz",
++      "integrity": "sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==",
++      "license": "Hippocratic-2.1",
++      "peerDependencies": {
++        "leaflet": "^1.9.0",
++        "react": "^18.0.0",
++        "react-dom": "^18.0.0"
++      }
++    },
+     "node_modules/@rolldown/pluginutils": {
+       "version": "1.0.0-beta.27",
+       "resolved": "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz",
+@@ -3362,6 +3376,23 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/@types/geojson": {
++      "version": "7946.0.16",
++      "resolved": "https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.16.tgz",
++      "integrity": "sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==",
++      "dev": true,
++      "license": "MIT"
++    },
++    "node_modules/@types/leaflet": {
++      "version": "1.9.22",
++      "resolved": "https://registry.npmjs.org/@types/leaflet/-/leaflet-1.9.22.tgz",
++      "integrity": "sha512-h3lhECYEKDasG7LFHu+GiHqAvsgLuQvlJvVZzJDGONo3sEL+wUOqSFLnwkZlK0qVxnxbuGFW8iBlJNYs5wgndA==",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "@types/geojson": "*"
++      }
++    },
+     "node_modules/@types/parse-json": {
+       "version": "4.0.2",
+       "resolved": "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.2.tgz",
+@@ -4213,6 +4244,12 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/leaflet": {
++      "version": "1.9.4",
++      "resolved": "https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz",
++      "integrity": "sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==",
++      "license": "BSD-2-Clause"
++    },
+     "node_modules/lightningcss": {
+       "version": "1.30.1",
+       "resolved": "https://registry.npmjs.org/lightningcss/-/lightningcss-1.30.1.tgz",
+@@ -4847,6 +4884,20 @@
+       "integrity": "sha512-s5un28nYxKJw5gvUHyW5PCC28CvBqLu9r3cWgzHT4Vo/5fqqkFcdRYsGcKf50WMPpjjFZS5d76fn3YCo2njKwQ==",
+       "license": "MIT"
+     },
++    "node_modules/react-leaflet": {
++      "version": "4.2.1",
++      "resolved": "https://registry.npmjs.org/react-leaflet/-/react-leaflet-4.2.1.tgz",
++      "integrity": "sha512-p9chkvhcKrWn/H/1FFeVSqLdReGwn2qmiobOQGO3BifX+/vV/39qhY8dGqbdcPh1e6jxh/QHriLXr7a4eLFK4Q==",
++      "license": "Hippocratic-2.1",
++      "dependencies": {
++        "@react-leaflet/core": "^2.1.0"
++      },
++      "peerDependencies": {
++        "leaflet": "^1.9.0",
++        "react": "^18.0.0",
++        "react-dom": "^18.0.0"
++      }
++    },
+     "node_modules/react-popper": {
+       "version": "2.3.0",
+       "resolved": "https://registry.npmjs.org/react-popper/-/react-popper-2.3.0.tgz",
+diff --git a/package.json b/package.json
+index 8d0ef56..ba9088b 100644
+--- a/package.json
++++ b/package.json
+@@ -46,6 +46,7 @@
+     "date-fns": "3.6.0",
+     "embla-carousel-react": "8.6.0",
+     "input-otp": "1.4.2",
++    "leaflet": "^1.9.4",
+     "lucide-react": "0.487.0",
+     "motion": "12.23.24",
+     "next-themes": "0.4.6",
+@@ -53,6 +54,7 @@
+     "react-dnd": "16.0.1",
+     "react-dnd-html5-backend": "16.0.1",
+     "react-hook-form": "7.55.0",
++    "react-leaflet": "^4.2.1",
+     "react-popper": "2.3.0",
+     "react-resizable-panels": "2.1.7",
+     "react-responsive-masonry": "2.7.1",
+@@ -67,6 +69,7 @@
+   },
+   "devDependencies": {
+     "@tailwindcss/vite": "4.1.12",
++    "@types/leaflet": "^1.9.22",
+     "@vitejs/plugin-react": "4.7.0",
+     "tailwindcss": "4.1.12",
+     "vite": "6.3.5"
+diff --git a/src/app/App.tsx b/src/app/App.tsx
+index 6bc1578..bb9360f 100644
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -23,6 +23,9 @@ import { ProtectedRoute } from './admin/ProtectedRoute';
+ import { Dashboard } from './admin/Dashboard';
+ import { AdminMessages } from './admin/pages/AdminMessages';
+ import { AdminMembres } from './admin/pages/AdminMembres';
++import { AdminRegistre } from './admin/pages/AdminRegistre';
++import { AdminConfiguration } from './admin/pages/AdminConfiguration';
++import { AdminCarte } from './admin/pages/AdminCarte';
+ import { AdminEvenements } from './admin/pages/AdminEvenements';
+ import { AdminActualites } from './admin/pages/AdminActualites';
+ import { AdminGuide } from './admin/pages/AdminGuide';
+@@ -79,6 +82,9 @@ export default function App() {
+               <Route index element={<Dashboard />} />
+               <Route path="messages" element={<AdminMessages />} />
+               <Route path="membres" element={<AdminMembres />} />
++              <Route path="registre" element={<AdminRegistre />} />
++              <Route path="configuration" element={<AdminConfiguration />} />
++              <Route path="carte" element={<AdminCarte />} />
+               <Route path="evenements" element={<AdminEvenements />} />
+               <Route path="actualites" element={<AdminActualites />} />
+               <Route path="guide" element={<AdminGuide />} />
+diff --git a/src/app/admin/AdminLayout.tsx b/src/app/admin/AdminLayout.tsx
+index 01653df..52f7e60 100644
+--- a/src/app/admin/AdminLayout.tsx
++++ b/src/app/admin/AdminLayout.tsx
+@@ -14,6 +14,9 @@ import {
+   X,
+   ShieldCheck,
+   History,
++  BookUser,
++  Settings,
++  Map as MapIcon,
+ } from 'lucide-react';
+ import { useAuth, AdminRole } from '../context/AuthContext';
+ import { cn } from '../components/Navbar';
+@@ -37,6 +40,9 @@ const navItems: NavItem[] = [
+   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
+   { label: 'Actions', path: '/admin/actions', icon: Activity, roles: STAFF_ROLES },
+   { label: 'Membres', path: '/admin/membres', icon: Users, roles: STAFF_ROLES },
++  { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
++  { label: 'Carte', path: '/admin/carte', icon: MapIcon, roles: ['super_admin', 'admin', 'agent'] },
++  { label: 'Configuration', path: '/admin/configuration', icon: Settings, roles: ['super_admin', 'admin'] },
+   { label: 'Événements', path: '/admin/evenements', icon: CalendarDays, roles: STAFF_ROLES },
+   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
+   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },
+diff --git a/src/app/admin/pages/AdminCarte.tsx b/src/app/admin/pages/AdminCarte.tsx
+new file mode 100644
+index 0000000..410b882
+--- /dev/null
++++ b/src/app/admin/pages/AdminCarte.tsx
+@@ -0,0 +1,152 @@
++import React, { useEffect, useMemo, useState } from 'react';
++import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
++import 'leaflet/dist/leaflet.css';
++import { Loader2, Map as MapIcon } from 'lucide-react';
++import { api, ApiError } from '../../../lib/api';
++import { Badge } from '../../components/ui/badge';
++import type { PointCarte, QuartierAgregat, StatutRessortissant } from '../types';
++
++// Centre approximatif de Cotonou — le point de départ le plus utile tant que
++// la grande majorité des ressortissants inscrits y résident.
++const CENTRE_COTONOU: [number, number] = [6.3703, 2.3912];
++
++const STATUT_COULEUR: Record<StatutRessortissant, string> = {
++  actif: '#009739',    // brand-green-500
++  inactif: '#94a3b8',  // slate-400
++  suspendu: '#ef3340', // brand-red-500
++};
++
++const STATUT_LABEL: Record<StatutRessortissant, string> = {
++  actif: 'Actif',
++  inactif: 'Inactif',
++  suspendu: 'Suspendu',
++};
++
++interface CarteData {
++  par_quartier: QuartierAgregat[];
++  points: PointCarte[];
++}
++
++export function AdminCarte() {
++  const [data, setData] = useState<CarteData | null>(null);
++  const [filtreVille, setFiltreVille] = useState<string | null>(null);
++
++  useEffect(() => {
++    (async () => {
++      try {
++        const res = await api.get<CarteData>('/v1/admin/ressortissants/carte');
++        setData(res);
++      } catch (err) {
++        // Pas de toast bloquant ici : la page reste utilisable vide plutôt
++        // que de planter si la géolocalisation n'est pas encore renseignée.
++        console.error(err instanceof ApiError ? err.message : err);
++        setData({ par_quartier: [], points: [] });
++      }
++    })();
++  }, []);
++
++  const villes = useMemo(
++    () => Array.from(new Set((data?.par_quartier ?? []).map((q) => q.ville))).sort(),
++    [data]
++  );
++
++  const quartiersAffiches = useMemo(
++    () => (data?.par_quartier ?? []).filter((q) => !filtreVille || q.ville === filtreVille),
++    [data, filtreVille]
++  );
++
++  const pointsAffiches = useMemo(
++    () => (data?.points ?? []).filter((p) => !filtreVille || p.ville === filtreVille),
++    [data, filtreVille]
++  );
++
++  if (data === null) {
++    return <div className="flex justify-center py-20 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
++  }
++
++  return (
++    <div>
++      <div className="mb-6">
++        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
++          <MapIcon className="w-6 h-6 text-slate-400" /> Carte du registre
++        </h1>
++        <p className="text-slate-500 text-sm mt-1">
++          Vue interne, non anonymisée — la vitrine publique n'affiche qu'une agrégation par ville.
++        </p>
++      </div>
++
++      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
++        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 overflow-hidden" style={{ height: 520 }}>
++          {pointsAffiches.length === 0 ? (
++            <div className="h-full flex items-center justify-center text-slate-400 text-sm text-center px-8">
++              Aucun ressortissant géolocalisé pour l'instant — les points apparaîtront ici dès que
++              des coordonnées seront renseignées au registre.
++            </div>
++          ) : (
++            <MapContainer center={CENTRE_COTONOU} zoom={12} style={{ height: '100%', width: '100%' }}>
++              <TileLayer
++                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
++                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
++              />
++              {pointsAffiches.map((p) => (
++                <CircleMarker
++                  key={p.id}
++                  center={[p.latitude, p.longitude]}
++                  radius={7}
++                  pathOptions={{ color: STATUT_COULEUR[p.statut], fillColor: STATUT_COULEUR[p.statut], fillOpacity: 0.8 }}
++                >
++                  <Popup>
++                    <div className="text-sm">
++                      <div className="font-semibold">{p.nom_complet}</div>
++                      <div className="text-slate-500">{p.ville}{p.quartier ? ` · ${p.quartier}` : ''}</div>
++                      <div className="mt-1">{STATUT_LABEL[p.statut]}</div>
++                    </div>
++                  </Popup>
++                </CircleMarker>
++              ))}
++            </MapContainer>
++          )}
++        </div>
++
++        <div className="bg-white rounded-3xl border border-slate-100 p-4 flex flex-col" style={{ maxHeight: 520 }}>
++          <div className="flex items-center justify-between mb-3">
++            <h2 className="font-bold text-slate-800">Par quartier</h2>
++            <select
++              className="text-sm border border-slate-200 rounded-lg px-2 py-1"
++              value={filtreVille ?? ''}
++              onChange={(e) => setFiltreVille(e.target.value || null)}
++            >
++              <option value="">Toutes les villes</option>
++              {villes.map((v) => <option key={v} value={v}>{v}</option>)}
++            </select>
++          </div>
++
++          {quartiersAffiches.length === 0 ? (
++            <p className="text-sm text-slate-400">Aucune donnée pour l'instant.</p>
++          ) : (
++            <div className="overflow-y-auto space-y-1.5 pr-1">
++              {quartiersAffiches.map((q) => (
++                <div key={`${q.ville}-${q.quartier}`} className="flex items-center justify-between text-sm bg-slate-50 rounded-lg px-3 py-2">
++                  <div>
++                    <div className="text-slate-800">{q.quartier}</div>
++                    <div className="text-xs text-slate-400">{q.ville}</div>
++                  </div>
++                  <Badge variant="outline">{q.total}</Badge>
++                </div>
++              ))}
++            </div>
++          )}
++
++          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-4 text-xs text-slate-500">
++            {(Object.keys(STATUT_LABEL) as StatutRessortissant[]).map((s) => (
++              <div key={s} className="flex items-center gap-1.5">
++                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STATUT_COULEUR[s] }} />
++                {STATUT_LABEL[s]}
++              </div>
++            ))}
++          </div>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/app/admin/pages/AdminConfiguration.tsx b/src/app/admin/pages/AdminConfiguration.tsx
+new file mode 100644
+index 0000000..62dae31
+--- /dev/null
++++ b/src/app/admin/pages/AdminConfiguration.tsx
+@@ -0,0 +1,434 @@
++import React, { useEffect, useState } from 'react';
++import { Loader2, Settings, Plus, Trash2, Pencil, Check, X as XIcon, FileStack, Wallet } from 'lucide-react';
++import { api, ApiError } from '../../../lib/api';
++import { Button } from '../../components/ui/button';
++import { Input } from '../../components/ui/input';
++import { Label } from '../../components/ui/label';
++import { Switch } from '../../components/ui/switch';
++import { Badge } from '../../components/ui/badge';
++import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
++import {
++  Select,
++  SelectContent,
++  SelectItem,
++  SelectTrigger,
++  SelectValue,
++} from '../../components/ui/select';
++import {
++  Table,
++  TableBody,
++  TableCell,
++  TableHead,
++  TableHeader,
++  TableRow,
++} from '../../components/ui/table';
++import {
++  Dialog,
++  DialogContent,
++  DialogHeader,
++  DialogTitle,
++  DialogFooter,
++} from '../../components/ui/dialog';
++import { toast } from 'sonner';
++import { useAuth } from '../../context/AuthContext';
++import type { Tarif, DocumentTypeRequis, DelaiDemande } from '../types';
++
++// Les deux types connus du cahier des charges — le champ reste un texte libre
++// côté API pour absorber de futurs types sans migration.
++const TYPES_DEMANDE = [
++  { value: 'carte_consulaire', label: 'Carte consulaire' },
++  { value: 'laissez_passer', label: 'Laissez-passer' },
++];
++
++const DELAI_LABEL: Record<DelaiDemande, string> = {
++  '3_jours': '3 jours',
++  '24h': '24 heures',
++  meme_jour: 'Le jour même',
++};
++
++export function AdminConfiguration() {
++  const { hasRole } = useAuth();
++  const canWrite = hasRole('super_admin', 'admin');
++
++  return (
++    <div>
++      <div className="mb-6">
++        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
++          <Settings className="w-6 h-6 text-slate-400" /> Configuration des demandes
++        </h1>
++        <p className="text-slate-500 text-sm mt-1">
++          Tarifs et pièces à fournir par type de demande — modifiables ici sans déploiement.
++        </p>
++      </div>
++
++      <Tabs defaultValue="tarifs">
++        <TabsList>
++          <TabsTrigger value="tarifs"><Wallet className="w-4 h-4 mr-1.5" /> Tarifs</TabsTrigger>
++          <TabsTrigger value="documents"><FileStack className="w-4 h-4 mr-1.5" /> Pièces requises</TabsTrigger>
++        </TabsList>
++        <TabsContent value="tarifs" className="mt-6">
++          <OngletTarifs canWrite={canWrite} />
++        </TabsContent>
++        <TabsContent value="documents" className="mt-6">
++          <OngletDocuments canWrite={canWrite} />
++        </TabsContent>
++      </Tabs>
++    </div>
++  );
++}
++
++// ===================== Onglet Tarifs =====================
++
++function OngletTarifs({ canWrite }: { canWrite: boolean }) {
++  const [tarifs, setTarifs] = useState<Tarif[] | null>(null);
++  const [editingId, setEditingId] = useState<number | null>(null);
++  const [montantEdit, setMontantEdit] = useState('');
++  const [creating, setCreating] = useState(false);
++  const [form, setForm] = useState({ type_demande: TYPES_DEMANDE[0].value, delai: '3_jours' as DelaiDemande, montant: '' });
++  const [saving, setSaving] = useState(false);
++
++  useEffect(() => { load(); }, []);
++
++  async function load() {
++    try {
++      const data = await api.get<Tarif[]>('/v1/admin/tarifs');
++      setTarifs(data);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Impossible de charger les tarifs.');
++    }
++  }
++
++  function commencerEdition(t: Tarif) {
++    setEditingId(t.id);
++    setMontantEdit(String(t.montant));
++  }
++
++  async function enregistrerMontant(t: Tarif) {
++    const montant = Number(montantEdit);
++    if (!montant || montant < 0) {
++      toast.error('Montant invalide.');
++      return;
++    }
++    try {
++      const updated = await api.put<Tarif>(`/v1/admin/tarifs/${t.id}`, { montant });
++      setTarifs((prev) => prev?.map((x) => (x.id === t.id ? updated : x)) ?? null);
++      setEditingId(null);
++      toast.success('Tarif mis à jour.');
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Échec de la mise à jour.');
++    }
++  }
++
++  async function toggleActif(t: Tarif) {
++    try {
++      const updated = await api.put<Tarif>(`/v1/admin/tarifs/${t.id}`, { est_actif: !t.est_actif });
++      setTarifs((prev) => prev?.map((x) => (x.id === t.id ? updated : x)) ?? null);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Échec de la mise à jour.');
++    }
++  }
++
++  async function supprimer(t: Tarif) {
++    if (!confirm(`Supprimer le tarif ${t.type_demande} / ${DELAI_LABEL[t.delai]} ?`)) return;
++    try {
++      await api.delete(`/v1/admin/tarifs/${t.id}`);
++      setTarifs((prev) => prev?.filter((x) => x.id !== t.id) ?? null);
++      toast.success('Tarif supprimé.');
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Échec de la suppression.');
++    }
++  }
++
++  async function creer() {
++    if (!form.montant || Number(form.montant) < 0) {
++      toast.error('Montant invalide.');
++      return;
++    }
++    setSaving(true);
++    try {
++      const created = await api.post<Tarif>('/v1/admin/tarifs', {
++        type_demande: form.type_demande,
++        delai: form.delai,
++        montant: Number(form.montant),
++      });
++      setTarifs((prev) => [...(prev ?? []), created]);
++      setCreating(false);
++      setForm({ type_demande: TYPES_DEMANDE[0].value, delai: '3_jours', montant: '' });
++      toast.success('Tarif ajouté.');
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : "Échec de l'ajout.");
++    } finally {
++      setSaving(false);
++    }
++  }
++
++  if (tarifs === null) {
++    return <div className="flex justify-center py-16 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
++  }
++
++  return (
++    <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
++      <Table>
++        <TableHeader>
++          <TableRow>
++            <TableHead>Type de demande</TableHead>
++            <TableHead>Délai</TableHead>
++            <TableHead>Montant</TableHead>
++            <TableHead>Actif</TableHead>
++            {canWrite && <TableHead className="text-right">Actions</TableHead>}
++          </TableRow>
++        </TableHeader>
++        <TableBody>
++          {tarifs.map((t) => (
++            <TableRow key={t.id}>
++              <TableCell className="font-medium text-slate-800">
++                {TYPES_DEMANDE.find((x) => x.value === t.type_demande)?.label ?? t.type_demande}
++              </TableCell>
++              <TableCell>{DELAI_LABEL[t.delai]}</TableCell>
++              <TableCell>
++                {editingId === t.id ? (
++                  <div className="flex items-center gap-2">
++                    <Input
++                      type="number"
++                      value={montantEdit}
++                      onChange={(e) => setMontantEdit(e.target.value)}
++                      className="w-28 h-8"
++                    />
++                    <span className="text-slate-400 text-sm">{t.devise}</span>
++                  </div>
++                ) : (
++                  <span className="font-mono">{t.montant.toLocaleString('fr-FR')} {t.devise}</span>
++                )}
++              </TableCell>
++              <TableCell>
++                <Switch checked={t.est_actif} onCheckedChange={() => toggleActif(t)} disabled={!canWrite} />
++              </TableCell>
++              {canWrite && (
++                <TableCell className="text-right">
++                  {editingId === t.id ? (
++                    <div className="flex justify-end gap-1">
++                      <Button size="icon" variant="ghost" onClick={() => enregistrerMontant(t)}><Check className="w-4 h-4 text-brand-green-600" /></Button>
++                      <Button size="icon" variant="ghost" onClick={() => setEditingId(null)}><XIcon className="w-4 h-4 text-slate-400" /></Button>
++                    </div>
++                  ) : (
++                    <div className="flex justify-end gap-1">
++                      <Button size="icon" variant="ghost" onClick={() => commencerEdition(t)}><Pencil className="w-4 h-4" /></Button>
++                      <Button size="icon" variant="ghost" onClick={() => supprimer(t)}><Trash2 className="w-4 h-4 text-brand-red-500" /></Button>
++                    </div>
++                  )}
++                </TableCell>
++              )}
++            </TableRow>
++          ))}
++        </TableBody>
++      </Table>
++
++      {canWrite && (
++        <div className="p-4 border-t border-slate-100">
++          {creating ? (
++            <div className="flex flex-wrap items-end gap-3">
++              <div>
++                <Label className="text-xs">Type</Label>
++                <Select value={form.type_demande} onValueChange={(v) => setForm((f) => ({ ...f, type_demande: v }))}>
++                  <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
++                  <SelectContent>
++                    {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
++                  </SelectContent>
++                </Select>
++              </div>
++              <div>
++                <Label className="text-xs">Délai</Label>
++                <Select value={form.delai} onValueChange={(v) => setForm((f) => ({ ...f, delai: v as DelaiDemande }))}>
++                  <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
++                  <SelectContent>
++                    {(Object.keys(DELAI_LABEL) as DelaiDemande[]).map((d) => <SelectItem key={d} value={d}>{DELAI_LABEL[d]}</SelectItem>)}
++                  </SelectContent>
++                </Select>
++              </div>
++              <div>
++                <Label className="text-xs">Montant (FCFA)</Label>
++                <Input type="number" value={form.montant} onChange={(e) => setForm((f) => ({ ...f, montant: e.target.value }))} className="w-32" />
++              </div>
++              <Button onClick={creer} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Ajouter'}</Button>
++              <Button variant="ghost" onClick={() => setCreating(false)}>Annuler</Button>
++            </div>
++          ) : (
++            <Button variant="outline" onClick={() => setCreating(true)}><Plus className="w-4 h-4 mr-2" /> Ajouter un tarif</Button>
++          )}
++        </div>
++      )}
++    </div>
++  );
++}
++
++// ===================== Onglet Documents requis =====================
++
++const EMPTY_DOC_FORM = { type_demande: TYPES_DEMANDE[0].value, code_document: '', label: '', obligatoire: true };
++
++function OngletDocuments({ canWrite }: { canWrite: boolean }) {
++  const [documents, setDocuments] = useState<DocumentTypeRequis[] | null>(null);
++  const [typeFiltre, setTypeFiltre] = useState(TYPES_DEMANDE[0].value);
++  const [editing, setEditing] = useState<DocumentTypeRequis | 'new' | null>(null);
++  const [form, setForm] = useState(EMPTY_DOC_FORM);
++  const [saving, setSaving] = useState(false);
++
++  useEffect(() => { load(); }, []);
++
++  async function load() {
++    try {
++      const data = await api.get<DocumentTypeRequis[]>('/v1/admin/document-types-requis');
++      setDocuments(data);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Impossible de charger les pièces requises.');
++    }
++  }
++
++  function ouvrirCreation() {
++    setForm({ ...EMPTY_DOC_FORM, type_demande: typeFiltre });
++    setEditing('new');
++  }
++
++  function ouvrirEdition(d: DocumentTypeRequis) {
++    setForm({ type_demande: d.type_demande, code_document: d.code_document, label: d.label, obligatoire: d.obligatoire });
++    setEditing(d);
++  }
++
++  async function enregistrer() {
++    if (!form.label.trim() || !form.code_document.trim()) {
++      toast.error('Le libellé et le code sont requis.');
++      return;
++    }
++    setSaving(true);
++    try {
++      if (editing === 'new') {
++        const created = await api.post<DocumentTypeRequis>('/v1/admin/document-types-requis', form);
++        setDocuments((prev) => [...(prev ?? []), created]);
++        toast.success('Pièce ajoutée.');
++      } else if (editing) {
++        const updated = await api.put<DocumentTypeRequis>(`/v1/admin/document-types-requis/${editing.id}`, {
++          label: form.label,
++          obligatoire: form.obligatoire,
++        });
++        setDocuments((prev) => prev?.map((x) => (x.id === editing.id ? updated : x)) ?? null);
++        toast.success('Pièce modifiée.');
++      }
++      setEditing(null);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : "Échec de l'enregistrement.");
++    } finally {
++      setSaving(false);
++    }
++  }
++
++  async function supprimer(d: DocumentTypeRequis) {
++    if (!confirm(`Retirer « ${d.label} » des pièces requises ?`)) return;
++    try {
++      await api.delete(`/v1/admin/document-types-requis/${d.id}`);
++      setDocuments((prev) => prev?.filter((x) => x.id !== d.id) ?? null);
++      toast.success('Pièce retirée.');
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Échec de la suppression.');
++    }
++  }
++
++  async function toggleActif(d: DocumentTypeRequis) {
++    try {
++      const updated = await api.put<DocumentTypeRequis>(`/v1/admin/document-types-requis/${d.id}`, { est_actif: !d.est_actif });
++      setDocuments((prev) => prev?.map((x) => (x.id === d.id ? updated : x)) ?? null);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Échec de la mise à jour.');
++    }
++  }
++
++  if (documents === null) {
++    return <div className="flex justify-center py-16 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
++  }
++
++  const filtres = documents.filter((d) => d.type_demande === typeFiltre).sort((a, b) => a.ordre - b.ordre);
++
++  return (
++    <div>
++      <div className="flex items-center justify-between mb-4">
++        <Select value={typeFiltre} onValueChange={setTypeFiltre}>
++          <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
++          <SelectContent>
++            {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
++          </SelectContent>
++        </Select>
++        {canWrite && (
++          <Button variant="outline" onClick={ouvrirCreation}><Plus className="w-4 h-4 mr-2" /> Ajouter une pièce</Button>
++        )}
++      </div>
++
++      {filtres.length === 0 ? (
++        <div className="text-center py-16 text-slate-400 bg-white rounded-3xl border border-slate-100">
++          Aucune pièce configurée pour ce type de demande.
++        </div>
++      ) : (
++        <div className="bg-white rounded-3xl border border-slate-100 divide-y divide-slate-100">
++          {filtres.map((d) => (
++            <div key={d.id} className="flex items-center gap-4 p-4">
++              <div className="flex-1 min-w-0">
++                <div className="font-medium text-slate-800">{d.label}</div>
++                <div className="text-xs text-slate-400 font-mono">{d.code_document}</div>
++              </div>
++              {d.obligatoire ? (
++                <Badge variant="outline" className="bg-brand-gold-50 text-brand-gold-700 border-brand-gold-200">Obligatoire</Badge>
++              ) : (
++                <Badge variant="outline" className="bg-slate-50 text-slate-500 border-slate-200">Optionnel</Badge>
++              )}
++              <Switch checked={d.est_actif} onCheckedChange={() => toggleActif(d)} disabled={!canWrite} />
++              {canWrite && (
++                <div className="flex gap-1">
++                  <Button size="icon" variant="ghost" onClick={() => ouvrirEdition(d)}><Pencil className="w-4 h-4" /></Button>
++                  <Button size="icon" variant="ghost" onClick={() => supprimer(d)}><Trash2 className="w-4 h-4 text-brand-red-500" /></Button>
++                </div>
++              )}
++            </div>
++          ))}
++        </div>
++      )}
++
++      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
++        <DialogContent>
++          <DialogHeader>
++            <DialogTitle>{editing === 'new' ? 'Ajouter une pièce requise' : 'Modifier la pièce'}</DialogTitle>
++          </DialogHeader>
++          <div className="space-y-4">
++            {editing === 'new' && (
++              <>
++                <div>
++                  <Label>Type de demande</Label>
++                  <Select value={form.type_demande} onValueChange={(v) => setForm((f) => ({ ...f, type_demande: v }))}>
++                    <SelectTrigger><SelectValue /></SelectTrigger>
++                    <SelectContent>
++                      {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
++                    </SelectContent>
++                  </Select>
++                </div>
++                <div>
++                  <Label>Code (identifiant technique, ex: photo_identite)</Label>
++                  <Input value={form.code_document} onChange={(e) => setForm((f) => ({ ...f, code_document: e.target.value }))} />
++                </div>
++              </>
++            )}
++            <div>
++              <Label>Libellé affiché au ressortissant</Label>
++              <Input value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
++            </div>
++            <div className="flex items-center gap-2">
++              <Switch checked={form.obligatoire} onCheckedChange={(v) => setForm((f) => ({ ...f, obligatoire: v }))} />
++              <Label>Pièce obligatoire</Label>
++            </div>
++          </div>
++          <DialogFooter>
++            <Button variant="ghost" onClick={() => setEditing(null)}>Annuler</Button>
++            <Button onClick={enregistrer} disabled={saving}>
++              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
++            </Button>
++          </DialogFooter>
++        </DialogContent>
++      </Dialog>
++    </div>
++  );
++}
+diff --git a/src/app/admin/pages/AdminRegistre.tsx b/src/app/admin/pages/AdminRegistre.tsx
+new file mode 100644
+index 0000000..07d3227
+--- /dev/null
++++ b/src/app/admin/pages/AdminRegistre.tsx
+@@ -0,0 +1,304 @@
++import React, { useEffect, useState } from 'react';
++import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, X, Phone, Mail, MapPin, BadgeCheck } from 'lucide-react';
++import { api, ApiError, downloadFile } from '../../../lib/api';
++import { Badge } from '../../components/ui/badge';
++import { Button } from '../../components/ui/button';
++import { Input } from '../../components/ui/input';
++import { VilleSelect } from '../../components/VilleSelect';
++import {
++  Select,
++  SelectContent,
++  SelectItem,
++  SelectTrigger,
++  SelectValue,
++} from '../../components/ui/select';
++import {
++  Table,
++  TableBody,
++  TableCell,
++  TableHead,
++  TableHeader,
++  TableRow,
++} from '../../components/ui/table';
++import {
++  Dialog,
++  DialogContent,
++  DialogHeader,
++  DialogTitle,
++} from '../../components/ui/dialog';
++import { toast } from 'sonner';
++import type { Ressortissant, StatutRessortissant } from '../types';
++
++interface Meta {
++  total: number;
++  current_page: number;
++  last_page: number;
++}
++
++const STATUT_LABEL: Record<StatutRessortissant, string> = {
++  actif: 'Actif',
++  inactif: 'Inactif',
++  suspendu: 'Suspendu',
++};
++
++const STATUT_COULEUR: Record<StatutRessortissant, string> = {
++  actif: 'bg-brand-green-50 text-brand-green-700 border-brand-green-200',
++  inactif: 'bg-slate-100 text-slate-600 border-slate-200',
++  suspendu: 'bg-brand-red-50 text-brand-red-700 border-brand-red-200',
++};
++
++export function AdminRegistre() {
++  const [ressortissants, setRessortissants] = useState<Ressortissant[] | null>(null);
++  const [meta, setMeta] = useState<Meta | null>(null);
++  const [page, setPage] = useState(1);
++
++  const [statut, setStatut] = useState<string>('tous');
++  const [ville, setVille] = useState<string | null>(null);
++  const [recherche, setRecherche] = useState('');
++  const [rechercheDebounced, setRechercheDebounced] = useState('');
++
++  const [viewing, setViewing] = useState<Ressortissant | null>(null);
++  const [loadingDetail, setLoadingDetail] = useState(false);
++  const [exporting, setExporting] = useState(false);
++
++  useEffect(() => {
++    const t = setTimeout(() => setRechercheDebounced(recherche), 400);
++    return () => clearTimeout(t);
++  }, [recherche]);
++
++  useEffect(() => {
++    setPage(1);
++  }, [statut, ville, rechercheDebounced]);
++
++  useEffect(() => {
++    load();
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [page, statut, ville, rechercheDebounced]);
++
++  async function load() {
++    setRessortissants(null);
++    try {
++      const params = new URLSearchParams();
++      params.set('page', String(page));
++      if (statut !== 'tous') params.set('statut', statut);
++      if (ville) params.set('ville', ville);
++      if (rechercheDebounced) params.set('recherche', rechercheDebounced);
++
++      const res = await api.get<{ items: Ressortissant[]; meta: Meta }>(
++        `/v1/admin/ressortissants?${params.toString()}`
++      );
++      setRessortissants(res.items);
++      setMeta(res.meta);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Impossible de charger le registre.');
++    }
++  }
++
++  async function ouvrirDetail(id: number) {
++    setLoadingDetail(true);
++    try {
++      const r = await api.get<Ressortissant>(`/v1/admin/ressortissants/${id}`);
++      setViewing(r);
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : 'Impossible de charger la fiche.');
++    } finally {
++      setLoadingDetail(false);
++    }
++  }
++
++  async function exporter() {
++    setExporting(true);
++    try {
++      const params = new URLSearchParams();
++      if (statut !== 'tous') params.set('statut', statut);
++      await downloadFile(`/v1/admin/ressortissants/export?${params.toString()}`, 'registre-consulaire.csv');
++    } catch (err) {
++      toast.error(err instanceof ApiError ? err.message : "Impossible d'exporter le registre.");
++    } finally {
++      setExporting(false);
++    }
++  }
++
++  return (
++    <div>
++      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
++        <div>
++          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
++            <BookUser className="w-6 h-6 text-slate-400" /> Registre consulaire
++          </h1>
++          <p className="text-slate-500 text-sm mt-1">
++            Ressortissants inscrits{meta ? ` — ${meta.total} au total` : ''}.
++          </p>
++        </div>
++        <Button variant="outline" onClick={exporter} disabled={exporting}>
++          {exporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
++          Exporter (CSV)
++        </Button>
++      </div>
++
++      <div className="flex flex-wrap gap-3 mb-6">
++        <div className="relative flex-1 min-w-[220px]">
++          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
++          <Input
++            placeholder="Nom, prénom, n° registre, email..."
++            value={recherche}
++            onChange={(e) => setRecherche(e.target.value)}
++            className="pl-9"
++          />
++        </div>
++        <Select value={statut} onValueChange={setStatut}>
++          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
++          <SelectContent>
++            <SelectItem value="tous">Tous statuts</SelectItem>
++            <SelectItem value="actif">Actif</SelectItem>
++            <SelectItem value="inactif">Inactif</SelectItem>
++            <SelectItem value="suspendu">Suspendu</SelectItem>
++          </SelectContent>
++        </Select>
++        <div className="w-[220px]">
++          <VilleSelect value={ville} onChange={setVille} placeholder="Toutes les villes" allowClear clearLabel="Toutes les villes" />
++        </div>
++      </div>
++
++      {ressortissants === null ? (
++        <div className="flex justify-center py-20 text-slate-400">
++          <Loader2 className="w-8 h-8 animate-spin" />
++        </div>
++      ) : ressortissants.length === 0 ? (
++        <div className="text-center py-16 text-slate-400 bg-white rounded-3xl border border-slate-100">
++          Aucun ressortissant ne correspond à ces critères.
++        </div>
++      ) : (
++        <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
++          <Table>
++            <TableHeader>
++              <TableRow>
++                <TableHead>N° registre</TableHead>
++                <TableHead>Nom complet</TableHead>
++                <TableHead>Ville / Quartier</TableHead>
++                <TableHead>Contact</TableHead>
++                <TableHead>Statut</TableHead>
++                <TableHead className="text-right">Inscrit le</TableHead>
++              </TableRow>
++            </TableHeader>
++            <TableBody>
++              {ressortissants.map((r) => (
++                <TableRow
++                  key={r.id}
++                  className="cursor-pointer hover:bg-slate-50"
++                  onClick={() => ouvrirDetail(r.id)}
++                >
++                  <TableCell className="font-mono text-xs text-slate-500">{r.numero_registre || '—'}</TableCell>
++                  <TableCell className="font-medium text-slate-800">
++                    <div className="flex items-center gap-2">
++                      {r.nom_complet}
++                      {r.inscription_verifiee && <BadgeCheck className="w-4 h-4 text-brand-green-600" />}
++                    </div>
++                  </TableCell>
++                  <TableCell className="text-slate-500">
++                    {r.ville || '—'}{r.quartier ? ` · ${r.quartier}` : ''}
++                  </TableCell>
++                  <TableCell className="text-slate-500 text-sm">{r.telephone || r.email || '—'}</TableCell>
++                  <TableCell>
++                    <Badge variant="outline" className={STATUT_COULEUR[r.statut]}>
++                      {STATUT_LABEL[r.statut]}
++                    </Badge>
++                  </TableCell>
++                  <TableCell className="text-right text-slate-400 text-sm">{r.created_at}</TableCell>
++                </TableRow>
++              ))}
++            </TableBody>
++          </Table>
++        </div>
++      )}
++
++      {meta && meta.last_page > 1 && (
++        <div className="flex items-center justify-center gap-3 mt-6">
++          <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
++            <ChevronLeft className="w-4 h-4" />
++          </Button>
++          <span className="text-sm text-slate-500">
++            Page {meta.current_page} / {meta.last_page}
++          </span>
++          <Button variant="outline" size="icon" disabled={page >= meta.last_page} onClick={() => setPage((p) => p + 1)}>
++            <ChevronRight className="w-4 h-4" />
++          </Button>
++        </div>
++      )}
++
++      <Dialog open={!!viewing || loadingDetail} onOpenChange={(open) => !open && setViewing(null)}>
++        <DialogContent className="max-w-lg">
++          <DialogHeader>
++            <DialogTitle>Fiche ressortissant</DialogTitle>
++          </DialogHeader>
++          {loadingDetail || !viewing ? (
++            <div className="flex justify-center py-10 text-slate-400">
++              <Loader2 className="w-6 h-6 animate-spin" />
++            </div>
++          ) : (
++            <div className="space-y-4">
++              <div className="flex items-center justify-between">
++                <div>
++                  <div className="font-bold text-lg text-slate-900">{viewing.nom_complet}</div>
++                  <div className="text-xs text-slate-400 font-mono">{viewing.numero_registre || 'Sans numéro'}</div>
++                </div>
++                <Badge variant="outline" className={STATUT_COULEUR[viewing.statut]}>
++                  {STATUT_LABEL[viewing.statut]}
++                </Badge>
++              </div>
++
++              <div className="grid grid-cols-2 gap-3 text-sm">
++                {viewing.telephone && (
++                  <div className="flex items-center gap-2 text-slate-600"><Phone className="w-4 h-4 text-slate-400" /> {viewing.telephone}</div>
++                )}
++                {viewing.email && (
++                  <div className="flex items-center gap-2 text-slate-600"><Mail className="w-4 h-4 text-slate-400" /> {viewing.email}</div>
++                )}
++                {(viewing.ville || viewing.quartier) && (
++                  <div className="flex items-center gap-2 text-slate-600 col-span-2">
++                    <MapPin className="w-4 h-4 text-slate-400" /> {viewing.ville}{viewing.quartier ? ` · ${viewing.quartier}` : ''}{viewing.adresse ? ` — ${viewing.adresse}` : ''}
++                  </div>
++                )}
++                {viewing.nationalite && <div className="text-slate-500">Nationalité : <span className="text-slate-800">{viewing.nationalite}</span></div>}
++                {viewing.date_naissance && <div className="text-slate-500">Né(e) le : <span className="text-slate-800">{viewing.date_naissance}</span></div>}
++                {viewing.type_piece && (
++                  <div className="text-slate-500 col-span-2">
++                    Pièce : <span className="text-slate-800">{viewing.type_piece} {viewing.numero_piece}</span>
++                  </div>
++                )}
++              </div>
++
++              {viewing.motif_inactivation && (
++                <p className="text-xs text-brand-red-600 bg-brand-red-50 rounded-lg px-3 py-2">
++                  Motif : {viewing.motif_inactivation}
++                </p>
++              )}
++
++              <div>
++                <h4 className="text-sm font-bold text-slate-700 mb-2">Demandes</h4>
++                {!viewing.demandes || viewing.demandes.length === 0 ? (
++                  <p className="text-sm text-slate-400">Aucune demande déposée.</p>
++                ) : (
++                  <div className="space-y-2">
++                    {viewing.demandes.map((d) => (
++                      <div key={d.id} className="flex items-center justify-between text-sm bg-slate-50 rounded-lg px-3 py-2">
++                        <div>
++                          <div className="font-medium text-slate-800">{d.type.replace('_', ' ')}</div>
++                          <div className="text-xs text-slate-400 font-mono">{d.numero_dossier}</div>
++                        </div>
++                        <div className="text-right">
++                          <div className="text-slate-600">{d.statut_label}</div>
++                          <div className="text-xs text-slate-400">{d.date_depot}</div>
++                        </div>
++                      </div>
++                    ))}
++                  </div>
++                )}
++              </div>
++            </div>
++          )}
++        </DialogContent>
++      </Dialog>
++    </div>
++  );
++}
+diff --git a/src/app/admin/types.ts b/src/app/admin/types.ts
+index dc830f1..5ac902d 100644
+--- a/src/app/admin/types.ts
++++ b/src/app/admin/types.ts
+@@ -328,3 +328,101 @@ export interface Message {
+   created_at: string;
+   updated_at: string;
+ }
++
++// ===== Registre consulaire (ressortissants) =====
++
++export type StatutRessortissant = 'actif' | 'inactif' | 'suspendu';
++
++export interface Ressortissant {
++  id: number;
++  numero_registre: string | null;
++  nom: string;
++  prenom: string;
++  nom_complet: string;
++  sexe: string | null;
++  photo_url: string | null;
++  telephone: string | null;
++  whatsapp: string | null;
++  email: string | null;
++  ville: string | null;
++  quartier: string | null;
++  statut: StatutRessortissant;
++  inscription_verifiee: boolean;
++  created_at: string;
++  // Champs additionnels renvoyés uniquement par la fiche détaillée (show)
++  date_naissance?: string | null;
++  lieu_naissance?: string | null;
++  nationalite?: string | null;
++  profession?: string | null;
++  situation_matrimoniale?: string | null;
++  type_piece?: string | null;
++  numero_piece?: string | null;
++  date_expiration_piece?: string | null;
++  adresse?: string | null;
++  commune?: string | null;
++  latitude?: number | null;
++  longitude?: number | null;
++  date_arrivee?: string | null;
++  contact_urgence_nom?: string | null;
++  contact_urgence_telephone?: string | null;
++  motif_inactivation?: string | null;
++  derniere_connexion?: string | null;
++  demandes?: RessortissantDemandeResume[];
++}
++
++export interface RessortissantDemandeResume {
++  id: number;
++  numero_dossier: string;
++  type: string;
++  statut: string;
++  statut_label: string;
++  date_depot: string | null;
++}
++
++// ===== Configuration : tarifs & pièces requises =====
++
++export type DelaiDemande = '3_jours' | '24h' | 'meme_jour';
++
++export interface Tarif {
++  id: number;
++  entity_id: number;
++  type_demande: string;
++  delai: DelaiDemande;
++  montant: number;
++  devise: string;
++  delai_heures: number | null;
++  est_actif: boolean;
++}
++
++export interface DocumentTypeRequis {
++  id: number;
++  entity_id: number;
++  type_demande: string;
++  code_document: string;
++  label: string;
++  aide: string | null;
++  ordre: number;
++  nombre_requis: number;
++  formats_acceptes: string;
++  taille_max_ko: number;
++  obligatoire: boolean;
++  est_actif: boolean;
++}
++
++// ===== Carte interactive (vue admin) =====
++
++export interface QuartierAgregat {
++  ville: string;
++  quartier: string;
++  total: number;
++}
++
++export interface PointCarte {
++  id: number;
++  nom_complet: string;
++  ville: string | null;
++  quartier: string | null;
++  statut: StatutRessortissant;
++  latitude: number;
++  longitude: number;
++}
+diff --git a/src/app/context/AuthContext.tsx b/src/app/context/AuthContext.tsx
+index 36de73e..404ad1b 100644
+--- a/src/app/context/AuthContext.tsx
++++ b/src/app/context/AuthContext.tsx
+@@ -1,7 +1,7 @@
+ import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+ import { api, ApiError, getToken, setToken } from '../../lib/api';
+ 
+-export type AdminRole = 'super_admin' | 'admin' | 'moderateur' | 'tresorier';
++export type AdminRole = 'super_admin' | 'admin' | 'moderateur' | 'tresorier' | 'agent';
+ 
+ export interface AdminUser {
+   id: number;
