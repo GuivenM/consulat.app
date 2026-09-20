@@ -14,8 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { api } from '../../lib/api';
 
 // Les 77 communes du Bénin viennent de l'API (source unique de vérité côté
-// backend, voir Membre::VILLES_BENIN) — mises en cache en mémoire le temps
-// de la session pour éviter de rappeler l'endpoint à chaque champ affiché.
+// backend, voir Ressortissant::VILLES_BENIN) — mises en cache en mémoire le
+// temps de la session pour éviter de rappeler l'endpoint à chaque champ affiché.
 let villesCache: string[] | null = null;
 
 interface VilleSelectProps {
@@ -40,7 +40,7 @@ export function VilleSelect({
   useEffect(() => {
     if (villesCache) return;
     api
-      .get<string[]>('/v1/membres/villes')
+      .get<string[]>('/v1/communes-benin')
       .then((data) => {
         villesCache = data;
         setVilles(data);

@@ -1,27 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { Loader2 } from 'lucide-react';
-import { api, ApiError } from '../../lib/api';
-import { Membre } from '../admin/types';
-import { Zoomable } from '../components/Zoomable';
 
 export function About() {
-  const [bureau, setBureau] = useState<Membre[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api
-      .get<Membre[]>('/v1/membres/bureau')
-      .then(setBureau)
-      .catch((err) => {
-        if (!(err instanceof ApiError)) console.error(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Le bureau renvoyé par l'API est déjà trié par rang (Président en premier,
-  // etc.) — utilisé plus bas pour la liste de l'équipe.
-
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
@@ -69,43 +49,6 @@ export function About() {
           <div>
             <div className="font-bold text-slate-900">Dr. Fidèle Elenga</div>
             <div className="text-sm text-slate-500 uppercase tracking-widest">Consul Honoraire de la République du Congo au Bénin</div>
-          </div>
-        </div>
-
-        {/* Team Grid */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">L'équipe du Consulat</h2>
-
-          {loading && (
-            <div className="flex justify-center py-12 text-slate-400">
-              <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-          )}
-
-          {!loading && bureau.length === 0 && (
-            <div className="text-center py-12 text-slate-500">Composition du bureau à venir.</div>
-          )}
-
-          {/* flex-wrap plutôt qu'une grille stricte : le nombre de membres du
-              bureau varie (ajouts/retraits en admin), ça reste centré et propre
-              que ce soit 2, 5 ou 9 cartes. */}
-          <div className="flex flex-wrap justify-center gap-6">
-            {bureau.map((member) => (
-              <div
-                key={member.id}
-                className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] bg-slate-50 p-6 rounded-2xl text-center hover:bg-white hover:shadow-lg transition-all border border-slate-100"
-              >
-                <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xl">
-                  {member.photo_url ? (
-                    <Zoomable src={member.photo_url} alt={member.nom_complet} className="w-full h-full object-cover" />
-                  ) : (
-                    <span>{member.prenom[0]}{member.nom[0]}</span>
-                  )}
-                </div>
-                <h3 className="font-bold text-slate-900">{member.nom_complet}</h3>
-                <p className="text-sm text-brand-green-600 font-medium">{member.poste}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>

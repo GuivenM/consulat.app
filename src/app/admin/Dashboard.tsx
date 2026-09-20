@@ -8,6 +8,8 @@ import {
   Newspaper,
   BookOpen,
   Handshake,
+  Settings,
+  Map as MapIcon,
   Loader2,
   ArrowRight,
 } from 'lucide-react';
@@ -20,6 +22,8 @@ import type {
   Actualite,
   GuideSection,
   Partenaire,
+  Tarif,
+  DocumentTypeRequis,
 } from './types';
 
 interface Overview {
@@ -36,6 +40,9 @@ interface Overview {
   guideSections: number;
   partenairesActifs: number;
   partenairesTotal: number;
+  villesCouvertes: number;
+  tarifsActifs: number;
+  documentsRequisActifs: number;
 }
 
 export function Dashboard() {
@@ -51,27 +58,32 @@ export function Dashboard() {
         const [
           messages,
           ressortissantsStats,
-          demandes,
+          demandesReponse,
           actualites,
           guide,
           partenairesActifs,
           partenairesInactifs,
+          tarifs,
+          documentsRequis,
         ] = await Promise.all([
           api.get<Message[]>('/v1/messages'),
           api.get<RessortissantStats>('/v1/admin/ressortissants/statistiques'),
-          // NOTE : /v1/admin/demandes pagine côté serveur (20/page par défaut) mais
-          // ne renvoie pas encore de total exploitable par ce client HTTP (le
-          // `meta` de la réponse est ignoré par api.get, voir lib/api.ts) — une
-          // vraie page Demandes visera cet endpoint avec ses propres filtres,
-          // ce large par_page n'est qu'un aperçu pour le tableau de bord.
-          api.get<Demande[]>('/v1/admin/demandes?par_page=200'),
+          // NOTE : /v1/admin/demandes pagine côté serveur (20/page par défaut) et
+          // renvoie {items, meta} sous data (même forme que le registre) — meta.total
+          // sera exploité par la vraie page Demandes ; ce large par_page n'est qu'un
+          // aperçu pour le tableau de bord.
+          api.get<{ items: Demande[] }>('/v1/admin/demandes?par_page=200'),
           api.get<Actualite[]>('/v1/actualites'),
           api.get<GuideSection[]>('/v1/guide?all=1'),
           api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
           api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
+          api.get<Tarif[]>('/v1/admin/tarifs'),
+          api.get<DocumentTypeRequis[]>('/v1/admin/document-types-requis'),
         ]);
 
         if (cancelled) return;
+
+        const demandes = demandesReponse.items;
 
         setData({
           messagesNonLus: messages.filter((m) => m.statut === 'non_lu').length,
@@ -90,6 +102,9 @@ export function Dashboard() {
           guideSections: guide.length,
           partenairesActifs: partenairesActifs.length,
           partenairesTotal: partenairesActifs.length + partenairesInactifs.length,
+          villesCouvertes: Object.keys(ressortissantsStats.par_ville).length,
+          tarifsActifs: tarifs.filter((t) => t.est_actif).length,
+          documentsRequisActifs: documentsRequis.filter((d) => d.est_actif).length,
         });
       } catch {
         if (!cancelled) setError('Impossible de charger les données du tableau de bord.');
@@ -170,6 +185,18 @@ export function Dashboard() {
               icon={BookUser}
               title="Registre consulaire"
               stat={`${data.ressortissantsActifs} actif${data.ressortissantsActifs > 1 ? 's' : ''} / ${data.ressortissantsTotal}`}
+            />
+            <ModuleCard
+              to="/admin/carte"
+              icon={MapIcon}
+              title="Carte interactive"
+              stat={`${data.villesCouvertes} ville${data.villesCouvertes > 1 ? 's' : ''} couverte${data.villesCouvertes > 1 ? 's' : ''}`}
+            />
+            <ModuleCard
+              to="/admin/configuration"
+              icon={Settings}
+              title="Configuration"
+              stat={`${data.tarifsActifs} tarif${data.tarifsActifs > 1 ? 's' : ''} · ${data.documentsRequisActifs} pièce${data.documentsRequisActifs > 1 ? 's' : ''} requise${data.documentsRequisActifs > 1 ? 's' : ''}`}
             />
             <ModuleCard
               to="/admin/messages"

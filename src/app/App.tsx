@@ -12,6 +12,7 @@ import { PolitiqueConfidentialite } from './pages/PolitiqueConfidentialite';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { MemberAuthProvider } from './context/MemberAuthContext';
+import { RessortissantAuthProvider } from './context/RessortissantAuthContext';
 import { ImageLightboxProvider } from './components/ImageLightbox';
 import { AdminLogin } from './admin/AdminLogin';
 import { ActivationCompteAdmin } from './admin/ActivationCompteAdmin';
@@ -36,6 +37,17 @@ import { MemberProtectedRoute } from './member/MemberProtectedRoute';
 import { MemberDashboard } from './member/MemberDashboard';
 import { MemberEvenements } from './member/MemberEvenements';
 import { MemberProfil } from './member/MemberProfil';
+import { Inscription } from './ressortissant/Inscription';
+import { VerificationEmail } from './ressortissant/VerificationEmail';
+import { RessortissantLogin } from './ressortissant/Login';
+import { MotDePasseOublieRessortissant } from './ressortissant/MotDePasseOublie';
+import { ReinitialiserMotDePasse } from './ressortissant/ReinitialiserMotDePasse';
+import { RessortissantLayout } from './ressortissant/RessortissantLayout';
+import { RessortissantProtectedRoute } from './ressortissant/RessortissantProtectedRoute';
+import { RessortissantDashboard } from './ressortissant/Dashboard';
+import { NouvelleDemande } from './ressortissant/NouvelleDemande';
+import { DemandeDetail } from './ressortissant/DemandeDetail';
+import { Profil } from './ressortissant/Profil';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -53,6 +65,7 @@ export default function App() {
       <ScrollToTop />
       <AuthProvider>
       <MemberAuthProvider>
+      <RessortissantAuthProvider>
       <ImageLightboxProvider>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -98,8 +111,24 @@ export default function App() {
               <Route path="profil" element={<MemberProfil />} />
             </Route>
           </Route>
+
+          <Route path="/espace-consulaire/inscription" element={<Inscription />} />
+          <Route path="/espace-consulaire/verification-email" element={<VerificationEmail />} />
+          <Route path="/espace-consulaire/login" element={<RessortissantLogin />} />
+          <Route path="/espace-consulaire/mot-de-passe-oublie" element={<MotDePasseOublieRessortissant />} />
+          <Route path="/espace-consulaire/reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
+
+          <Route element={<RessortissantProtectedRoute />}>
+            <Route path="/espace-consulaire" element={<RessortissantLayout />}>
+              <Route index element={<RessortissantDashboard />} />
+              <Route path="nouvelle-demande" element={<NouvelleDemande />} />
+              <Route path="demandes/:id" element={<DemandeDetail />} />
+              <Route path="profil" element={<Profil />} />
+            </Route>
+          </Route>
         </Routes>
       </ImageLightboxProvider>
+      </RessortissantAuthProvider>
       </MemberAuthProvider>
       </AuthProvider>
       <Toaster position="top-right" richColors />

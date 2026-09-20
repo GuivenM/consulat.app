@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '../../../lib/api';
-import type { Adhesion, Message, CotisationStats } from '../types';
+import type { Demande, Message } from '../types';
 
-export type NotificationType = 'adhesion' | 'message' | 'cotisation';
+export type NotificationType = 'demande' | 'message';
 
 export interface AdminNotification {
   type: NotificationType;
@@ -17,36 +17,31 @@ interface NotificationsState {
   loading: boolean;
   items: AdminNotification[];
   total: number;
-  adhesionsEnAttente: number;
+  demandesEnAttente: number;
   messagesNonLus: number;
-  cotisationsEnRetard: number;
   refresh: () => void;
 }
 
 const INTERVALLE_RAFRAICHISSEMENT_MS = 60_000;
 
 /**
- * "Nouveau" est dérivé du statut métier existant (une adhésion en_attente,
- * un message non_lu redeviennent silencieux dès qu'un admin les traite) —
- * pas d'un système de notifications séparé à marquer lu/non lu.
+ * "Nouveau" est dérivé du statut métier existant (une demande reçue, un
+ * message non_lu redeviennent silencieux dès qu'un admin/agent les
+ * traite) — pas d'un système de notifications séparé à marquer lu/non lu.
  */
 export function useAdminNotifications(): NotificationsState {
   const [loading, setLoading] = useState(true);
-  const [adhesions, setAdhesions] = useState<Adhesion[]>([]);
+  const [demandesRecues, setDemandesRecues] = useState<Demande[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [cotisationsEnRetard, setCotisationsEnRetard] = useState(0);
 
   const charger = useCallback(async () => {
     try {
-      const moisCourant = new Date().toISOString().slice(0, 7);
-      const [adhesionsData, messagesData, stats] = await Promise.all([
-        api.get<Adhesion[]>('/v1/adhesions'),
+      const [demandesData, messagesData] = await Promise.all([
+        api.get<Demande[]>('/v1/admin/demandes?statut=recu&par_page=50'),
         api.get<Message[]>('/v1/messages'),
-        api.get<CotisationStats>(`/v1/cotisations/statistiques?mois=${moisCourant}`),
       ]);
-      setAdhesions(adhesionsData);
+      setDemandesRecues(demandesData);
       setMessages(messagesData);
-      setCotisationsEnRetard(stats.nb_impayees);
     } catch {
       // Échec silencieux : la cloche affiche simplement les derniers
       // chiffres connus plutôt qu'une erreur intrusive.
@@ -61,17 +56,16 @@ export function useAdminNotifications(): NotificationsState {
     return () => clearInterval(interval);
   }, [charger]);
 
-  const adhesionsEnAttente = adhesions.filter((a) => a.statut === 'en_attente');
   const messagesNonLus = messages.filter((m) => m.statut === 'non_lu');
 
   const items: AdminNotification[] = [
-    ...adhesionsEnAttente.map((a) => ({
-      type: 'adhesion' as const,
-      id: a.id,
-      titre: `Nouvelle adhésion — ${a.prenom} ${a.nom}`,
-      sous_titre: 'En attente de traitement',
-      date: a.created_at,
-      lien: '/admin/adhesions',
+    ...demandesRecues.map((d) => ({
+      type: 'demande' as const,
+      id: d.id,
+      titre: `Nouvelle demande — ${d.numero_dossier}`,
+      sous_titre: d.ressortissant?.nom_complet ?? d.type,
+      date: d.date_depot ?? '',
+      lien: '/admin/demandes',
     })),
     ...messagesNonLus.map((m) => ({
       type: 'message' as const,
@@ -88,10 +82,9 @@ export function useAdminNotifications(): NotificationsState {
   return {
     loading,
     items,
-    total: adhesionsEnAttente.length + messagesNonLus.length,
-    adhesionsEnAttente: adhesionsEnAttente.length,
+    total: demandesRecues.length + messagesNonLus.length,
+    demandesEnAttente: demandesRecues.length,
     messagesNonLus: messagesNonLus.length,
-    cotisationsEnRetard,
     refresh: charger,
   };
 }

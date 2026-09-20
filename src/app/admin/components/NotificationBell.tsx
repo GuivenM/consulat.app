@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, UserPlus, Mail, Loader2 } from 'lucide-react';
+import { Bell, FileText, Mail, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,9 +13,8 @@ import { cn } from '../../components/Navbar';
 import { AdminNotification } from '../hooks/useAdminNotifications';
 
 const ICONS: Record<AdminNotification['type'], React.ComponentType<{ className?: string }>> = {
-  adhesion: UserPlus,
+  demande: FileText,
   message: Mail,
-  cotisation: Mail,
 };
 
 function tempsEcoule(dateIso: string): string {
