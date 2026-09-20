@@ -36,14 +36,12 @@ interface UtilisateurAdmin {
   en_attente_activation: boolean;
   derniere_connexion: string | null;
   initiales: string;
-  membre: { id: number; nom: string; prenom: string; poste: string | null } | null;
 }
 
 const ROLES: { value: AdminRole; label: string }[] = [
   { value: 'super_admin', label: 'Super Administrateur' },
   { value: 'admin', label: 'Administrateur' },
-  { value: 'tresorier', label: 'Trésorier' },
-  { value: 'moderateur', label: 'Modérateur' },
+  { value: 'agent', label: 'Agent' },
 ];
 
 export function AdminUtilisateurs() {
@@ -122,7 +120,7 @@ export function AdminUtilisateurs() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Utilisateurs</h1>
           <p className="text-slate-500 text-sm mt-1">
-            Comptes ayant accès à l'espace d'administration. Les nouveaux accès se créent depuis la fiche d'un membre du bureau.
+            Comptes ayant accès à l'espace d'administration.
           </p>
         </div>
       </div>
@@ -163,11 +161,6 @@ export function AdminUtilisateurs() {
                           <div className="text-xs text-slate-500 flex items-center gap-1">
                             <Mail className="w-3 h-3" /> {u.email}
                           </div>
-                          {u.membre && (
-                            <div className="text-xs text-slate-400 mt-0.5">
-                              Lié à {u.membre.prenom} {u.membre.nom}{u.membre.poste ? ` — ${u.membre.poste}` : ''}
-                            </div>
-                          )}
                         </div>
                       </div>
                     </TableCell>

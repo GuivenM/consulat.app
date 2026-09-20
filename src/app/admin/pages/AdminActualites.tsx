@@ -84,7 +84,7 @@ function emptyForm(): FormState {
 
 export function AdminActualites() {
   const { hasRole } = useAuth();
-  const canCreate = hasRole('super_admin', 'admin', 'moderateur');
+  const canCreate = hasRole('super_admin', 'admin');
   const canEdit = hasRole('super_admin', 'admin');
   const canDelete = hasRole('super_admin');
 

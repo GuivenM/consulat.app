@@ -359,7 +359,6 @@ export interface Ressortissant {
   numero_piece?: string | null;
   date_expiration_piece?: string | null;
   adresse?: string | null;
-  commune?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   date_arrivee?: string | null;
@@ -425,4 +424,61 @@ export interface PointCarte {
   statut: StatutRessortissant;
   latitude: number;
   longitude: number;
+}
+
+export interface RessortissantStats {
+  total: number;
+  par_statut: Record<string, number>;
+  par_ville: Record<string, number>;
+}
+
+// ===== Demandes (dépôt de dossier) =====
+
+export type StatutDemande = 'recu' | 'en_traitement' | 'pret' | 'retire' | 'rejete';
+export type StatutPaiementDemande = 'en_attente' | 'partiel' | 'paye';
+
+export interface DemandeRessortissantResume {
+  id: number;
+  nom_complet: string;
+  numero_registre: string | null;
+  ville: string | null;
+  quartier: string | null;
+}
+
+export interface Demande {
+  id: number;
+  numero_dossier: string;
+  type: string;
+  delai: DelaiDemande;
+  delai_label: string;
+  statut: StatutDemande;
+  statut_label: string;
+  motif_rejet: string | null;
+  montant: number;
+  devise: string;
+  paiement_statut: StatutPaiementDemande;
+  documents_complets: boolean;
+  date_depot: string | null;
+  date_disponibilite_prevue: string | null;
+  date_pret: string | null;
+  date_retrait: string | null;
+  ressortissant: DemandeRessortissantResume | null;
+  // Renvoyés uniquement par la fiche détaillée (show)
+  donnees_specifiques?: Record<string, unknown> | null;
+  note_interne?: string | null;
+  traite_par?: string | null;
+  documents?: DemandeDocumentAdmin[];
+}
+
+export interface DemandeDocumentAdmin {
+  id: number;
+  code_document: string;
+  label: string;
+  nom_original: string | null;
+  statut: 'en_attente' | 'valide' | 'rejete';
+  statut_label: string;
+  motif_rejet: string | null;
+  verifie_par: string | null;
+  verifie_at: string | null;
+  created_at: string;
 }

@@ -1,0 +1,2878 @@
+diff --git a/src/app/App.tsx b/src/app/App.tsx
+index bb9360f..60a373e 100644
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+ import { Layout } from './components/Layout';
+ import { Home } from './pages/Home';
+ import { About } from './pages/About';
+-import { Actions } from './pages/Actions';
+-import { ActionsSection } from './pages/ActionsSection';
+ import { Guide } from './pages/Guide';
+ import { News } from './pages/News';
+ import { NewsDetail } from './pages/NewsDetail';
+@@ -22,15 +20,12 @@ import { AdminLayout } from './admin/AdminLayout';
+ import { ProtectedRoute } from './admin/ProtectedRoute';
+ import { Dashboard } from './admin/Dashboard';
+ import { AdminMessages } from './admin/pages/AdminMessages';
+-import { AdminMembres } from './admin/pages/AdminMembres';
+ import { AdminRegistre } from './admin/pages/AdminRegistre';
+ import { AdminConfiguration } from './admin/pages/AdminConfiguration';
+ import { AdminCarte } from './admin/pages/AdminCarte';
+-import { AdminEvenements } from './admin/pages/AdminEvenements';
+ import { AdminActualites } from './admin/pages/AdminActualites';
+ import { AdminGuide } from './admin/pages/AdminGuide';
+ import { AdminPartenaires } from './admin/pages/AdminPartenaires';
+-import { AdminActions } from './admin/pages/AdminActions';
+ import { AdminUtilisateurs } from './admin/pages/AdminUtilisateurs';
+ import { AdminJournal } from './admin/pages/AdminJournal';
+ import { MemberLogin } from './member/MemberLogin';
+@@ -63,8 +58,6 @@ export default function App() {
+           <Route path="/" element={<Layout />}>
+             <Route index element={<Home />} />
+             <Route path="about" element={<About />} />
+-            <Route path="actions" element={<Actions />} />
+-            <Route path="actions/:section" element={<ActionsSection />} />
+             <Route path="guide" element={<Guide />} />
+             <Route path="news" element={<News />} />
+             <Route path="news/:id" element={<NewsDetail />} />
+@@ -81,15 +74,12 @@ export default function App() {
+             <Route path="/admin" element={<AdminLayout />}>
+               <Route index element={<Dashboard />} />
+               <Route path="messages" element={<AdminMessages />} />
+-              <Route path="membres" element={<AdminMembres />} />
+               <Route path="registre" element={<AdminRegistre />} />
+               <Route path="configuration" element={<AdminConfiguration />} />
+               <Route path="carte" element={<AdminCarte />} />
+-              <Route path="evenements" element={<AdminEvenements />} />
+               <Route path="actualites" element={<AdminActualites />} />
+               <Route path="guide" element={<AdminGuide />} />
+               <Route path="partenaires" element={<AdminPartenaires />} />
+-              <Route path="actions" element={<AdminActions />} />
+               <Route element={<ProtectedRoute roles={['super_admin']} />}>
+                 <Route path="utilisateurs" element={<AdminUtilisateurs />} />
+                 <Route path="journal" element={<AdminJournal />} />
+diff --git a/src/app/admin/AdminLayout.tsx b/src/app/admin/AdminLayout.tsx
+index 52f7e60..5e3dac3 100644
+--- a/src/app/admin/AdminLayout.tsx
++++ b/src/app/admin/AdminLayout.tsx
+@@ -4,9 +4,6 @@ import {
+   LayoutDashboard,
+   Mail,
+   Newspaper,
+-  Activity,
+-  Users,
+-  CalendarDays,
+   BookOpen,
+   Handshake,
+   LogOut,
+@@ -32,18 +29,15 @@ interface NavItem {
+   roles?: AdminRole[];
+ }
+ 
+-const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'moderateur'];
++const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'agent'];
+ 
+ const navItems: NavItem[] = [
+-  { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: ['super_admin', 'admin', 'moderateur', 'tresorier'] },
++  { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: STAFF_ROLES },
+   { label: 'Messages', path: '/admin/messages', icon: Mail, roles: STAFF_ROLES },
+   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
+-  { label: 'Actions', path: '/admin/actions', icon: Activity, roles: STAFF_ROLES },
+-  { label: 'Membres', path: '/admin/membres', icon: Users, roles: STAFF_ROLES },
+   { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
+   { label: 'Carte', path: '/admin/carte', icon: MapIcon, roles: ['super_admin', 'admin', 'agent'] },
+   { label: 'Configuration', path: '/admin/configuration', icon: Settings, roles: ['super_admin', 'admin'] },
+-  { label: 'Événements', path: '/admin/evenements', icon: CalendarDays, roles: STAFF_ROLES },
+   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
+   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },
+   { label: 'Utilisateurs', path: '/admin/utilisateurs', icon: ShieldCheck, roles: ['super_admin'] },
+diff --git a/src/app/admin/Dashboard.tsx b/src/app/admin/Dashboard.tsx
+index 06f4632..c52e926 100644
+--- a/src/app/admin/Dashboard.tsx
++++ b/src/app/admin/Dashboard.tsx
+@@ -1,51 +1,41 @@
+ import React, { useEffect, useState } from 'react';
+ import { Link } from 'react-router-dom';
+ import {
+-  UserPlus,
++  FileText,
+   Mail,
+-  Users,
+-  Wallet,
+-  CalendarDays,
++  BookUser,
++  CheckCircle2,
+   Newspaper,
+   BookOpen,
+   Handshake,
+-  Activity,
+   Loader2,
+   ArrowRight,
+ } from 'lucide-react';
+ import { api } from '../../lib/api';
+ import { useAuth } from '../context/AuthContext';
+ import type {
+-  Adhesion,
+   Message,
+-  Membre,
+-  CotisationStats,
+-  Evenement,
++  RessortissantStats,
++  Demande,
+   Actualite,
+   GuideSection,
+   Partenaire,
+-  Action,
+ } from './types';
+ 
+ interface Overview {
+-  adhesionsEnAttente: number;
+-  adhesionsTotal: number;
+   messagesNonLus: number;
+   messagesTotal: number;
+-  membresActifs: number;
+-  membresTotal: number;
+-  cotisationsEnRetard: number;
+-  cotisationsTauxAJour: number;
+-  evenementsAVenir: number;
+-  evenementsTotal: number;
++  ressortissantsActifs: number;
++  ressortissantsTotal: number;
++  demandesEnAttente: number;
++  demandesPretes: number;
++  demandesTotal: number;
+   actualitesBrouillons: number;
+   actualitesTotal: number;
+   guideDocuments: number;
+   guideSections: number;
+   partenairesActifs: number;
+   partenairesTotal: number;
+-  actionsEnCours: number;
+-  actionsTotal: number;
+ }
+ 
+ export function Dashboard() {
+@@ -55,49 +45,42 @@ export function Dashboard() {
+ 
+   useEffect(() => {
+     let cancelled = false;
+-    const moisCourant = new Date().toISOString().slice(0, 7);
+ 
+     (async () => {
+       try {
+         const [
+-          adhesions,
+           messages,
+-          membres,
+-          cotisationsStats,
+-          evenements,
++          ressortissantsStats,
++          demandes,
+           actualites,
+           guide,
+           partenairesActifs,
+           partenairesInactifs,
+-          actions,
+         ] = await Promise.all([
+-          api.get<Adhesion[]>('/v1/adhesions'),
+           api.get<Message[]>('/v1/messages'),
+-          api.get<Membre[]>('/v1/membres-admin/tous'),
+-          api.get<CotisationStats>(`/v1/cotisations/statistiques?mois=${moisCourant}`),
+-          api.get<Evenement[]>('/v1/evenements'),
++          api.get<RessortissantStats>('/v1/admin/ressortissants/statistiques'),
++          // NOTE : /v1/admin/demandes pagine côté serveur (20/page par défaut) mais
++          // ne renvoie pas encore de total exploitable par ce client HTTP (le
++          // `meta` de la réponse est ignoré par api.get, voir lib/api.ts) — une
++          // vraie page Demandes visera cet endpoint avec ses propres filtres,
++          // ce large par_page n'est qu'un aperçu pour le tableau de bord.
++          api.get<Demande[]>('/v1/admin/demandes?par_page=200'),
+           api.get<Actualite[]>('/v1/actualites'),
+           api.get<GuideSection[]>('/v1/guide?all=1'),
+           api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
+           api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
+-          api.get<Action[]>('/v1/actions'),
+         ]);
+ 
+         if (cancelled) return;
+ 
+-        const today = new Date().toISOString().slice(0, 10);
+-
+         setData({
+-          adhesionsEnAttente: adhesions.filter((a) => a.statut === 'en_attente').length,
+-          adhesionsTotal: adhesions.length,
+           messagesNonLus: messages.filter((m) => m.statut === 'non_lu').length,
+           messagesTotal: messages.length,
+-          membresActifs: membres.filter((m) => m.statut === 'actif').length,
+-          membresTotal: membres.length,
+-          cotisationsEnRetard: cotisationsStats.nb_impayees,
+-          cotisationsTauxAJour: cotisationsStats.taux_a_jour,
+-          evenementsAVenir: evenements.filter((e) => e.date_debut >= today && e.statut === 'publie').length,
+-          evenementsTotal: evenements.length,
++          ressortissantsActifs: ressortissantsStats.par_statut.actif ?? 0,
++          ressortissantsTotal: ressortissantsStats.total,
++          demandesEnAttente: demandes.filter((d) => d.statut === 'recu' || d.statut === 'en_traitement').length,
++          demandesPretes: demandes.filter((d) => d.statut === 'pret').length,
++          demandesTotal: demandes.length,
+           actualitesBrouillons: actualites.filter((a) => a.statut === 'brouillon').length,
+           actualitesTotal: actualites.length,
+           guideDocuments: guide.reduce(
+@@ -107,8 +90,6 @@ export function Dashboard() {
+           guideSections: guide.length,
+           partenairesActifs: partenairesActifs.length,
+           partenairesTotal: partenairesActifs.length + partenairesInactifs.length,
+-          actionsEnCours: actions.filter((a) => a.statut === 'actif').length,
+-          actionsTotal: actions.length,
+         });
+       } catch {
+         if (!cancelled) setError('Impossible de charger les données du tableau de bord.');
+@@ -147,10 +128,16 @@ export function Dashboard() {
+           {/* À traiter en priorité */}
+           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+             <StatCard
+-              label="Adhésions en attente"
+-              value={data.adhesionsEnAttente}
+-              icon={UserPlus}
+-              tone={data.adhesionsEnAttente > 0 ? 'gold' : 'green'}
++              label="Demandes en attente"
++              value={data.demandesEnAttente}
++              icon={FileText}
++              tone={data.demandesEnAttente > 0 ? 'gold' : 'green'}
++            />
++            <StatCard
++              label="Dossiers prêts"
++              value={data.demandesPretes}
++              icon={CheckCircle2}
++              tone={data.demandesPretes > 0 ? 'gold' : 'green'}
+             />
+             <StatCard
+               label="Messages non lus"
+@@ -159,15 +146,9 @@ export function Dashboard() {
+               tone={data.messagesNonLus > 0 ? 'red' : 'green'}
+             />
+             <StatCard
+-              label="Cotisations en retard"
+-              value={data.cotisationsEnRetard}
+-              icon={Wallet}
+-              tone={data.cotisationsEnRetard > 0 ? 'red' : 'green'}
+-            />
+-            <StatCard
+-              label="Événements à venir"
+-              value={data.evenementsAVenir}
+-              icon={CalendarDays}
++              label="Ressortissants inscrits"
++              value={data.ressortissantsActifs}
++              icon={BookUser}
+               tone="green"
+             />
+           </div>
+@@ -178,11 +159,17 @@ export function Dashboard() {
+           </h2>
+           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+             <ModuleCard
+-              to="/admin/adhesions"
+-              icon={UserPlus}
+-              title="Adhésions"
+-              stat={`${data.adhesionsTotal} demande${data.adhesionsTotal > 1 ? 's' : ''} au total`}
+-              badge={data.adhesionsEnAttente}
++              to="/admin/demandes"
++              icon={FileText}
++              title="Demandes"
++              stat={`${data.demandesTotal} dossier${data.demandesTotal > 1 ? 's' : ''} au total`}
++              badge={data.demandesEnAttente}
++            />
++            <ModuleCard
++              to="/admin/registre"
++              icon={BookUser}
++              title="Registre consulaire"
++              stat={`${data.ressortissantsActifs} actif${data.ressortissantsActifs > 1 ? 's' : ''} / ${data.ressortissantsTotal}`}
+             />
+             <ModuleCard
+               to="/admin/messages"
+@@ -191,25 +178,6 @@ export function Dashboard() {
+               stat={`${data.messagesTotal} message${data.messagesTotal > 1 ? 's' : ''} reçu${data.messagesTotal > 1 ? 's' : ''}`}
+               badge={data.messagesNonLus}
+             />
+-            <ModuleCard
+-              to="/admin/membres"
+-              icon={Users}
+-              title="Membres"
+-              stat={`${data.membresActifs} actif${data.membresActifs > 1 ? 's' : ''} / ${data.membresTotal}`}
+-            />
+-            <ModuleCard
+-              to="/admin/cotisations"
+-              icon={Wallet}
+-              title="Cotisations"
+-              stat={`${data.cotisationsTauxAJour}% à jour ce mois`}
+-              badge={data.cotisationsEnRetard}
+-            />
+-            <ModuleCard
+-              to="/admin/evenements"
+-              icon={CalendarDays}
+-              title="Événements"
+-              stat={`${data.evenementsTotal} événement${data.evenementsTotal > 1 ? 's' : ''} au total`}
+-            />
+             <ModuleCard
+               to="/admin/actualites"
+               icon={Newspaper}
+@@ -228,12 +196,6 @@ export function Dashboard() {
+               title="Partenaires"
+               stat={`${data.partenairesActifs} actif${data.partenairesActifs > 1 ? 's' : ''} / ${data.partenairesTotal}`}
+             />
+-            <ModuleCard
+-              to="/admin/actions"
+-              icon={Activity}
+-              title="Actions"
+-              stat={`${data.actionsEnCours} en cours / ${data.actionsTotal}`}
+-            />
+           </div>
+         </>
+       )}
+diff --git a/src/app/admin/pages/AdminActions.tsx b/src/app/admin/pages/AdminActions.tsx
+deleted file mode 100644
+index cdba58f..0000000
+--- a/src/app/admin/pages/AdminActions.tsx
++++ /dev/null
+@@ -1,569 +0,0 @@
+-import React, { useEffect, useMemo, useState } from 'react';
+-import { Loader2, Plus, Pencil, Trash2, Eye, Calendar, MapPin, Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+-import { api, ApiError } from '../../../lib/api';
+-import { compressImage } from '../../../lib/compressImage';
+-import { useAuth } from '../../context/AuthContext';
+-import { Zoomable } from '../../components/Zoomable';
+-import type { Action, StatutAction, SectionAction } from '../types';
+-import { Button } from '../../components/ui/button';
+-import { Badge } from '../../components/ui/badge';
+-import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
+-import {
+-  Table,
+-  TableBody,
+-  TableCell,
+-  TableHead,
+-  TableHeader,
+-  TableRow,
+-} from '../../components/ui/table';
+-import {
+-  Dialog,
+-  DialogContent,
+-  DialogHeader,
+-  DialogTitle,
+-  DialogFooter,
+-} from '../../components/ui/dialog';
+-import { Input } from '../../components/ui/input';
+-import { Label } from '../../components/ui/label';
+-import { Textarea } from '../../components/ui/textarea';
+-import {
+-  Select,
+-  SelectContent,
+-  SelectItem,
+-  SelectTrigger,
+-  SelectValue,
+-} from '../../components/ui/select';
+-import { toast } from 'sonner';
+-
+-const SECTION_LABELS: Record<SectionAction, string> = {
+-  solidarite: 'Solidarité & Intégration',
+-  education: 'Éducation & Formation',
+-  culture: 'Culture & Identité',
+-  communication: 'Communication & Partenariats',
+-};
+-
+-const STATUT_LABELS: Record<StatutAction, string> = {
+-  actif: 'En cours',
+-  a_venir: 'À venir',
+-  termine: 'Terminé',
+-  inactif: 'Inactif',
+-};
+-
+-const STATUT_BADGE: Record<StatutAction, string> = {
+-  actif: 'bg-brand-green-50 text-brand-green-600 border-brand-green-200',
+-  a_venir: 'bg-brand-gold-50 text-brand-gold-500 border-brand-gold-200',
+-  termine: 'bg-slate-100 text-slate-500 border-slate-200',
+-  inactif: 'bg-brand-red-50 text-brand-red-600 border-brand-red-200',
+-};
+-
+-type FilterTab = 'toutes' | SectionAction;
+-
+-interface FormState {
+-  titre: string;
+-  description: string;
+-  section: SectionAction;
+-  dateDebut: string;
+-  dateFin: string;
+-  dateEvenement: string;
+-  lieu: string;
+-  objectifs: string;
+-  activitesCles: string;
+-  resultats: string;
+-  statut: StatutAction;
+-  imageFile: File | null;
+-}
+-
+-function emptyForm(): FormState {
+-  return {
+-    titre: '', description: '', section: 'solidarite', dateDebut: '', dateFin: '',
+-    dateEvenement: '', lieu: '', objectifs: '', activitesCles: '', resultats: '',
+-    statut: 'a_venir', imageFile: null,
+-  };
+-}
+-
+-function toLines(v: string) {
+-  return v.split('\n').map((l) => l.trim()).filter(Boolean);
+-}
+-
+-export function AdminActions() {
+-  const { hasRole } = useAuth();
+-  const canWrite = hasRole('super_admin', 'admin');
+-  const canDelete = hasRole('super_admin');
+-
+-  const [actions, setActions] = useState<Action[] | null>(null);
+-  const [filter, setFilter] = useState<FilterTab>('toutes');
+-  const [editing, setEditing] = useState<Action | 'new' | null>(null);
+-  const [viewing, setViewing] = useState<Action | null>(null);
+-  const [form, setForm] = useState<FormState>(emptyForm());
+-  const [saving, setSaving] = useState(false);
+-  const [search, setSearch] = useState('');
+-  const [sortKey, setSortKey] = useState<'titre' | 'section' | 'statut'>('titre');
+-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+-
+-  async function load() {
+-    try {
+-      const data = await api.get<Action[]>('/v1/actions');
+-      setActions(data);
+-    } catch {
+-      toast.error('Impossible de charger les actions.');
+-    }
+-  }
+-
+-  useEffect(() => {
+-    load();
+-  }, []);
+-
+-  function toggleSort(key: 'titre' | 'section' | 'statut') {
+-    if (sortKey === key) {
+-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+-    } else {
+-      setSortKey(key);
+-      setSortDir('asc');
+-    }
+-  }
+-
+-  const filtered = useMemo(() => {
+-    if (!actions) return [];
+-    let list = filter === 'toutes' ? actions : actions.filter((a) => a.section === filter);
+-
+-    const q = search.trim().toLowerCase();
+-    if (q) {
+-      list = list.filter(
+-        (a) =>
+-          a.titre.toLowerCase().includes(q) ||
+-          a.description.toLowerCase().includes(q) ||
+-          (a.lieu || '').toLowerCase().includes(q)
+-      );
+-    }
+-
+-    const sorted = [...list].sort((a, b) => {
+-      let cmp = 0;
+-      if (sortKey === 'titre') cmp = a.titre.localeCompare(b.titre);
+-      else if (sortKey === 'section') cmp = a.section.localeCompare(b.section);
+-      else cmp = a.statut.localeCompare(b.statut);
+-      return sortDir === 'asc' ? cmp : -cmp;
+-    });
+-
+-    return sorted;
+-  }, [actions, filter, search, sortKey, sortDir]);
+-
+-  function openCreate() {
+-    setForm(emptyForm());
+-    setEditing('new');
+-  }
+-
+-  function openEdit(a: Action) {
+-    setForm({
+-      titre: a.titre,
+-      description: a.description,
+-      section: a.section,
+-      dateDebut: a.date_debut ? a.date_debut.slice(0, 10) : '',
+-      dateFin: a.date_fin ? a.date_fin.slice(0, 10) : '',
+-      dateEvenement: a.date_evenement ? a.date_evenement.slice(0, 10) : '',
+-      lieu: a.lieu || '',
+-      objectifs: (a.objectifs || []).join('\n'),
+-      activitesCles: (a.activites_cles || []).join('\n'),
+-      resultats: (a.resultats || []).join('\n'),
+-      statut: a.statut,
+-      imageFile: null,
+-    });
+-    setEditing(a);
+-  }
+-
+-  function buildFormData() {
+-    const fd = new FormData();
+-    fd.append('titre', form.titre);
+-    fd.append('description', form.description);
+-    fd.append('section', form.section);
+-    if (form.dateDebut) fd.append('date_debut', form.dateDebut);
+-    if (form.dateFin) fd.append('date_fin', form.dateFin);
+-    if (form.dateEvenement) fd.append('date_evenement', form.dateEvenement);
+-    if (form.lieu) fd.append('lieu', form.lieu);
+-    toLines(form.objectifs).forEach((v) => fd.append('objectifs[]', v));
+-    toLines(form.activitesCles).forEach((v) => fd.append('activites_cles[]', v));
+-    toLines(form.resultats).forEach((v) => fd.append('resultats[]', v));
+-    fd.append('statut', form.statut);
+-    if (form.imageFile) fd.append('image', form.imageFile);
+-    return fd;
+-  }
+-
+-  async function save() {
+-    if (!form.titre.trim() || !form.description.trim()) {
+-      toast.error('Titre et description sont obligatoires.');
+-      return;
+-    }
+-    setSaving(true);
+-    try {
+-      const fd = buildFormData();
+-      if (editing === 'new') {
+-        const created = await api.postForm<Action>('/v1/actions', fd, 'POST');
+-        setActions((prev) => (prev ? [created, ...prev] : [created]));
+-        toast.success('Action créée avec succès.');
+-      } else if (editing) {
+-        // La route de mise à jour est en POST côté backend (pas de PUT).
+-        const updated = await api.postForm<Action>(`/v1/actions/${editing.id}`, fd, 'POST');
+-        setActions((prev) => prev?.map((a) => (a.id === updated.id ? updated : a)) ?? null);
+-        toast.success('Action mise à jour.');
+-      }
+-      setEditing(null);
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Une erreur est survenue.');
+-    } finally {
+-      setSaving(false);
+-    }
+-  }
+-
+-  async function remove(a: Action) {
+-    if (!confirm(`Supprimer définitivement « ${a.titre} » ?`)) return;
+-    try {
+-      await api.delete(`/v1/actions/${a.id}`);
+-      setActions((prev) => prev?.filter((x) => x.id !== a.id) ?? null);
+-      toast.success('Action supprimée.');
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Suppression impossible.');
+-    }
+-  }
+-
+-  return (
+-    <div>
+-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+-        <div>
+-          <h1 className="text-xl font-bold text-slate-900">Actions</h1>
+-          <p className="text-slate-500 text-sm mt-0.5">
+-            Projets et réalisations, par catégorie.
+-          </p>
+-        </div>
+-        {canWrite && (
+-          <Button onClick={openCreate} className="bg-brand-green-600 hover:bg-brand-green-700">
+-            <Plus className="w-4 h-4" /> Créer une action
+-          </Button>
+-        )}
+-      </div>
+-
+-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-5">
+-        <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterTab)}>
+-          <TabsList className="flex-wrap h-auto">
+-            <TabsTrigger value="toutes">Toutes</TabsTrigger>
+-            {Object.entries(SECTION_LABELS).map(([value, label]) => (
+-              <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
+-            ))}
+-          </TabsList>
+-        </Tabs>
+-
+-        <div className="relative lg:w-64">
+-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+-          <Input
+-            value={search}
+-            onChange={(e) => setSearch(e.target.value)}
+-            placeholder="Rechercher une action…"
+-            className="pl-9"
+-          />
+-        </div>
+-      </div>
+-
+-      {actions === null ? (
+-        <div className="flex items-center gap-2 text-slate-500 text-sm">
+-          <Loader2 className="w-4 h-4 animate-spin" /> Chargement…
+-        </div>
+-      ) : filtered.length === 0 ? (
+-        <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-brand-green-100">
+-          Aucune action dans cette catégorie.
+-        </div>
+-      ) : (
+-        <div className="bg-white rounded-xl border border-brand-green-100 overflow-hidden">
+-          <Table>
+-            <TableHeader>
+-              <TableRow>
+-                <TableHead>
+-                  <SortableHeader label="Action" active={sortKey === 'titre'} dir={sortDir} onClick={() => toggleSort('titre')} />
+-                </TableHead>
+-                <TableHead className="hidden md:table-cell">
+-                  <SortableHeader label="Commission" active={sortKey === 'section'} dir={sortDir} onClick={() => toggleSort('section')} />
+-                </TableHead>
+-                <TableHead className="hidden lg:table-cell">Lieu</TableHead>
+-                <TableHead>
+-                  <SortableHeader label="Statut" active={sortKey === 'statut'} dir={sortDir} onClick={() => toggleSort('statut')} />
+-                </TableHead>
+-                <TableHead className="text-right">Actions</TableHead>
+-              </TableRow>
+-            </TableHeader>
+-            <TableBody>
+-              {filtered.map((a) => (
+-                <TableRow key={a.id} className="cursor-pointer" onClick={() => setViewing(a)}>
+-                  <TableCell className="max-w-[320px]">
+-                    <div className="font-medium text-slate-900 line-clamp-1">{a.titre}</div>
+-                    <div className="text-xs text-slate-400 line-clamp-1">{a.description}</div>
+-                  </TableCell>
+-                  <TableCell className="hidden md:table-cell">
+-                    <Badge variant="secondary">{SECTION_LABELS[a.section]}</Badge>
+-                  </TableCell>
+-                  <TableCell className="hidden lg:table-cell text-slate-600 text-sm">
+-                    {a.lieu || '—'}
+-                  </TableCell>
+-                  <TableCell>
+-                    <Badge variant="outline" className={STATUT_BADGE[a.statut]}>
+-                      {STATUT_LABELS[a.statut]}
+-                    </Badge>
+-                  </TableCell>
+-                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+-                    <div className="flex justify-end gap-1">
+-                      <Button variant="ghost" size="icon" onClick={() => setViewing(a)}>
+-                        <Eye className="w-4 h-4" />
+-                      </Button>
+-                      {canWrite && (
+-                        <Button variant="ghost" size="icon" onClick={() => openEdit(a)}>
+-                          <Pencil className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                      {canDelete && (
+-                        <Button
+-                          variant="ghost"
+-                          size="icon"
+-                          className="text-brand-red-600 hover:text-brand-red-700"
+-                          onClick={() => remove(a)}
+-                        >
+-                          <Trash2 className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                    </div>
+-                  </TableCell>
+-                </TableRow>
+-              ))}
+-            </TableBody>
+-          </Table>
+-        </div>
+-      )}
+-
+-      <Dialog open={!!viewing} onOpenChange={(open) => !open && setViewing(null)}>
+-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+-          {viewing && (
+-            <>
+-              {viewing.image_url && (
+-                <Zoomable
+-                  src={viewing.image_url}
+-                  alt={viewing.titre}
+-                  downloadable
+-                  className="w-full h-44 object-cover rounded-xl -mt-2"
+-                />
+-              )}
+-              <DialogHeader>
+-                <div className="flex items-center gap-2 flex-wrap">
+-                  <DialogTitle>{viewing.titre}</DialogTitle>
+-                  <Badge variant="outline" className={STATUT_BADGE[viewing.statut]}>
+-                    {STATUT_LABELS[viewing.statut]}
+-                  </Badge>
+-                </div>
+-              </DialogHeader>
+-
+-              <div className="space-y-4 text-sm">
+-                <div className="flex items-center gap-2 flex-wrap">
+-                  <Badge variant="secondary">{SECTION_LABELS[viewing.section]}</Badge>
+-                </div>
+-
+-                <p className="text-slate-600">{viewing.description}</p>
+-
+-                <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+-                  {(viewing.date_debut || viewing.date_fin) && (
+-                    <div className="col-span-2">
+-                      <p className="text-slate-400 text-xs flex items-center gap-1">
+-                        <Calendar className="w-3 h-3" /> Période
+-                      </p>
+-                      <p className="text-slate-700">
+-                        {viewing.date_debut ? new Date(viewing.date_debut).toLocaleDateString('fr-FR') : '?'}
+-                        {' → '}
+-                        {viewing.date_fin ? new Date(viewing.date_fin).toLocaleDateString('fr-FR') : '?'}
+-                      </p>
+-                    </div>
+-                  )}
+-                  {viewing.date_evenement && (
+-                    <div>
+-                      <p className="text-slate-400 text-xs flex items-center gap-1">
+-                        <Calendar className="w-3 h-3" /> Date
+-                      </p>
+-                      <p className="text-slate-700">{new Date(viewing.date_evenement).toLocaleDateString('fr-FR')}</p>
+-                    </div>
+-                  )}
+-                  {viewing.lieu && (
+-                    <div>
+-                      <p className="text-slate-400 text-xs flex items-center gap-1">
+-                        <MapPin className="w-3 h-3" /> Lieu
+-                      </p>
+-                      <p className="text-slate-700">{viewing.lieu}</p>
+-                    </div>
+-                  )}
+-                </dl>
+-
+-                {viewing.objectifs && viewing.objectifs.length > 0 && (
+-                  <div>
+-                    <p className="text-slate-400 text-xs mb-1">Objectifs</p>
+-                    <ul className="list-disc list-inside text-slate-700 space-y-0.5">
+-                      {viewing.objectifs.map((o, i) => <li key={i}>{o}</li>)}
+-                    </ul>
+-                  </div>
+-                )}
+-
+-                {viewing.activites_cles && viewing.activites_cles.length > 0 && (
+-                  <div>
+-                    <p className="text-slate-400 text-xs mb-1">Activités clés</p>
+-                    <ul className="list-disc list-inside text-slate-700 space-y-0.5">
+-                      {viewing.activites_cles.map((o, i) => <li key={i}>{o}</li>)}
+-                    </ul>
+-                  </div>
+-                )}
+-
+-                {viewing.resultats && viewing.resultats.length > 0 && (
+-                  <div>
+-                    <p className="text-slate-400 text-xs mb-1">Résultats</p>
+-                    <ul className="list-disc list-inside text-slate-700 space-y-0.5">
+-                      {viewing.resultats.map((o, i) => <li key={i}>{o}</li>)}
+-                    </ul>
+-                  </div>
+-                )}
+-              </div>
+-
+-              {canWrite && (
+-                <DialogFooter>
+-                  <Button
+-                    variant="outline"
+-                    onClick={() => {
+-                      setViewing(null);
+-                      openEdit(viewing);
+-                    }}
+-                  >
+-                    <Pencil className="w-4 h-4" /> Modifier
+-                  </Button>
+-                </DialogFooter>
+-              )}
+-            </>
+-          )}
+-        </DialogContent>
+-      </Dialog>
+-
+-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+-        <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+-          <DialogHeader>
+-            <DialogTitle>{editing === 'new' ? 'Créer une action' : "Modifier l'action"}</DialogTitle>
+-          </DialogHeader>
+-
+-          <div className="space-y-4">
+-            <div className="space-y-1.5">
+-              <Label htmlFor="titre">Titre</Label>
+-              <Input id="titre" value={form.titre} onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))} />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="description">Description</Label>
+-              <Textarea id="description" rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="image">Image</Label>
+-              <Input
+-                id="image"
+-                type="file"
+-                accept="image/jpeg,image/png,image/jpg"
+-                onChange={async (e) => {
+-                  const raw = e.target.files?.[0] || null;
+-                  const imageFile = raw ? await compressImage(raw) : null;
+-                  setForm((f) => ({ ...f, imageFile }));
+-                }}
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label>Commission</Label>
+-                <Select value={form.section} onValueChange={(v) => setForm((f) => ({ ...f, section: v as SectionAction }))}>
+-                  <SelectTrigger><SelectValue /></SelectTrigger>
+-                  <SelectContent>
+-                    {Object.entries(SECTION_LABELS).map(([value, label]) => (
+-                      <SelectItem key={value} value={value}>{label}</SelectItem>
+-                    ))}
+-                  </SelectContent>
+-                </Select>
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label>Statut</Label>
+-                <Select value={form.statut} onValueChange={(v) => setForm((f) => ({ ...f, statut: v as StatutAction }))}>
+-                  <SelectTrigger><SelectValue /></SelectTrigger>
+-                  <SelectContent>
+-                    {Object.entries(STATUT_LABELS).map(([value, label]) => (
+-                      <SelectItem key={value} value={value}>{label}</SelectItem>
+-                    ))}
+-                  </SelectContent>
+-                </Select>
+-              </div>
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="date-debut">Date de début (optionnel)</Label>
+-                <Input id="date-debut" type="date" value={form.dateDebut} onChange={(e) => setForm((f) => ({ ...f, dateDebut: e.target.value }))} />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="date-fin">Date de fin (optionnel)</Label>
+-                <Input id="date-fin" type="date" value={form.dateFin} onChange={(e) => setForm((f) => ({ ...f, dateFin: e.target.value }))} />
+-              </div>
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="date-evenement">Date ponctuelle (optionnel)</Label>
+-                <Input id="date-evenement" type="date" value={form.dateEvenement} onChange={(e) => setForm((f) => ({ ...f, dateEvenement: e.target.value }))} />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="lieu">Lieu</Label>
+-                <Input id="lieu" value={form.lieu} onChange={(e) => setForm((f) => ({ ...f, lieu: e.target.value }))} />
+-              </div>
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="objectifs">Objectifs <span className="text-slate-400 font-normal">(un par ligne)</span></Label>
+-              <Textarea id="objectifs" rows={3} value={form.objectifs} onChange={(e) => setForm((f) => ({ ...f, objectifs: e.target.value }))} placeholder={'Renforcer l\'insertion des jeunes\nFavoriser l\'entraide communautaire'} />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="activites">Activités clés <span className="text-slate-400 font-normal">(une par ligne)</span></Label>
+-              <Textarea id="activites" rows={3} value={form.activitesCles} onChange={(e) => setForm((f) => ({ ...f, activitesCles: e.target.value }))} />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="resultats">Résultats <span className="text-slate-400 font-normal">(un par ligne)</span></Label>
+-              <Textarea id="resultats" rows={3} value={form.resultats} onChange={(e) => setForm((f) => ({ ...f, resultats: e.target.value }))} />
+-            </div>
+-          </div>
+-
+-          <DialogFooter>
+-            <Button disabled={saving} onClick={save} className="bg-brand-green-600 hover:bg-brand-green-700">
+-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+-              {editing === 'new' ? 'Créer' : 'Enregistrer'}
+-            </Button>
+-          </DialogFooter>
+-        </DialogContent>
+-      </Dialog>
+-    </div>
+-  );
+-}
+-
+-function SortableHeader({
+-  label,
+-  active,
+-  dir,
+-  onClick,
+-}: {
+-  label: string;
+-  active: boolean;
+-  dir: 'asc' | 'desc';
+-  onClick: () => void;
+-}) {
+-  return (
+-    <button onClick={onClick} className="flex items-center gap-1 hover:text-slate-900">
+-      {label}
+-      {active ? (
+-        dir === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+-      ) : (
+-        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+-      )}
+-    </button>
+-  );
+-}
+diff --git a/src/app/admin/pages/AdminActualites.tsx b/src/app/admin/pages/AdminActualites.tsx
+index 3641df0..7750651 100644
+--- a/src/app/admin/pages/AdminActualites.tsx
++++ b/src/app/admin/pages/AdminActualites.tsx
+@@ -84,7 +84,7 @@ function emptyForm(): FormState {
+ 
+ export function AdminActualites() {
+   const { hasRole } = useAuth();
+-  const canCreate = hasRole('super_admin', 'admin', 'moderateur');
++  const canCreate = hasRole('super_admin', 'admin');
+   const canEdit = hasRole('super_admin', 'admin');
+   const canDelete = hasRole('super_admin');
+ 
+diff --git a/src/app/admin/pages/AdminEvenements.tsx b/src/app/admin/pages/AdminEvenements.tsx
+deleted file mode 100644
+index 4d37af8..0000000
+--- a/src/app/admin/pages/AdminEvenements.tsx
++++ /dev/null
+@@ -1,661 +0,0 @@
+-import React, { useEffect, useMemo, useState } from 'react';
+-import { Loader2, Plus, Pencil, Trash2, MapPin, Users, Eye, Calendar, Clock, Ticket, Phone, Mail as MailIcon, User as UserIcon } from 'lucide-react';
+-import { api, ApiError } from '../../../lib/api';
+-import { compressImage } from '../../../lib/compressImage';
+-import { useAuth } from '../../context/AuthContext';
+-import { Zoomable } from '../../components/Zoomable';
+-import type { Evenement, StatutEvenement } from '../types';
+-import { Button } from '../../components/ui/button';
+-import { Badge } from '../../components/ui/badge';
+-import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
+-import {
+-  Table,
+-  TableBody,
+-  TableCell,
+-  TableHead,
+-  TableHeader,
+-  TableRow,
+-} from '../../components/ui/table';
+-import {
+-  Dialog,
+-  DialogContent,
+-  DialogHeader,
+-  DialogTitle,
+-  DialogFooter,
+-} from '../../components/ui/dialog';
+-import { Input } from '../../components/ui/input';
+-import { Label } from '../../components/ui/label';
+-import { Textarea } from '../../components/ui/textarea';
+-import {
+-  Select,
+-  SelectContent,
+-  SelectItem,
+-  SelectTrigger,
+-  SelectValue,
+-} from '../../components/ui/select';
+-import { toast } from 'sonner';
+-
+-const STATUT_LABELS: Record<StatutEvenement, string> = {
+-  publie: 'Publié',
+-  brouillon: 'Brouillon',
+-  annule: 'Annulé',
+-};
+-
+-const STATUT_BADGE: Record<StatutEvenement, string> = {
+-  publie: 'bg-brand-green-50 text-brand-green-600 border-brand-green-200',
+-  brouillon: 'bg-slate-100 text-slate-500 border-slate-200',
+-  annule: 'bg-brand-red-50 text-brand-red-600 border-brand-red-200',
+-};
+-
+-type FilterTab = 'tous' | StatutEvenement;
+-
+-interface FormState {
+-  titre: string;
+-  description: string;
+-  contenu: string;
+-  dateDebut: string;
+-  dateFin: string;
+-  heureDebut: string;
+-  heureFin: string;
+-  lieu: string;
+-  adresse: string;
+-  ville: string;
+-  categorie: string;
+-  capaciteMax: string;
+-  prix: string;
+-  lienBillet: string;
+-  organisateur: string;
+-  emailContact: string;
+-  telephoneContact: string;
+-  statut: StatutEvenement;
+-  imageFile: File | null;
+-}
+-
+-function emptyForm(): FormState {
+-  return {
+-    titre: '',
+-    description: '',
+-    contenu: '',
+-    dateDebut: '',
+-    dateFin: '',
+-    heureDebut: '',
+-    heureFin: '',
+-    lieu: '',
+-    adresse: '',
+-    ville: '',
+-    categorie: '',
+-    capaciteMax: '',
+-    prix: '',
+-    lienBillet: '',
+-    organisateur: '',
+-    emailContact: '',
+-    telephoneContact: '',
+-    statut: 'brouillon',
+-    imageFile: null,
+-  };
+-}
+-
+-export function AdminEvenements() {
+-  const { hasRole } = useAuth();
+-  const canWrite = hasRole('super_admin', 'admin');
+-  const canDelete = hasRole('super_admin');
+-
+-  const [evenements, setEvenements] = useState<Evenement[] | null>(null);
+-  const [filter, setFilter] = useState<FilterTab>('tous');
+-  const [editing, setEditing] = useState<Evenement | 'new' | null>(null);
+-  const [viewing, setViewing] = useState<Evenement | null>(null);
+-  const [form, setForm] = useState<FormState>(emptyForm());
+-  const [saving, setSaving] = useState(false);
+-
+-  async function load() {
+-    try {
+-      const data = await api.get<Evenement[]>('/v1/evenements');
+-      setEvenements(data);
+-    } catch {
+-      toast.error('Impossible de charger les événements.');
+-    }
+-  }
+-
+-  useEffect(() => {
+-    load();
+-  }, []);
+-
+-  const filtered = useMemo(() => {
+-    if (!evenements) return [];
+-    const sorted = [...evenements].sort((a, b) => b.date_debut.localeCompare(a.date_debut));
+-    if (filter === 'tous') return sorted;
+-    return sorted.filter((e) => e.statut === filter);
+-  }, [evenements, filter]);
+-
+-  function openCreate() {
+-    setForm(emptyForm());
+-    setEditing('new');
+-  }
+-
+-  function openEdit(e: Evenement) {
+-    setForm({
+-      titre: e.titre,
+-      description: e.description || '',
+-      contenu: e.contenu || '',
+-      dateDebut: e.date_debut,
+-      dateFin: e.date_fin,
+-      heureDebut: e.heure_debut || '',
+-      heureFin: e.heure_fin || '',
+-      lieu: e.lieu || '',
+-      adresse: e.adresse || '',
+-      ville: e.ville || '',
+-      categorie: e.categorie || '',
+-      capaciteMax: e.capacite_max?.toString() || '',
+-      prix: e.prix?.toString() || '',
+-      lienBillet: e.lien_billet || '',
+-      organisateur: e.organisateur || '',
+-      emailContact: e.email_contact || '',
+-      telephoneContact: e.telephone_contact || '',
+-      statut: e.statut,
+-      imageFile: null,
+-    });
+-    setEditing(e);
+-  }
+-
+-  function buildFormData() {
+-    const fd = new FormData();
+-    fd.append('titre', form.titre);
+-    if (form.description) fd.append('description', form.description);
+-    if (form.contenu) fd.append('contenu', form.contenu);
+-    fd.append('date_debut', form.dateDebut);
+-    fd.append('date_fin', form.dateFin);
+-    if (form.heureDebut) fd.append('heure_debut', form.heureDebut);
+-    if (form.heureFin) fd.append('heure_fin', form.heureFin);
+-    if (form.lieu) fd.append('lieu', form.lieu);
+-    if (form.adresse) fd.append('adresse', form.adresse);
+-    if (form.ville) fd.append('ville', form.ville);
+-    if (form.categorie) fd.append('categorie', form.categorie);
+-    if (form.capaciteMax) fd.append('capacite_max', form.capaciteMax);
+-    if (form.prix) {
+-      fd.append('prix', form.prix);
+-      fd.append('devise', 'FCFA');
+-    }
+-    if (form.lienBillet) fd.append('lien_billet', form.lienBillet);
+-    if (form.organisateur) fd.append('organisateur', form.organisateur);
+-    if (form.emailContact) fd.append('email_contact', form.emailContact);
+-    if (form.telephoneContact) fd.append('telephone_contact', form.telephoneContact);
+-    fd.append('statut', form.statut);
+-    if (form.imageFile) fd.append('image', form.imageFile);
+-    return fd;
+-  }
+-
+-  async function save() {
+-    if (!form.titre.trim() || !form.dateDebut || !form.dateFin) {
+-      toast.error('Titre, date de début et date de fin sont obligatoires.');
+-      return;
+-    }
+-    if (form.dateFin < form.dateDebut) {
+-      toast.error('La date de fin doit être postérieure ou égale à la date de début.');
+-      return;
+-    }
+-    setSaving(true);
+-    try {
+-      const fd = buildFormData();
+-      if (editing === 'new') {
+-        const created = await api.postForm<Evenement>('/v1/evenements', fd, 'POST');
+-        setEvenements((prev) => (prev ? [created, ...prev] : [created]));
+-        toast.success('Événement créé avec succès.');
+-      } else if (editing) {
+-        const updated = await api.postForm<Evenement>(`/v1/evenements/${editing.id}`, fd, 'PUT');
+-        setEvenements((prev) => prev?.map((e) => (e.id === updated.id ? updated : e)) ?? null);
+-        toast.success('Événement mis à jour.');
+-      }
+-      setEditing(null);
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Une erreur est survenue.');
+-    } finally {
+-      setSaving(false);
+-    }
+-  }
+-
+-  async function remove(e: Evenement) {
+-    if (!confirm(`Supprimer définitivement « ${e.titre} » ?`)) return;
+-    try {
+-      await api.delete(`/v1/evenements/${e.id}`);
+-      setEvenements((prev) => prev?.filter((x) => x.id !== e.id) ?? null);
+-      toast.success('Événement supprimé.');
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Suppression impossible.');
+-    }
+-  }
+-
+-  function periode(e: Evenement) {
+-    const d1 = new Date(e.date_debut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+-    const d2 = new Date(e.date_fin).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+-    return e.date_debut === e.date_fin ? d2 : `${d1} → ${d2}`;
+-  }
+-
+-  return (
+-    <div>
+-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+-        <div>
+-          <h1 className="text-xl font-bold text-slate-900">Événements</h1>
+-          <p className="text-slate-500 text-sm mt-0.5">Calendrier, lieux, capacité et billetterie.</p>
+-        </div>
+-        {canWrite && (
+-          <Button onClick={openCreate} className="bg-brand-green-600 hover:bg-brand-green-700">
+-            <Plus className="w-4 h-4" /> Créer un événement
+-          </Button>
+-        )}
+-      </div>
+-
+-      <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterTab)} className="mb-5">
+-        <TabsList>
+-          <TabsTrigger value="tous">Tous</TabsTrigger>
+-          <TabsTrigger value="publie">Publiés</TabsTrigger>
+-          <TabsTrigger value="brouillon">Brouillons</TabsTrigger>
+-          <TabsTrigger value="annule">Annulés</TabsTrigger>
+-        </TabsList>
+-      </Tabs>
+-
+-      {evenements === null ? (
+-        <div className="flex items-center gap-2 text-slate-500 text-sm">
+-          <Loader2 className="w-4 h-4 animate-spin" /> Chargement…
+-        </div>
+-      ) : filtered.length === 0 ? (
+-        <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-brand-green-100">
+-          Aucun événement dans cette catégorie.
+-        </div>
+-      ) : (
+-        <div className="bg-white rounded-xl border border-brand-green-100 overflow-hidden">
+-          <Table>
+-            <TableHeader>
+-              <TableRow>
+-                <TableHead>Événement</TableHead>
+-                <TableHead className="hidden md:table-cell">Période</TableHead>
+-                <TableHead className="hidden lg:table-cell">Lieu</TableHead>
+-                <TableHead>Statut</TableHead>
+-                <TableHead className="text-right">Actions</TableHead>
+-              </TableRow>
+-            </TableHeader>
+-            <TableBody>
+-              {filtered.map((e) => (
+-                <TableRow key={e.id} className="cursor-pointer" onClick={() => setViewing(e)}>
+-                  <TableCell>
+-                    <div className="font-medium text-slate-900">{e.titre}</div>
+-                    {e.capacite_max ? (
+-                      <div className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
+-                        <Users className="w-3 h-3" />
+-                        {e.nombre_inscrits} / {e.capacite_max} inscrits
+-                      </div>
+-                    ) : null}
+-                  </TableCell>
+-                  <TableCell className="hidden md:table-cell text-slate-600 text-sm">
+-                    {periode(e)}
+-                  </TableCell>
+-                  <TableCell className="hidden lg:table-cell text-slate-600 text-sm">
+-                    {e.lieu ? (
+-                      <span className="flex items-center gap-1">
+-                        <MapPin className="w-3 h-3 text-slate-400" /> {e.lieu}
+-                      </span>
+-                    ) : (
+-                      '—'
+-                    )}
+-                  </TableCell>
+-                  <TableCell>
+-                    <Badge variant="outline" className={STATUT_BADGE[e.statut]}>
+-                      {STATUT_LABELS[e.statut]}
+-                    </Badge>
+-                  </TableCell>
+-                  <TableCell className="text-right" onClick={(ev) => ev.stopPropagation()}>
+-                    <div className="flex justify-end gap-1">
+-                      <Button variant="ghost" size="icon" onClick={() => setViewing(e)}>
+-                        <Eye className="w-4 h-4" />
+-                      </Button>
+-                      {canWrite && (
+-                        <Button variant="ghost" size="icon" onClick={() => openEdit(e)}>
+-                          <Pencil className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                      {canDelete && (
+-                        <Button
+-                          variant="ghost"
+-                          size="icon"
+-                          className="text-brand-red-600 hover:text-brand-red-700"
+-                          onClick={() => remove(e)}
+-                        >
+-                          <Trash2 className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                    </div>
+-                  </TableCell>
+-                </TableRow>
+-              ))}
+-            </TableBody>
+-          </Table>
+-        </div>
+-      )}
+-
+-      <Dialog open={!!viewing} onOpenChange={(open) => !open && setViewing(null)}>
+-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+-          {viewing && (
+-            <>
+-              {viewing.image_url && (
+-                <Zoomable
+-                  src={viewing.image_url}
+-                  alt={viewing.titre}
+-                  downloadable
+-                  className="w-full h-44 object-cover rounded-xl -mt-2"
+-                />
+-              )}
+-              <DialogHeader>
+-                <div className="flex items-center gap-2 flex-wrap">
+-                  <DialogTitle>{viewing.titre}</DialogTitle>
+-                  <Badge variant="outline" className={STATUT_BADGE[viewing.statut]}>
+-                    {STATUT_LABELS[viewing.statut]}
+-                  </Badge>
+-                </div>
+-              </DialogHeader>
+-
+-              <div className="space-y-4 text-sm">
+-                {viewing.description && <p className="text-slate-600">{viewing.description}</p>}
+-
+-                <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+-                  <InfoRow icon={Calendar} label="Période" value={periode(viewing)} />
+-                  {(viewing.heure_debut || viewing.heure_fin) && (
+-                    <InfoRow
+-                      icon={Clock}
+-                      label="Horaires"
+-                      value={`${viewing.heure_debut || '?'} – ${viewing.heure_fin || '?'}`}
+-                    />
+-                  )}
+-                  {viewing.lieu && <InfoRow icon={MapPin} label="Lieu" value={[viewing.lieu, viewing.ville].filter(Boolean).join(', ')} />}
+-                  {viewing.adresse && <InfoRow label="Adresse" value={viewing.adresse} />}
+-                  {viewing.capacite_max ? (
+-                    <InfoRow
+-                      icon={Users}
+-                      label="Inscrits"
+-                      value={`${viewing.nombre_inscrits} / ${viewing.capacite_max}`}
+-                    />
+-                  ) : null}
+-                  {viewing.prix !== null && viewing.prix !== undefined && (
+-                    <InfoRow
+-                      icon={Ticket}
+-                      label="Prix"
+-                      value={viewing.prix > 0 ? `${viewing.prix} ${viewing.devise || 'FCFA'}` : 'Gratuit'}
+-                    />
+-                  )}
+-                  {viewing.lien_billet && (
+-                    <div className="col-span-2">
+-                      <a
+-                        href={viewing.lien_billet}
+-                        target="_blank"
+-                        rel="noreferrer"
+-                        className="text-brand-green-600 text-xs font-medium hover:underline"
+-                      >
+-                        Lien billetterie →
+-                      </a>
+-                    </div>
+-                  )}
+-                  {viewing.organisateur && <InfoRow icon={UserIcon} label="Organisateur" value={viewing.organisateur} />}
+-                  {viewing.email_contact && <InfoRow icon={MailIcon} label="Email de contact" value={viewing.email_contact} />}
+-                  {viewing.telephone_contact && <InfoRow icon={Phone} label="Téléphone" value={viewing.telephone_contact} />}
+-                </dl>
+-
+-                {viewing.contenu && (
+-                  <div className="pt-2 border-t border-slate-100">
+-                    <p className="text-slate-400 text-xs mb-1">Détails</p>
+-                    <p className="text-slate-700 whitespace-pre-wrap">{viewing.contenu}</p>
+-                  </div>
+-                )}
+-              </div>
+-
+-              {canWrite && (
+-                <DialogFooter>
+-                  <Button
+-                    variant="outline"
+-                    onClick={() => {
+-                      setViewing(null);
+-                      openEdit(viewing);
+-                    }}
+-                  >
+-                    <Pencil className="w-4 h-4" /> Modifier
+-                  </Button>
+-                </DialogFooter>
+-              )}
+-            </>
+-          )}
+-        </DialogContent>
+-      </Dialog>
+-
+-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+-        <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+-          <DialogHeader>
+-            <DialogTitle>{editing === 'new' ? 'Créer un événement' : "Modifier l'événement"}</DialogTitle>
+-          </DialogHeader>
+-
+-          <div className="space-y-4">
+-            <div className="space-y-1.5">
+-              <Label htmlFor="titre">Titre</Label>
+-              <Input
+-                id="titre"
+-                value={form.titre}
+-                onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))}
+-              />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="description">Description courte</Label>
+-              <Textarea
+-                id="description"
+-                rows={2}
+-                value={form.description}
+-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+-              />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="contenu">Contenu détaillé</Label>
+-              <Textarea
+-                id="contenu"
+-                rows={4}
+-                value={form.contenu}
+-                onChange={(e) => setForm((f) => ({ ...f, contenu: e.target.value }))}
+-              />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="image">Image</Label>
+-              <Input
+-                id="image"
+-                type="file"
+-                accept="image/jpeg,image/png,image/jpg"
+-                onChange={async (e) => {
+-                  const raw = e.target.files?.[0] || null;
+-                  const imageFile = raw ? await compressImage(raw) : null;
+-                  setForm((f) => ({ ...f, imageFile }));
+-                }}
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="date-debut">Date de début</Label>
+-                <Input
+-                  id="date-debut"
+-                  type="date"
+-                  value={form.dateDebut}
+-                  onChange={(e) => setForm((f) => ({ ...f, dateDebut: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="date-fin">Date de fin</Label>
+-                <Input
+-                  id="date-fin"
+-                  type="date"
+-                  value={form.dateFin}
+-                  onChange={(e) => setForm((f) => ({ ...f, dateFin: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="heure-debut">Heure de début</Label>
+-                <Input
+-                  id="heure-debut"
+-                  type="time"
+-                  value={form.heureDebut}
+-                  onChange={(e) => setForm((f) => ({ ...f, heureDebut: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="heure-fin">Heure de fin</Label>
+-                <Input
+-                  id="heure-fin"
+-                  type="time"
+-                  value={form.heureFin}
+-                  onChange={(e) => setForm((f) => ({ ...f, heureFin: e.target.value }))}
+-                />
+-              </div>
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="lieu">Lieu</Label>
+-                <Input
+-                  id="lieu"
+-                  value={form.lieu}
+-                  onChange={(e) => setForm((f) => ({ ...f, lieu: e.target.value }))}
+-                  placeholder="Salle des fêtes, Akpakpa…"
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="ville">Ville</Label>
+-                <Input
+-                  id="ville"
+-                  value={form.ville}
+-                  onChange={(e) => setForm((f) => ({ ...f, ville: e.target.value }))}
+-                  placeholder="Cotonou"
+-                />
+-              </div>
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="adresse">Adresse</Label>
+-              <Input
+-                id="adresse"
+-                value={form.adresse}
+-                onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="capacite">Capacité max (optionnel)</Label>
+-                <Input
+-                  id="capacite"
+-                  type="number"
+-                  min="0"
+-                  value={form.capaciteMax}
+-                  onChange={(e) => setForm((f) => ({ ...f, capaciteMax: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="prix">Prix en FCFA (optionnel)</Label>
+-                <Input
+-                  id="prix"
+-                  type="number"
+-                  min="0"
+-                  value={form.prix}
+-                  onChange={(e) => setForm((f) => ({ ...f, prix: e.target.value }))}
+-                  placeholder="0 = gratuit"
+-                />
+-              </div>
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="lien-billet">Lien billetterie (optionnel)</Label>
+-              <Input
+-                id="lien-billet"
+-                value={form.lienBillet}
+-                onChange={(e) => setForm((f) => ({ ...f, lienBillet: e.target.value }))}
+-                placeholder="https://…"
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="organisateur">Organisateur</Label>
+-                <Input
+-                  id="organisateur"
+-                  value={form.organisateur}
+-                  onChange={(e) => setForm((f) => ({ ...f, organisateur: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label>Statut</Label>
+-                <Select
+-                  value={form.statut}
+-                  onValueChange={(v) => setForm((f) => ({ ...f, statut: v as StatutEvenement }))}
+-                >
+-                  <SelectTrigger>
+-                    <SelectValue />
+-                  </SelectTrigger>
+-                  <SelectContent>
+-                    <SelectItem value="brouillon">Brouillon</SelectItem>
+-                    <SelectItem value="publie">Publié</SelectItem>
+-                    <SelectItem value="annule">Annulé</SelectItem>
+-                  </SelectContent>
+-                </Select>
+-              </div>
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="email-contact">Email de contact</Label>
+-                <Input
+-                  id="email-contact"
+-                  type="email"
+-                  value={form.emailContact}
+-                  onChange={(e) => setForm((f) => ({ ...f, emailContact: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="tel-contact">Téléphone de contact</Label>
+-                <Input
+-                  id="tel-contact"
+-                  value={form.telephoneContact}
+-                  onChange={(e) => setForm((f) => ({ ...f, telephoneContact: e.target.value }))}
+-                />
+-              </div>
+-            </div>
+-          </div>
+-
+-          <DialogFooter>
+-            <Button
+-              disabled={saving}
+-              onClick={save}
+-              className="bg-brand-green-600 hover:bg-brand-green-700"
+-            >
+-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+-              {editing === 'new' ? 'Créer' : 'Enregistrer'}
+-            </Button>
+-          </DialogFooter>
+-        </DialogContent>
+-      </Dialog>
+-    </div>
+-  );
+-}
+-
+-function InfoRow({
+-  icon: Icon,
+-  label,
+-  value,
+-}: {
+-  icon?: React.ComponentType<{ className?: string }>;
+-  label: string;
+-  value: string;
+-}) {
+-  return (
+-    <div>
+-      <p className="text-slate-400 text-xs flex items-center gap-1">
+-        {Icon && <Icon className="w-3 h-3" />}
+-        {label}
+-      </p>
+-      <p className="text-slate-700">{value}</p>
+-    </div>
+-  );
+-}
+diff --git a/src/app/admin/pages/AdminMembres.tsx b/src/app/admin/pages/AdminMembres.tsx
+deleted file mode 100644
+index 033bab3..0000000
+--- a/src/app/admin/pages/AdminMembres.tsx
++++ /dev/null
+@@ -1,739 +0,0 @@
+-import React, { useEffect, useMemo, useState } from 'react';
+-import { Loader2, Plus, Pencil, Trash2, UserX, UserCheck, Eye, MessageCircle, Facebook, Instagram, Linkedin, Twitter, Search, ArrowUp, ArrowDown, ArrowUpDown, Link2, Download, KeyRound } from 'lucide-react';
+-import { api, ApiError, downloadFile } from '../../../lib/api';
+-import { compressImage } from '../../../lib/compressImage';
+-import { useAuth } from '../../context/AuthContext';
+-import { cn } from '../../components/Navbar';
+-import { useLightbox } from '../../components/ImageLightbox';
+-import type { Membre, StatutMembre } from '../types';
+-import { Button } from '../../components/ui/button';
+-import { Badge } from '../../components/ui/badge';
+-import { Avatar, AvatarImage, AvatarFallback } from '../../components/ui/avatar';
+-import { VilleSelect } from '../../components/VilleSelect';
+-import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
+-import {
+-  Table,
+-  TableBody,
+-  TableCell,
+-  TableHead,
+-  TableHeader,
+-  TableRow,
+-} from '../../components/ui/table';
+-import {
+-  Dialog,
+-  DialogContent,
+-  DialogHeader,
+-  DialogTitle,
+-  DialogFooter,
+-} from '../../components/ui/dialog';
+-import { Input } from '../../components/ui/input';
+-import { Label } from '../../components/ui/label';
+-import {
+-  Select,
+-  SelectContent,
+-  SelectItem,
+-  SelectTrigger,
+-  SelectValue,
+-} from '../../components/ui/select';
+-import { toast } from 'sonner';
+-
+-type FilterTab = 'tous' | StatutMembre;
+-
+-const NONE = '__aucun__';
+-
+-interface FormState {
+-  nom: string;
+-  prenom: string;
+-  poste: string;
+-  commission: string;
+-  whatsapp: string;
+-  ville: string;
+-  facebook: string;
+-  instagram: string;
+-  linkedin: string;
+-  twitter: string;
+-  photoFile: File | null;
+-}
+-
+-const EMPTY_FORM: FormState = {
+-  nom: '',
+-  prenom: '',
+-  poste: NONE,
+-  commission: NONE,
+-  whatsapp: '',
+-  ville: '',
+-  facebook: '',
+-  instagram: '',
+-  linkedin: '',
+-  twitter: '',
+-  photoFile: null,
+-};
+-
+-export function AdminMembres() {
+-  const { hasRole } = useAuth();
+-  const { openImage } = useLightbox();
+-  const canWrite = hasRole('super_admin', 'admin');
+-  const canDelete = hasRole('super_admin');
+-  const canCreerAcces = hasRole('super_admin');
+-  const [creatingAccesId, setCreatingAccesId] = useState<number | null>(null);
+-
+-  const [membres, setMembres] = useState<Membre[] | null>(null);
+-  const [postes, setPostes] = useState<string[]>([]);
+-  const [commissions, setCommissions] = useState<string[]>([]);
+-  const [filter, setFilter] = useState<FilterTab>('tous');
+-
+-  const [editing, setEditing] = useState<Membre | 'new' | null>(null);
+-  const [viewing, setViewing] = useState<Membre | null>(null);
+-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+-  const [saving, setSaving] = useState(false);
+-
+-  async function load() {
+-    try {
+-      const [m, p, c] = await Promise.all([
+-        api.get<Membre[]>('/v1/membres-admin/tous'),
+-        api.get<string[]>('/v1/membres/postes-bureau'),
+-        api.get<string[]>('/v1/membres/commissions'),
+-      ]);
+-      setMembres(m);
+-      setPostes(p);
+-      setCommissions(c);
+-    } catch {
+-      toast.error('Impossible de charger les membres.');
+-    }
+-  }
+-
+-  const [search, setSearch] = useState('');
+-  const [villeFilter, setVilleFilter] = useState<string | null>(null);
+-  const [sortKey, setSortKey] = useState<'nom' | 'role' | 'statut' | 'ville'>('nom');
+-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+-  const [exporting, setExporting] = useState(false);
+-
+-  async function exportCsv() {
+-    setExporting(true);
+-    try {
+-      await downloadFile(`/v1/membres-admin/export?statut=${filter}`);
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : "Impossible d'exporter les membres.");
+-    } finally {
+-      setExporting(false);
+-    }
+-  }
+-
+-  useEffect(() => {
+-    load();
+-  }, []);
+-
+-  function toggleSort(key: 'nom' | 'role' | 'statut' | 'ville') {
+-    if (sortKey === key) {
+-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+-    } else {
+-      setSortKey(key);
+-      setSortDir('asc');
+-    }
+-  }
+-
+-  const filtered = useMemo(() => {
+-    if (!membres) return [];
+-    let list = filter === 'tous' ? membres : membres.filter((m) => m.statut === filter);
+-
+-    if (villeFilter) {
+-      list = list.filter((m) => m.ville === villeFilter);
+-    }
+-
+-    const q = search.trim().toLowerCase();
+-    if (q) {
+-      list = list.filter(
+-        (m) =>
+-          m.nom_complet.toLowerCase().includes(q) ||
+-          (m.poste || '').toLowerCase().includes(q) ||
+-          (m.commission || '').toLowerCase().includes(q) ||
+-          (m.whatsapp || '').toLowerCase().includes(q)
+-      );
+-    }
+-
+-    const sorted = [...list].sort((a, b) => {
+-      let cmp = 0;
+-      if (sortKey === 'nom') cmp = a.nom_complet.localeCompare(b.nom_complet);
+-      else if (sortKey === 'role') cmp = a.role.localeCompare(b.role);
+-      else if (sortKey === 'ville') cmp = (a.ville || '').localeCompare(b.ville || '');
+-      else cmp = a.statut.localeCompare(b.statut);
+-      return sortDir === 'asc' ? cmp : -cmp;
+-    });
+-
+-    return sorted;
+-  }, [membres, filter, villeFilter, search, sortKey, sortDir]);
+-
+-  function openCreate() {
+-    setForm(EMPTY_FORM);
+-    setEditing('new');
+-  }
+-
+-  function openEdit(m: Membre) {
+-    setForm({
+-      nom: m.nom,
+-      prenom: m.prenom,
+-      poste: m.poste || NONE,
+-      commission: m.commission || NONE,
+-      whatsapp: m.whatsapp || '',
+-      ville: m.ville || '',
+-      facebook: m.facebook || '',
+-      instagram: m.instagram || '',
+-      linkedin: m.linkedin || '',
+-      twitter: m.twitter || '',
+-      photoFile: null,
+-    });
+-    setEditing(m);
+-  }
+-
+-  function buildFormData() {
+-    const fd = new FormData();
+-    fd.append('nom', form.nom);
+-    fd.append('prenom', form.prenom);
+-    if (form.poste !== NONE) fd.append('poste', form.poste);
+-    if (form.commission !== NONE) fd.append('commission', form.commission);
+-    if (form.whatsapp) fd.append('whatsapp', form.whatsapp);
+-    if (form.ville) fd.append('ville', form.ville);
+-    if (form.facebook) fd.append('facebook', form.facebook);
+-    if (form.instagram) fd.append('instagram', form.instagram);
+-    if (form.linkedin) fd.append('linkedin', form.linkedin);
+-    if (form.twitter) fd.append('twitter', form.twitter);
+-    if (form.photoFile) fd.append('photo', form.photoFile);
+-    return fd;
+-  }
+-
+-  async function save() {
+-    if (!form.nom.trim() || !form.prenom.trim()) {
+-      toast.error('Nom et prénom sont obligatoires.');
+-      return;
+-    }
+-    setSaving(true);
+-    try {
+-      const fd = buildFormData();
+-      if (editing === 'new') {
+-        const created = await api.postForm<Membre>('/v1/membres', fd, 'POST');
+-        setMembres((prev) => (prev ? [created, ...prev] : [created]));
+-        toast.success('Membre ajouté avec succès.');
+-      } else if (editing) {
+-        const updated = await api.postForm<Membre>(`/v1/membres/${editing.id}`, fd, 'PUT');
+-        setMembres((prev) => prev?.map((m) => (m.id === updated.id ? updated : m)) ?? null);
+-        toast.success('Membre mis à jour.');
+-      }
+-      setEditing(null);
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Une erreur est survenue.');
+-    } finally {
+-      setSaving(false);
+-    }
+-  }
+-
+-  async function toggleStatut(m: Membre) {
+-    const nouveauStatut: StatutMembre = m.statut === 'actif' ? 'inactif' : 'actif';
+-    try {
+-      const updated = await api.put<Membre>(`/v1/membres/${m.id}`, { statut: nouveauStatut });
+-      setMembres((prev) => prev?.map((x) => (x.id === updated.id ? updated : x)) ?? null);
+-      toast.success(
+-        nouveauStatut === 'actif' ? 'Membre réactivé.' : 'Membre désactivé.'
+-      );
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Action impossible.');
+-    }
+-  }
+-
+-  async function remove(m: Membre) {
+-    if (!confirm(`Supprimer définitivement ${m.prenom} ${m.nom} ?`)) return;
+-    try {
+-      await api.delete(`/v1/membres/${m.id}`);
+-      setMembres((prev) => prev?.filter((x) => x.id !== m.id) ?? null);
+-      toast.success('Membre supprimé.');
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : 'Suppression impossible.');
+-    }
+-  }
+-
+-  async function creerAccesAdmin(m: Membre) {
+-    if (!confirm(`Créer un accès administrateur pour ${m.prenom} ${m.nom} (${m.poste}) ? Un email d'activation lui sera envoyé.`)) return;
+-    setCreatingAccesId(m.id);
+-    try {
+-      const res = await api.post<{ email: string; role_label: string }>(`/v1/membres/${m.id}/creer-acces-admin`, {});
+-      setMembres((prev) => prev?.map((x) => (x.id === m.id ? { ...x, a_compte_admin: true } : x)) ?? null);
+-      toast.success(`Accès ${res.role_label} créé, email envoyé à ${res.email}.`);
+-    } catch (err) {
+-      toast.error(err instanceof ApiError ? err.message : "Impossible de créer l'accès admin.");
+-    } finally {
+-      setCreatingAccesId(null);
+-    }
+-  }
+-
+-  return (
+-    <div>
+-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+-        <div>
+-          <h1 className="text-xl font-bold text-slate-900">Membres</h1>
+-          <p className="text-slate-500 text-sm mt-0.5">
+-            Registre des ressortissants inscrits.
+-          </p>
+-        </div>
+-        {canWrite && (
+-          <Button onClick={openCreate} className="bg-brand-green-600 hover:bg-brand-green-700">
+-            <Plus className="w-4 h-4" /> Ajouter un membre
+-          </Button>
+-        )}
+-      </div>
+-
+-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+-        <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterTab)}>
+-          <TabsList>
+-            <TabsTrigger value="tous">Tous</TabsTrigger>
+-            <TabsTrigger value="actif">Actifs</TabsTrigger>
+-            <TabsTrigger value="en_attente_paiement">En attente</TabsTrigger>
+-            <TabsTrigger value="inactif">Inactifs</TabsTrigger>
+-          </TabsList>
+-        </Tabs>
+-
+-        <div className="flex items-center gap-2">
+-          <div className="relative sm:w-64">
+-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+-            <Input
+-              value={search}
+-              onChange={(e) => setSearch(e.target.value)}
+-              placeholder="Rechercher un membre…"
+-              className="pl-9"
+-            />
+-          </div>
+-          <div className="w-48">
+-            <VilleSelect value={villeFilter} onChange={setVilleFilter} allowClear clearLabel="Toutes les villes" />
+-          </div>
+-          <Button variant="outline" onClick={exportCsv} disabled={exporting}>
+-            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+-            Exporter
+-          </Button>
+-        </div>
+-      </div>
+-
+-      {membres === null ? (
+-        <div className="flex items-center gap-2 text-slate-500 text-sm">
+-          <Loader2 className="w-4 h-4 animate-spin" /> Chargement…
+-        </div>
+-      ) : filtered.length === 0 ? (
+-        <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-brand-green-100">
+-          Aucun membre dans cette catégorie.
+-        </div>
+-      ) : (
+-        <div className="bg-white rounded-xl border border-brand-green-100 overflow-hidden">
+-          <Table>
+-            <TableHeader>
+-              <TableRow>
+-                <TableHead>
+-                  <SortableHeader label="Membre" active={sortKey === 'nom'} dir={sortDir} onClick={() => toggleSort('nom')} />
+-                </TableHead>
+-                <TableHead className="hidden md:table-cell">
+-                  <SortableHeader label="Rôle" active={sortKey === 'role'} dir={sortDir} onClick={() => toggleSort('role')} />
+-                </TableHead>
+-                <TableHead className="hidden lg:table-cell">
+-                  <SortableHeader label="Ville" active={sortKey === 'ville'} dir={sortDir} onClick={() => toggleSort('ville')} />
+-                </TableHead>
+-                <TableHead>
+-                  <SortableHeader label="Statut" active={sortKey === 'statut'} dir={sortDir} onClick={() => toggleSort('statut')} />
+-                </TableHead>
+-                <TableHead className="text-right">Actions</TableHead>
+-              </TableRow>
+-            </TableHeader>
+-            <TableBody>
+-              {filtered.map((m) => (
+-                <TableRow key={m.id} className="cursor-pointer" onClick={() => setViewing(m)}>
+-                  <TableCell>
+-                    <div className="flex items-center gap-3">
+-                      <Avatar className="w-8 h-8">
+-                        {m.photo_url && <AvatarImage src={m.photo_url} alt={m.nom_complet} />}
+-                        <AvatarFallback className="text-xs bg-brand-green-50 text-brand-green-700">
+-                          {m.prenom[0]}
+-                          {m.nom[0]}
+-                        </AvatarFallback>
+-                      </Avatar>
+-                      <span className="font-medium text-slate-900">{m.nom_complet}</span>
+-                    </div>
+-                  </TableCell>
+-                  <TableCell className="hidden md:table-cell text-slate-600">{m.role}</TableCell>
+-                  <TableCell className="hidden lg:table-cell text-slate-600">{m.ville || '—'}</TableCell>
+-                  <TableCell>
+-                    <Badge
+-                      variant="outline"
+-                      className={
+-                        m.statut === 'actif'
+-                          ? 'bg-brand-green-50 text-brand-green-600 border-brand-green-200'
+-                          : m.statut === 'en_attente_paiement'
+-                          ? 'bg-amber-50 text-amber-600 border-amber-200'
+-                          : 'bg-slate-100 text-slate-500 border-slate-200'
+-                      }
+-                    >
+-                      {m.statut === 'actif' ? 'Actif' : m.statut === 'en_attente_paiement' ? 'En attente de paiement' : 'Inactif'}
+-                    </Badge>
+-                  </TableCell>
+-                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+-                    <div className="flex justify-end gap-1">
+-                      <Button variant="ghost" size="icon" onClick={() => setViewing(m)}>
+-                        <Eye className="w-4 h-4" />
+-                      </Button>
+-                      {canWrite && m.statut !== 'actif' && (
+-                        <Button
+-                          variant="ghost"
+-                          size="icon"
+-                          title="Copier le lien de paiement à envoyer au membre"
+-                          onClick={() => {
+-                            navigator.clipboard.writeText(`${window.location.origin}/cotisation/${m.id}`);
+-                            toast.success('Lien de paiement copié.');
+-                          }}
+-                        >
+-                          <Link2 className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                      {canCreerAcces && m.peut_avoir_acces_admin && !m.a_compte_admin && (
+-                        <Button
+-                          variant="ghost"
+-                          size="icon"
+-                          title="Créer un accès admin pour ce membre"
+-                          disabled={creatingAccesId === m.id}
+-                          onClick={() => creerAccesAdmin(m)}
+-                        >
+-                          {creatingAccesId === m.id ? (
+-                            <Loader2 className="w-4 h-4 animate-spin" />
+-                          ) : (
+-                            <KeyRound className="w-4 h-4" />
+-                          )}
+-                        </Button>
+-                      )}
+-                      {canWrite && (
+-                        <>
+-                          <Button variant="ghost" size="icon" onClick={() => openEdit(m)}>
+-                            <Pencil className="w-4 h-4" />
+-                          </Button>
+-                          <Button variant="ghost" size="icon" onClick={() => toggleStatut(m)}>
+-                            {m.statut === 'actif' ? (
+-                              <UserX className="w-4 h-4" />
+-                            ) : (
+-                              <UserCheck className="w-4 h-4" />
+-                            )}
+-                          </Button>
+-                        </>
+-                      )}
+-                      {canDelete && (
+-                        <Button
+-                          variant="ghost"
+-                          size="icon"
+-                          className="text-brand-red-600 hover:text-brand-red-700"
+-                          onClick={() => remove(m)}
+-                        >
+-                          <Trash2 className="w-4 h-4" />
+-                        </Button>
+-                      )}
+-                    </div>
+-                  </TableCell>
+-                </TableRow>
+-              ))}
+-            </TableBody>
+-          </Table>
+-        </div>
+-      )}
+-
+-      <Dialog open={!!viewing} onOpenChange={(open) => !open && setViewing(null)}>
+-        <DialogContent className="max-w-md">
+-          {viewing && (
+-            <>
+-              <DialogHeader>
+-                <div className="flex flex-col items-center text-center gap-3 pt-2">
+-                  <Avatar
+-                    className={cn('w-24 h-24', viewing.photo_url && 'cursor-zoom-in')}
+-                    onClick={() => viewing.photo_url && openImage(viewing.photo_url, viewing.nom_complet, true)}
+-                  >
+-                    {viewing.photo_url && <AvatarImage src={viewing.photo_url} alt={viewing.nom_complet} />}
+-                    <AvatarFallback className="text-2xl bg-brand-green-50 text-brand-green-700">
+-                      {viewing.prenom[0]}
+-                      {viewing.nom[0]}
+-                    </AvatarFallback>
+-                  </Avatar>
+-                  <div>
+-                    <DialogTitle className="text-lg">{viewing.nom_complet}</DialogTitle>
+-                    <p className="text-sm text-slate-500 mt-0.5">{viewing.role}</p>
+-                  </div>
+-                  <Badge
+-                    variant="outline"
+-                    className={
+-                      viewing.statut === 'actif'
+-                        ? 'bg-brand-green-50 text-brand-green-600 border-brand-green-200'
+-                        : viewing.statut === 'en_attente_paiement'
+-                        ? 'bg-amber-50 text-amber-600 border-amber-200'
+-                        : 'bg-slate-100 text-slate-500 border-slate-200'
+-                    }
+-                  >
+-                    {viewing.statut === 'actif' ? 'Actif' : viewing.statut === 'en_attente_paiement' ? 'En attente de paiement' : 'Inactif'}
+-                  </Badge>
+-                </div>
+-              </DialogHeader>
+-
+-              <div className="space-y-4">
+-                {(viewing.poste || viewing.commission) && (
+-                  <div className="grid grid-cols-2 gap-3 text-sm">
+-                    {viewing.poste && (
+-                      <div>
+-                        <p className="text-slate-400 text-xs">Poste au bureau</p>
+-                        <p className="text-slate-700">{viewing.poste}</p>
+-                      </div>
+-                    )}
+-                    {viewing.commission && (
+-                      <div>
+-                        <p className="text-slate-400 text-xs">Commission</p>
+-                        <p className="text-slate-700">{viewing.commission}</p>
+-                      </div>
+-                    )}
+-                  </div>
+-                )}
+-
+-                {(viewing.whatsapp || viewing.facebook || viewing.instagram || viewing.linkedin || viewing.twitter) && (
+-                  <div>
+-                    <p className="text-slate-400 text-xs mb-2">Contact & réseaux</p>
+-                    <div className="flex flex-wrap gap-2">
+-                      {viewing.whatsapp && (
+-                        <a
+-                          href={`https://wa.me/${viewing.whatsapp.replace(/[^0-9]/g, '')}`}
+-                          target="_blank"
+-                          rel="noreferrer"
+-                          className="flex items-center gap-1.5 text-xs bg-slate-50 hover:bg-slate-100 rounded-lg px-2.5 py-1.5 text-slate-600"
+-                        >
+-                          <MessageCircle className="w-3.5 h-3.5" /> {viewing.whatsapp}
+-                        </a>
+-                      )}
+-                      {viewing.facebook && (
+-                        <a href={viewing.facebook} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-xs bg-slate-50 hover:bg-slate-100 rounded-lg px-2.5 py-1.5 text-slate-600">
+-                          <Facebook className="w-3.5 h-3.5" /> Facebook
+-                        </a>
+-                      )}
+-                      {viewing.instagram && (
+-                        <a href={viewing.instagram} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-xs bg-slate-50 hover:bg-slate-100 rounded-lg px-2.5 py-1.5 text-slate-600">
+-                          <Instagram className="w-3.5 h-3.5" /> Instagram
+-                        </a>
+-                      )}
+-                      {viewing.linkedin && (
+-                        <a href={viewing.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-xs bg-slate-50 hover:bg-slate-100 rounded-lg px-2.5 py-1.5 text-slate-600">
+-                          <Linkedin className="w-3.5 h-3.5" /> LinkedIn
+-                        </a>
+-                      )}
+-                      {viewing.twitter && (
+-                        <a href={viewing.twitter} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-xs bg-slate-50 hover:bg-slate-100 rounded-lg px-2.5 py-1.5 text-slate-600">
+-                          <Twitter className="w-3.5 h-3.5" /> X / Twitter
+-                        </a>
+-                      )}
+-                    </div>
+-                  </div>
+-                )}
+-
+-                <p className="text-xs text-slate-400 text-center pt-2 border-t border-slate-100">
+-                  Membre depuis le {new Date(viewing.created_at).toLocaleDateString('fr-FR')}
+-                </p>
+-              </div>
+-
+-              {canWrite && (
+-                <DialogFooter>
+-                  {viewing.statut !== 'actif' && (
+-                    <Button
+-                      variant="outline"
+-                      onClick={() => {
+-                        navigator.clipboard.writeText(`${window.location.origin}/cotisation/${viewing.id}`);
+-                        toast.success('Lien de paiement copié.');
+-                      }}
+-                    >
+-                      <Link2 className="w-4 h-4" /> Copier le lien de paiement
+-                    </Button>
+-                  )}
+-                  <Button
+-                    variant="outline"
+-                    onClick={() => {
+-                      setViewing(null);
+-                      openEdit(viewing);
+-                    }}
+-                  >
+-                    <Pencil className="w-4 h-4" /> Modifier
+-                  </Button>
+-                </DialogFooter>
+-              )}
+-            </>
+-          )}
+-        </DialogContent>
+-      </Dialog>
+-
+-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+-          <DialogHeader>
+-            <DialogTitle>{editing === 'new' ? 'Ajouter un membre' : 'Modifier le membre'}</DialogTitle>
+-          </DialogHeader>
+-
+-          <div className="space-y-4">
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="prenom">Prénom</Label>
+-                <Input
+-                  id="prenom"
+-                  value={form.prenom}
+-                  onChange={(e) => setForm((f) => ({ ...f, prenom: e.target.value }))}
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="nom">Nom</Label>
+-                <Input
+-                  id="nom"
+-                  value={form.nom}
+-                  onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+-                />
+-              </div>
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="photo">Photo</Label>
+-              <Input
+-                id="photo"
+-                type="file"
+-                accept="image/jpeg,image/png,image/jpg"
+-                onChange={async (e) => {
+-                  const raw = e.target.files?.[0] || null;
+-                  const photoFile = raw ? await compressImage(raw) : null;
+-                  setForm((f) => ({ ...f, photoFile }));
+-                }}
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label>Poste au bureau</Label>
+-                <Select
+-                  value={form.poste}
+-                  onValueChange={(v) => setForm((f) => ({ ...f, poste: v }))}
+-                >
+-                  <SelectTrigger>
+-                    <SelectValue />
+-                  </SelectTrigger>
+-                  <SelectContent>
+-                    <SelectItem value={NONE}>Aucun</SelectItem>
+-                    {postes.map((p) => (
+-                      <SelectItem key={p} value={p}>
+-                        {p}
+-                      </SelectItem>
+-                    ))}
+-                  </SelectContent>
+-                </Select>
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label>Commission</Label>
+-                <Select
+-                  value={form.commission}
+-                  onValueChange={(v) => setForm((f) => ({ ...f, commission: v }))}
+-                >
+-                  <SelectTrigger>
+-                    <SelectValue />
+-                  </SelectTrigger>
+-                  <SelectContent>
+-                    <SelectItem value={NONE}>Aucune</SelectItem>
+-                    {commissions.map((c) => (
+-                      <SelectItem key={c} value={c}>
+-                        {c}
+-                      </SelectItem>
+-                    ))}
+-                  </SelectContent>
+-                </Select>
+-              </div>
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label htmlFor="whatsapp">WhatsApp</Label>
+-              <Input
+-                id="whatsapp"
+-                value={form.whatsapp}
+-                onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
+-                placeholder="+229 00 00 00 00"
+-              />
+-            </div>
+-
+-            <div className="space-y-1.5">
+-              <Label>Ville</Label>
+-              <VilleSelect
+-                value={form.ville || null}
+-                onChange={(ville) => setForm((f) => ({ ...f, ville: ville || '' }))}
+-              />
+-            </div>
+-
+-            <div className="grid grid-cols-2 gap-3">
+-              <div className="space-y-1.5">
+-                <Label htmlFor="facebook">Facebook</Label>
+-                <Input
+-                  id="facebook"
+-                  value={form.facebook}
+-                  onChange={(e) => setForm((f) => ({ ...f, facebook: e.target.value }))}
+-                  placeholder="https://facebook.com/…"
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="instagram">Instagram</Label>
+-                <Input
+-                  id="instagram"
+-                  value={form.instagram}
+-                  onChange={(e) => setForm((f) => ({ ...f, instagram: e.target.value }))}
+-                  placeholder="https://instagram.com/…"
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="linkedin">LinkedIn</Label>
+-                <Input
+-                  id="linkedin"
+-                  value={form.linkedin}
+-                  onChange={(e) => setForm((f) => ({ ...f, linkedin: e.target.value }))}
+-                  placeholder="https://linkedin.com/…"
+-                />
+-              </div>
+-              <div className="space-y-1.5">
+-                <Label htmlFor="twitter">X / Twitter</Label>
+-                <Input
+-                  id="twitter"
+-                  value={form.twitter}
+-                  onChange={(e) => setForm((f) => ({ ...f, twitter: e.target.value }))}
+-                  placeholder="https://x.com/…"
+-                />
+-              </div>
+-            </div>
+-          </div>
+-
+-          <DialogFooter>
+-            <Button
+-              disabled={saving}
+-              onClick={save}
+-              className="bg-brand-green-600 hover:bg-brand-green-700"
+-            >
+-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+-              {editing === 'new' ? 'Ajouter' : 'Enregistrer'}
+-            </Button>
+-          </DialogFooter>
+-        </DialogContent>
+-      </Dialog>
+-    </div>
+-  );
+-}
+-
+-function SortableHeader({
+-  label,
+-  active,
+-  dir,
+-  onClick,
+-}: {
+-  label: string;
+-  active: boolean;
+-  dir: 'asc' | 'desc';
+-  onClick: () => void;
+-}) {
+-  return (
+-    <button onClick={onClick} className="flex items-center gap-1 hover:text-slate-900">
+-      {label}
+-      {active ? (
+-        dir === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+-      ) : (
+-        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+-      )}
+-    </button>
+-  );
+-}
+diff --git a/src/app/admin/pages/AdminUtilisateurs.tsx b/src/app/admin/pages/AdminUtilisateurs.tsx
+index ca83ee8..1daf6fb 100644
+--- a/src/app/admin/pages/AdminUtilisateurs.tsx
++++ b/src/app/admin/pages/AdminUtilisateurs.tsx
+@@ -36,14 +36,12 @@ interface UtilisateurAdmin {
+   en_attente_activation: boolean;
+   derniere_connexion: string | null;
+   initiales: string;
+-  membre: { id: number; nom: string; prenom: string; poste: string | null } | null;
+ }
+ 
+ const ROLES: { value: AdminRole; label: string }[] = [
+   { value: 'super_admin', label: 'Super Administrateur' },
+   { value: 'admin', label: 'Administrateur' },
+-  { value: 'tresorier', label: 'Trésorier' },
+-  { value: 'moderateur', label: 'Modérateur' },
++  { value: 'agent', label: 'Agent' },
+ ];
+ 
+ export function AdminUtilisateurs() {
+@@ -122,7 +120,7 @@ export function AdminUtilisateurs() {
+         <div>
+           <h1 className="text-2xl font-bold text-slate-900">Utilisateurs</h1>
+           <p className="text-slate-500 text-sm mt-1">
+-            Comptes ayant accès à l'espace d'administration. Les nouveaux accès se créent depuis la fiche d'un membre du bureau.
++            Comptes ayant accès à l'espace d'administration.
+           </p>
+         </div>
+       </div>
+@@ -163,11 +161,6 @@ export function AdminUtilisateurs() {
+                           <div className="text-xs text-slate-500 flex items-center gap-1">
+                             <Mail className="w-3 h-3" /> {u.email}
+                           </div>
+-                          {u.membre && (
+-                            <div className="text-xs text-slate-400 mt-0.5">
+-                              Lié à {u.membre.prenom} {u.membre.nom}{u.membre.poste ? ` — ${u.membre.poste}` : ''}
+-                            </div>
+-                          )}
+                         </div>
+                       </div>
+                     </TableCell>
+diff --git a/src/app/admin/types.ts b/src/app/admin/types.ts
+index 5ac902d..8bfcf82 100644
+--- a/src/app/admin/types.ts
++++ b/src/app/admin/types.ts
+@@ -359,7 +359,6 @@ export interface Ressortissant {
+   numero_piece?: string | null;
+   date_expiration_piece?: string | null;
+   adresse?: string | null;
+-  commune?: string | null;
+   latitude?: number | null;
+   longitude?: number | null;
+   date_arrivee?: string | null;
+@@ -426,3 +425,60 @@ export interface PointCarte {
+   latitude: number;
+   longitude: number;
+ }
++
++export interface RessortissantStats {
++  total: number;
++  par_statut: Record<string, number>;
++  par_ville: Record<string, number>;
++}
++
++// ===== Demandes (dépôt de dossier) =====
++
++export type StatutDemande = 'recu' | 'en_traitement' | 'pret' | 'retire' | 'rejete';
++export type StatutPaiementDemande = 'en_attente' | 'partiel' | 'paye';
++
++export interface DemandeRessortissantResume {
++  id: number;
++  nom_complet: string;
++  numero_registre: string | null;
++  ville: string | null;
++  quartier: string | null;
++}
++
++export interface Demande {
++  id: number;
++  numero_dossier: string;
++  type: string;
++  delai: DelaiDemande;
++  delai_label: string;
++  statut: StatutDemande;
++  statut_label: string;
++  motif_rejet: string | null;
++  montant: number;
++  devise: string;
++  paiement_statut: StatutPaiementDemande;
++  documents_complets: boolean;
++  date_depot: string | null;
++  date_disponibilite_prevue: string | null;
++  date_pret: string | null;
++  date_retrait: string | null;
++  ressortissant: DemandeRessortissantResume | null;
++  // Renvoyés uniquement par la fiche détaillée (show)
++  donnees_specifiques?: Record<string, unknown> | null;
++  note_interne?: string | null;
++  traite_par?: string | null;
++  documents?: DemandeDocumentAdmin[];
++}
++
++export interface DemandeDocumentAdmin {
++  id: number;
++  code_document: string;
++  label: string;
++  nom_original: string | null;
++  statut: 'en_attente' | 'valide' | 'rejete';
++  statut_label: string;
++  motif_rejet: string | null;
++  verifie_par: string | null;
++  verifie_at: string | null;
++  created_at: string;
++}
+diff --git a/src/app/components/Navbar.tsx b/src/app/components/Navbar.tsx
+index 2c4f05a..412f659 100644
+--- a/src/app/components/Navbar.tsx
++++ b/src/app/components/Navbar.tsx
+@@ -29,7 +29,6 @@ export function Navbar() {
+   const navLinks = [
+     { name: 'Accueil', path: '/' },
+     { name: 'Le Consulat', path: '/about' },
+-    { name: 'Nos Actions', path: '/actions' },
+     { name: 'Guide', path: '/guide' },
+     { name: 'Actualités', path: '/news' },
+     { name: 'Contacts', path: '/contact' },
+diff --git a/src/app/context/AuthContext.tsx b/src/app/context/AuthContext.tsx
+index 404ad1b..ea97826 100644
+--- a/src/app/context/AuthContext.tsx
++++ b/src/app/context/AuthContext.tsx
+@@ -1,7 +1,7 @@
+ import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+ import { api, ApiError, getToken, setToken } from '../../lib/api';
+ 
+-export type AdminRole = 'super_admin' | 'admin' | 'moderateur' | 'tresorier' | 'agent';
++export type AdminRole = 'super_admin' | 'admin' | 'agent';
+ 
+ export interface AdminUser {
+   id: number;
+diff --git a/src/app/pages/Actions.tsx b/src/app/pages/Actions.tsx
+deleted file mode 100644
+index bdc5610..0000000
+--- a/src/app/pages/Actions.tsx
++++ /dev/null
+@@ -1,169 +0,0 @@
+-import React, { useEffect, useState } from 'react';
+-import { Link } from 'react-router-dom';
+-import { motion } from 'motion/react';
+-import { Users, GraduationCap, Palette, Handshake, Loader2, ArrowRight } from 'lucide-react';
+-import { api, ApiError } from '../../lib/api';
+-import { Action, SectionAction } from '../admin/types';
+-import { Zoomable } from '../components/Zoomable';
+-
+-// Les 4 piliers sont fixes (mêmes valeurs que la Commission choisie en admin)
+-// et gardent toujours leur propre nom/texte de présentation — les actions
+-// créées dessous n'apparaissent jamais à la place, seulement en cliquant
+-// sur le pilier (page /actions/{section}).
+-const PILLARS: { section: SectionAction; title: string; fallbackDesc: string; icon: React.ReactNode; color: 'emerald' | 'blue' | 'red' | 'purple' }[] = [
+-  {
+-    section: 'solidarite',
+-    title: 'Solidarité & Intégration',
+-    fallbackDesc: "Renforcer l'entraide entre les membres et faciliter l'intégration harmonieuse des jeunes Congolais dans la société béninoise.",
+-    icon: <Users className="w-6 h-6" />,
+-    color: 'emerald',
+-  },
+-  {
+-    section: 'education',
+-    title: 'Éducation & Formation',
+-    fallbackDesc: "Promouvoir l'accès à l'information, au savoir et au renforcement des capacités à travers des initiatives éducatives et formatives.",
+-    icon: <GraduationCap className="w-6 h-6" />,
+-    color: 'blue',
+-  },
+-  {
+-    section: 'culture',
+-    title: 'Culture & Identité',
+-    fallbackDesc: "Valoriser la culture congolaise et préserver l'identité à travers des activités culturelles, artistiques et communautaires.",
+-    icon: <Palette className="w-6 h-6" />,
+-    color: 'red',
+-  },
+-  {
+-    section: 'communication',
+-    title: 'Communication & Partenariats',
+-    fallbackDesc: "Développer la visibilité de l'association et établir des collaborations stratégiques avec des institutions, entreprises et organisations.",
+-    icon: <Handshake className="w-6 h-6" />,
+-    color: 'purple',
+-  },
+-];
+-
+-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1000&auto=format&fit=crop';
+-
+-export function Actions() {
+-  const [actions, setActions] = useState<Action[]>([]);
+-  const [loading, setLoading] = useState(true);
+-  const [error, setError] = useState<string | null>(null);
+-
+-  useEffect(() => {
+-    api
+-      .get<Action[]>('/v1/actions')
+-      .then((data) => setActions(data.filter((a) => a.statut !== 'inactif')))
+-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Erreur de chargement'))
+-      .finally(() => setLoading(false));
+-  }, []);
+-
+-  return (
+-    <div className="bg-white min-h-screen">
+-      {/* Header with Pattern */}
+-      <div className="relative bg-slate-900 text-white py-32 overflow-hidden">
+-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+-        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-green-500/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+-        
+-        <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
+-          <motion.div
+-            initial={{ opacity: 0, y: 30 }}
+-            animate={{ opacity: 1, y: 0 }}
+-            transition={{ duration: 0.8 }}
+-          >
+-            <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-brand-green-300 font-medium text-sm mb-6 backdrop-blur-md">
+-              Nos domaines d'intervention
+-            </span>
+-            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+-              Impact & <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green-400 to-brand-gold-400">Actions</span>
+-            </h1>
+-            <p className="text-xl text-slate-300 max-w-2xl mx-auto font-light">
+-              Découvrez comment nous transformons la vie de la communauté congolaise au Bénin à travers quatre piliers d'excellence.
+-            </p>
+-          </motion.div>
+-        </div>
+-      </div>
+-
+-      {loading && (
+-        <div className="flex justify-center py-24 text-slate-400">
+-          <Loader2 className="w-8 h-8 animate-spin" />
+-        </div>
+-      )}
+-
+-      {error && !loading && (
+-        <div className="text-center py-24 text-slate-500">{error}</div>
+-      )}
+-
+-      <div className="container mx-auto px-4 md:px-6 py-24 space-y-32">
+-        {!loading && !error && PILLARS.map((pillar, index) => {
+-          // Le pilier garde toujours son propre nom/texte. Les actions créées
+-          // dessous (ex: "Nettoyage de plage 2026") ne sont que des éléments
+-          // du pilier, visibles en cliquant dessus — jamais affichées ici à
+-          // la place de l'identité du pilier.
+-          const actionsDuPilier = actions.filter((a) => a.section === pillar.section);
+-          const derniere = [...actionsDuPilier].sort(
+-            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+-          )[0];
+-
+-          return (
+-          <Link to={`/actions/${pillar.section}`} key={pillar.section} className="block group/pillar">
+-          <motion.div 
+-            initial={{ opacity: 0, y: 40 }}
+-            whileInView={{ opacity: 1, y: 0 }}
+-            viewport={{ once: true, margin: "-100px" }}
+-            transition={{ duration: 0.7 }}
+-            className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-16 items-center`}
+-          >
+-            {/* Visual Side */}
+-            <div className="w-full lg:w-1/2 group">
+-              <div className="relative">
+-                {/* Decorative border offset */}
+-                <div className={`absolute inset-0 border-2 border-${pillar.color}-500/20 rounded-[2rem] transform translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500`}></div>
+-                
+-                <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/3]">
+-                  <Zoomable
+-                    src={derniere?.image_url || FALLBACK_IMAGE}
+-                    alt={pillar.title}
+-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+-                  />
+-                </div>
+-                
+-                {/* Floating count badge */}
+-                {actionsDuPilier.length > 0 && (
+-                  <div className="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 animate-bounce-slow">
+-                     <div className={`w-10 h-10 rounded-full bg-${pillar.color}-100 flex items-center justify-center text-${pillar.color}-600`}>
+-                       {pillar.icon}
+-                     </div>
+-                     <span className="font-bold text-slate-900">
+-                       {actionsDuPilier.length} réalisation{actionsDuPilier.length > 1 ? 's' : ''}
+-                     </span>
+-                  </div>
+-                )}
+-              </div>
+-            </div>
+-
+-            {/* Content Side */}
+-            <div className="w-full lg:w-1/2">
+-              <div className="mb-6 flex items-center gap-2">
+-                <span className={`w-12 h-1 bg-${pillar.color}-500 rounded-full`}></span>
+-                <span className={`text-${pillar.color}-600 font-bold uppercase tracking-widest text-sm`}>
+-                  Pilier 0{index + 1}
+-                </span>
+-              </div>
+-              
+-              <h2 className="text-4xl font-bold text-slate-900 mb-6 leading-tight">{pillar.title}</h2>
+-              <p className="text-xl text-slate-600 mb-8 leading-relaxed font-light">
+-                {pillar.fallbackDesc}
+-              </p>
+-
+-              <span className={`inline-flex items-center gap-2 font-bold text-${pillar.color}-600 group-hover/pillar:gap-3 transition-all`}>
+-                Voir les réalisations
+-                <ArrowRight size={18} />
+-              </span>
+-            </div>
+-          </motion.div>
+-          </Link>
+-          );
+-        })}
+-      </div>
+-    </div>
+-  );
+-}
+diff --git a/src/app/pages/ActionsSection.tsx b/src/app/pages/ActionsSection.tsx
+deleted file mode 100644
+index ada68d4..0000000
+--- a/src/app/pages/ActionsSection.tsx
++++ /dev/null
+@@ -1,106 +0,0 @@
+-import React, { useEffect, useState } from 'react';
+-import { Link, useParams } from 'react-router-dom';
+-import { motion } from 'motion/react';
+-import { ArrowLeft, Calendar, Loader2, MapPin } from 'lucide-react';
+-import { api, ApiError } from '../../lib/api';
+-import { Action, SectionAction } from '../admin/types';
+-import { Zoomable } from '../components/Zoomable';
+-
+-const PILLAR_TITLES: Record<SectionAction, string> = {
+-  solidarite: 'Solidarité & Intégration',
+-  education: 'Éducation & Formation',
+-  culture: 'Culture & Identité',
+-  communication: 'Communication & Partenariats',
+-};
+-
+-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1000&auto=format&fit=crop';
+-
+-export function ActionsSection() {
+-  const { section } = useParams<{ section: SectionAction }>();
+-  const [actions, setActions] = useState<Action[]>([]);
+-  const [loading, setLoading] = useState(true);
+-  const [error, setError] = useState<string | null>(null);
+-
+-  useEffect(() => {
+-    if (!section) return;
+-    setLoading(true);
+-    setError(null);
+-    api
+-      .get<Action[]>(`/v1/actions/section/${section}`)
+-      .then((data) => setActions(data.filter((a) => a.statut !== 'inactif')))
+-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Erreur de chargement'))
+-      .finally(() => setLoading(false));
+-  }, [section]);
+-
+-  const title = (section && PILLAR_TITLES[section]) || 'Actions';
+-
+-  return (
+-    <div className="bg-slate-50 min-h-screen pt-32 pb-20">
+-      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+-        <Link
+-          to="/actions"
+-          className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 transition-colors"
+-        >
+-          <ArrowLeft size={18} />
+-          Retour aux piliers
+-        </Link>
+-
+-        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12">{title}</h1>
+-
+-        {loading && (
+-          <div className="flex justify-center py-24 text-slate-400">
+-            <Loader2 className="w-8 h-8 animate-spin" />
+-          </div>
+-        )}
+-
+-        {error && !loading && <div className="text-center py-24 text-slate-500">{error}</div>}
+-
+-        {!loading && !error && actions.length === 0 && (
+-          <div className="text-center py-24 text-slate-500">
+-            Aucune réalisation publiée pour ce pilier pour le moment.
+-          </div>
+-        )}
+-
+-        <div className="grid md:grid-cols-2 gap-8">
+-          {actions.map((action, index) => (
+-            <motion.div
+-              key={action.id}
+-              initial={{ opacity: 0, y: 20 }}
+-              whileInView={{ opacity: 1, y: 0 }}
+-              viewport={{ once: true }}
+-              transition={{ delay: index * 0.1 }}
+-              className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100"
+-            >
+-              <div className="aspect-video bg-slate-200">
+-                <Zoomable
+-                  src={action.image_url || FALLBACK_IMAGE}
+-                  alt={action.titre}
+-                  className="w-full h-full object-cover"
+-                />
+-              </div>
+-              <div className="p-6">
+-                <h2 className="text-xl font-bold text-slate-900 mb-2">{action.titre}</h2>
+-                <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm mb-3">
+-                  {(action.date_affichage || action.date_debut) && (
+-                    <div className="flex items-center gap-1.5">
+-                      <Calendar size={14} />
+-                      {action.date_affichage ||
+-                        new Date(action.date_debut as string).toLocaleDateString('fr-FR', { dateStyle: 'long' })}
+-                    </div>
+-                  )}
+-                  {(action.lieu_affichage || action.lieu) && (
+-                    <div className="flex items-center gap-1.5">
+-                      <MapPin size={14} />
+-                      {action.lieu_affichage || action.lieu}
+-                    </div>
+-                  )}
+-                </div>
+-                <p className="text-slate-600 leading-relaxed">{action.description}</p>
+-              </div>
+-            </motion.div>
+-          ))}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}
+diff --git a/src/app/pages/Events.tsx b/src/app/pages/Events.tsx
+deleted file mode 100644
+index a7dc318..0000000
+--- a/src/app/pages/Events.tsx
++++ /dev/null
+@@ -1,116 +0,0 @@
+-import React, { useEffect, useState } from 'react';
+-import { motion } from 'motion/react';
+-import { Calendar, MapPin, Loader2 } from 'lucide-react';
+-import { api, ApiError } from '../../lib/api';
+-import { Evenement } from '../admin/types';
+-import { FedaPayButton } from '../components/FedaPayButton';
+-import { Zoomable } from '../components/Zoomable';
+-
+-export function Events() {
+-  const [evenements, setEvenements] = useState<Evenement[]>([]);
+-  const [loading, setLoading] = useState(true);
+-  const [error, setError] = useState<string | null>(null);
+-
+-  useEffect(() => {
+-    api
+-      .get<Evenement[]>('/v1/evenements?a_venir=1')
+-      .then(setEvenements)
+-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Erreur de chargement'))
+-      .finally(() => setLoading(false));
+-  }, []);
+-
+-  return (
+-    <div className="bg-slate-50 min-h-screen pt-32 pb-20">
+-      <div className="container mx-auto px-4 md:px-6">
+-        <div className="mb-16">
+-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Événements</h1>
+-          <p className="text-xl text-slate-500">Les prochains rendez-vous de la communauté congolaise au Bénin.</p>
+-        </div>
+-
+-        {loading && (
+-          <div className="flex justify-center py-20 text-slate-400">
+-            <Loader2 className="w-8 h-8 animate-spin" />
+-          </div>
+-        )}
+-
+-        {error && !loading && (
+-          <div className="text-center py-20 text-slate-500">{error}</div>
+-        )}
+-
+-        {!loading && !error && evenements.length === 0 && (
+-          <div className="text-center py-20 text-slate-500">Aucun événement à venir pour le moment.</div>
+-        )}
+-
+-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+-          {evenements.map((evt, index) => {
+-            const payant = !!evt.prix && evt.prix > 0;
+-            const complet = evt.capacite_max != null && evt.nombre_inscrits >= evt.capacite_max;
+-
+-            return (
+-              <motion.div
+-                key={evt.id}
+-                initial={{ opacity: 0, y: 20 }}
+-                whileInView={{ opacity: 1, y: 0 }}
+-                transition={{ delay: index * 0.05 }}
+-                className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex flex-col"
+-              >
+-                <div className="h-48 bg-slate-200 relative overflow-hidden">
+-                  {evt.image_url ? (
+-                    <Zoomable src={evt.image_url} alt={evt.titre} className="w-full h-full object-cover" />
+-                  ) : (
+-                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+-                      <Calendar size={40} />
+-                    </div>
+-                  )}
+-                  {evt.categorie && (
+-                    <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold text-slate-700 uppercase tracking-wider">
+-                      {evt.categorie}
+-                    </span>
+-                  )}
+-                </div>
+-
+-                <div className="p-6 flex flex-col flex-1">
+-                  <div className="flex items-center gap-2 text-brand-green-600 text-xs font-semibold mb-2">
+-                    <Calendar size={14} />
+-                    {new Date(evt.date_debut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+-                  </div>
+-
+-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{evt.titre}</h3>
+-
+-                  {evt.description && (
+-                    <p className="text-slate-500 text-sm mb-4 line-clamp-3">{evt.description}</p>
+-                  )}
+-
+-                  {evt.lieu && (
+-                    <div className="flex items-center gap-2 text-slate-400 text-xs mb-4">
+-                      <MapPin size={14} />
+-                      {evt.lieu}
+-                    </div>
+-                  )}
+-
+-                  <div className="mt-auto pt-4">
+-                    {complet ? (
+-                      <span className="text-sm font-semibold text-red-500">Événement complet</span>
+-                    ) : payant ? (
+-                      <FedaPayButton
+-                        endpoint={`/v1/paiements/evenements/${evt.id}`}
+-                        montant={evt.prix as number}
+-                        devise={evt.devise || 'XOF'}
+-                        label="Réserver ma place"
+-                        className="w-full justify-center"
+-                      />
+-                    ) : (
+-                      <span className="inline-block px-4 py-2 bg-brand-green-50 text-brand-green-700 rounded-full text-sm font-semibold">
+-                        Entrée libre
+-                      </span>
+-                    )}
+-                  </div>
+-                </div>
+-              </motion.div>
+-            );
+-          })}
+-        </div>
+-      </div>
+-    </div>
+-  );
+-}

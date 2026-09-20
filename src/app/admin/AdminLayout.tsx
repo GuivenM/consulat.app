@@ -4,9 +4,6 @@ import {
   LayoutDashboard,
   Mail,
   Newspaper,
-  Activity,
-  Users,
-  CalendarDays,
   BookOpen,
   Handshake,
   LogOut,
@@ -32,18 +29,15 @@ interface NavItem {
   roles?: AdminRole[];
 }
 
-const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'moderateur'];
+const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'agent'];
 
 const navItems: NavItem[] = [
-  { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: ['super_admin', 'admin', 'moderateur', 'tresorier'] },
+  { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: STAFF_ROLES },
   { label: 'Messages', path: '/admin/messages', icon: Mail, roles: STAFF_ROLES },
   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
-  { label: 'Actions', path: '/admin/actions', icon: Activity, roles: STAFF_ROLES },
-  { label: 'Membres', path: '/admin/membres', icon: Users, roles: STAFF_ROLES },
   { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
   { label: 'Carte', path: '/admin/carte', icon: MapIcon, roles: ['super_admin', 'admin', 'agent'] },
   { label: 'Configuration', path: '/admin/configuration', icon: Settings, roles: ['super_admin', 'admin'] },
-  { label: 'Événements', path: '/admin/evenements', icon: CalendarDays, roles: STAFF_ROLES },
   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },
   { label: 'Utilisateurs', path: '/admin/utilisateurs', icon: ShieldCheck, roles: ['super_admin'] },

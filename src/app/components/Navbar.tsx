@@ -29,7 +29,6 @@ export function Navbar() {
   const navLinks = [
     { name: 'Accueil', path: '/' },
     { name: 'Le Consulat', path: '/about' },
-    { name: 'Nos Actions', path: '/actions' },
     { name: 'Guide', path: '/guide' },
     { name: 'Actualités', path: '/news' },
     { name: 'Contacts', path: '/contact' },

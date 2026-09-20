@@ -1,51 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  UserPlus,
+  FileText,
   Mail,
-  Users,
-  Wallet,
-  CalendarDays,
+  BookUser,
+  CheckCircle2,
   Newspaper,
   BookOpen,
   Handshake,
-  Activity,
   Loader2,
   ArrowRight,
 } from 'lucide-react';
 import { api } from '../../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type {
-  Adhesion,
   Message,
-  Membre,
-  CotisationStats,
-  Evenement,
+  RessortissantStats,
+  Demande,
   Actualite,
   GuideSection,
   Partenaire,
-  Action,
 } from './types';
 
 interface Overview {
-  adhesionsEnAttente: number;
-  adhesionsTotal: number;
   messagesNonLus: number;
   messagesTotal: number;
-  membresActifs: number;
-  membresTotal: number;
-  cotisationsEnRetard: number;
-  cotisationsTauxAJour: number;
-  evenementsAVenir: number;
-  evenementsTotal: number;
+  ressortissantsActifs: number;
+  ressortissantsTotal: number;
+  demandesEnAttente: number;
+  demandesPretes: number;
+  demandesTotal: number;
   actualitesBrouillons: number;
   actualitesTotal: number;
   guideDocuments: number;
   guideSections: number;
   partenairesActifs: number;
   partenairesTotal: number;
-  actionsEnCours: number;
-  actionsTotal: number;
 }
 
 export function Dashboard() {
@@ -55,49 +45,42 @@ export function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    const moisCourant = new Date().toISOString().slice(0, 7);
 
     (async () => {
       try {
         const [
-          adhesions,
           messages,
-          membres,
-          cotisationsStats,
-          evenements,
+          ressortissantsStats,
+          demandes,
           actualites,
           guide,
           partenairesActifs,
           partenairesInactifs,
-          actions,
         ] = await Promise.all([
-          api.get<Adhesion[]>('/v1/adhesions'),
           api.get<Message[]>('/v1/messages'),
-          api.get<Membre[]>('/v1/membres-admin/tous'),
-          api.get<CotisationStats>(`/v1/cotisations/statistiques?mois=${moisCourant}`),
-          api.get<Evenement[]>('/v1/evenements'),
+          api.get<RessortissantStats>('/v1/admin/ressortissants/statistiques'),
+          // NOTE : /v1/admin/demandes pagine côté serveur (20/page par défaut) mais
+          // ne renvoie pas encore de total exploitable par ce client HTTP (le
+          // `meta` de la réponse est ignoré par api.get, voir lib/api.ts) — une
+          // vraie page Demandes visera cet endpoint avec ses propres filtres,
+          // ce large par_page n'est qu'un aperçu pour le tableau de bord.
+          api.get<Demande[]>('/v1/admin/demandes?par_page=200'),
           api.get<Actualite[]>('/v1/actualites'),
           api.get<GuideSection[]>('/v1/guide?all=1'),
           api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
           api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
-          api.get<Action[]>('/v1/actions'),
         ]);
 
         if (cancelled) return;
 
-        const today = new Date().toISOString().slice(0, 10);
-
         setData({
-          adhesionsEnAttente: adhesions.filter((a) => a.statut === 'en_attente').length,
-          adhesionsTotal: adhesions.length,
           messagesNonLus: messages.filter((m) => m.statut === 'non_lu').length,
           messagesTotal: messages.length,
-          membresActifs: membres.filter((m) => m.statut === 'actif').length,
-          membresTotal: membres.length,
-          cotisationsEnRetard: cotisationsStats.nb_impayees,
-          cotisationsTauxAJour: cotisationsStats.taux_a_jour,
-          evenementsAVenir: evenements.filter((e) => e.date_debut >= today && e.statut === 'publie').length,
-          evenementsTotal: evenements.length,
+          ressortissantsActifs: ressortissantsStats.par_statut.actif ?? 0,
+          ressortissantsTotal: ressortissantsStats.total,
+          demandesEnAttente: demandes.filter((d) => d.statut === 'recu' || d.statut === 'en_traitement').length,
+          demandesPretes: demandes.filter((d) => d.statut === 'pret').length,
+          demandesTotal: demandes.length,
           actualitesBrouillons: actualites.filter((a) => a.statut === 'brouillon').length,
           actualitesTotal: actualites.length,
           guideDocuments: guide.reduce(
@@ -107,8 +90,6 @@ export function Dashboard() {
           guideSections: guide.length,
           partenairesActifs: partenairesActifs.length,
           partenairesTotal: partenairesActifs.length + partenairesInactifs.length,
-          actionsEnCours: actions.filter((a) => a.statut === 'actif').length,
-          actionsTotal: actions.length,
         });
       } catch {
         if (!cancelled) setError('Impossible de charger les données du tableau de bord.');
@@ -147,10 +128,16 @@ export function Dashboard() {
           {/* À traiter en priorité */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
             <StatCard
-              label="Adhésions en attente"
-              value={data.adhesionsEnAttente}
-              icon={UserPlus}
-              tone={data.adhesionsEnAttente > 0 ? 'gold' : 'green'}
+              label="Demandes en attente"
+              value={data.demandesEnAttente}
+              icon={FileText}
+              tone={data.demandesEnAttente > 0 ? 'gold' : 'green'}
+            />
+            <StatCard
+              label="Dossiers prêts"
+              value={data.demandesPretes}
+              icon={CheckCircle2}
+              tone={data.demandesPretes > 0 ? 'gold' : 'green'}
             />
             <StatCard
               label="Messages non lus"
@@ -159,15 +146,9 @@ export function Dashboard() {
               tone={data.messagesNonLus > 0 ? 'red' : 'green'}
             />
             <StatCard
-              label="Cotisations en retard"
-              value={data.cotisationsEnRetard}
-              icon={Wallet}
-              tone={data.cotisationsEnRetard > 0 ? 'red' : 'green'}
-            />
-            <StatCard
-              label="Événements à venir"
-              value={data.evenementsAVenir}
-              icon={CalendarDays}
+              label="Ressortissants inscrits"
+              value={data.ressortissantsActifs}
+              icon={BookUser}
               tone="green"
             />
           </div>
@@ -178,11 +159,17 @@ export function Dashboard() {
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             <ModuleCard
-              to="/admin/adhesions"
-              icon={UserPlus}
-              title="Adhésions"
-              stat={`${data.adhesionsTotal} demande${data.adhesionsTotal > 1 ? 's' : ''} au total`}
-              badge={data.adhesionsEnAttente}
+              to="/admin/demandes"
+              icon={FileText}
+              title="Demandes"
+              stat={`${data.demandesTotal} dossier${data.demandesTotal > 1 ? 's' : ''} au total`}
+              badge={data.demandesEnAttente}
+            />
+            <ModuleCard
+              to="/admin/registre"
+              icon={BookUser}
+              title="Registre consulaire"
+              stat={`${data.ressortissantsActifs} actif${data.ressortissantsActifs > 1 ? 's' : ''} / ${data.ressortissantsTotal}`}
             />
             <ModuleCard
               to="/admin/messages"
@@ -190,25 +177,6 @@ export function Dashboard() {
               title="Messages"
               stat={`${data.messagesTotal} message${data.messagesTotal > 1 ? 's' : ''} reçu${data.messagesTotal > 1 ? 's' : ''}`}
               badge={data.messagesNonLus}
-            />
-            <ModuleCard
-              to="/admin/membres"
-              icon={Users}
-              title="Membres"
-              stat={`${data.membresActifs} actif${data.membresActifs > 1 ? 's' : ''} / ${data.membresTotal}`}
-            />
-            <ModuleCard
-              to="/admin/cotisations"
-              icon={Wallet}
-              title="Cotisations"
-              stat={`${data.cotisationsTauxAJour}% à jour ce mois`}
-              badge={data.cotisationsEnRetard}
-            />
-            <ModuleCard
-              to="/admin/evenements"
-              icon={CalendarDays}
-              title="Événements"
-              stat={`${data.evenementsTotal} événement${data.evenementsTotal > 1 ? 's' : ''} au total`}
             />
             <ModuleCard
               to="/admin/actualites"
@@ -227,12 +195,6 @@ export function Dashboard() {
               icon={Handshake}
               title="Partenaires"
               stat={`${data.partenairesActifs} actif${data.partenairesActifs > 1 ? 's' : ''} / ${data.partenairesTotal}`}
-            />
-            <ModuleCard
-              to="/admin/actions"
-              icon={Activity}
-              title="Actions"
-              stat={`${data.actionsEnCours} en cours / ${data.actionsTotal}`}
             />
           </div>
         </>
