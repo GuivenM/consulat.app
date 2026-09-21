@@ -37,10 +37,10 @@ export function useAdminNotifications(): NotificationsState {
   const charger = useCallback(async () => {
     try {
       const [demandesData, messagesData] = await Promise.all([
-        api.get<Demande[]>('/v1/admin/demandes?statut=recu&par_page=50'),
+        api.get<{ items: Demande[] }>('/v1/admin/demandes?statut=recu&par_page=50'),
         api.get<Message[]>('/v1/messages'),
       ]);
-      setDemandesRecues(demandesData);
+      setDemandesRecues(demandesData.items);
       setMessages(messagesData);
     } catch {
       // Échec silencieux : la cloche affiche simplement les derniers
