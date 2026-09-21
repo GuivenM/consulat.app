@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
+  FileText,
   Mail,
   Newspaper,
   BookOpen,
@@ -33,6 +34,7 @@ const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'agent'];
 
 const navItems: NavItem[] = [
   { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: STAFF_ROLES },
+  { label: 'Demandes', path: '/admin/demandes', icon: FileText, roles: ['super_admin', 'admin', 'agent'] },
   { label: 'Messages', path: '/admin/messages', icon: Mail, roles: STAFF_ROLES },
   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
   { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
@@ -48,12 +50,13 @@ export function AdminLayout() {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { messagesNonLus, loading, items, total } = useAdminNotifications();
+  const { messagesNonLus, demandesEnAttente, loading, items, total } = useAdminNotifications();
 
   const visibleNavItems = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
   const navBadges: Record<string, number> = {
     '/admin/messages': messagesNonLus,
+    '/admin/demandes': demandesEnAttente,
   };
 
   async function handleLogout() {

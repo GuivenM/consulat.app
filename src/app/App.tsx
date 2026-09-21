@@ -21,6 +21,7 @@ import { AdminLayout } from './admin/AdminLayout';
 import { ProtectedRoute } from './admin/ProtectedRoute';
 import { Dashboard } from './admin/Dashboard';
 import { AdminMessages } from './admin/pages/AdminMessages';
+import { AdminDemandes } from './admin/pages/AdminDemandes';
 import { AdminRegistre } from './admin/pages/AdminRegistre';
 import { AdminConfiguration } from './admin/pages/AdminConfiguration';
 import { AdminCarte } from './admin/pages/AdminCarte';
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="messages" element={<AdminMessages />} />
+              <Route path="demandes" element={<AdminDemandes />} />
               <Route path="registre" element={<AdminRegistre />} />
               <Route path="configuration" element={<AdminConfiguration />} />
               <Route path="carte" element={<AdminCarte />} />

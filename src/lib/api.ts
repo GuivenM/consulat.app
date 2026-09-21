@@ -113,6 +113,36 @@ export async function downloadFile(path: string, filenameFallback = 'export.csv'
   URL.revokeObjectURL(url);
 }
 
+// Ouverture d'un fichier privé (pièce d'un dossier) dans un nouvel onglet.
+// Même contrainte que downloadFile : un <a href> classique n'enverrait pas
+// le Bearer token, donc on récupère le blob nous-mêmes puis on l'ouvre.
+export async function openFile(path: string) {
+  const token = getToken();
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    let message = `Erreur ${res.status}`;
+    try {
+      const body = await res.json();
+      message = body?.message || message;
+    } catch {
+      // pas de corps JSON — on garde le message par défaut
+    }
+    throw new ApiError(message, res.status);
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  // Révocation différée : le nouvel onglet a besoin du temps de charger le
+  // blob avant qu'on lui retire son URL.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 export const api = {
   get: <T,>(path: string) => request<T>(path, { method: 'GET' }),
   post: <T,>(path: string, data?: unknown) =>
@@ -123,6 +153,11 @@ export const api = {
   put: <T,>(path: string, data?: unknown) =>
     request<T>(path, {
       method: 'PUT',
+      body: data !== undefined ? JSON.stringify(data) : undefined,
+    }),
+  patch: <T,>(path: string, data?: unknown) =>
+    request<T>(path, {
+      method: 'PATCH',
       body: data !== undefined ? JSON.stringify(data) : undefined,
     }),
   delete: <T,>(path: string) => request<T>(path, { method: 'DELETE' }),

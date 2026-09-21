@@ -475,6 +475,7 @@ export interface DemandeDocumentAdmin {
   code_document: string;
   label: string;
   nom_original: string | null;
+  fichier_url: string;
   statut: 'en_attente' | 'valide' | 'rejete';
   statut_label: string;
   motif_rejet: string | null;
