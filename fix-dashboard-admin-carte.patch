@@ -1,0 +1,288 @@
+diff --git a/src/app/admin/Dashboard.tsx b/src/app/admin/Dashboard.tsx
+index 9474d43..0c950e1 100644
+--- a/src/app/admin/Dashboard.tsx
++++ b/src/app/admin/Dashboard.tsx
+@@ -1,53 +1,52 @@
+ import React, { useEffect, useState } from 'react';
+ import { Link } from 'react-router-dom';
++import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
++import 'leaflet/dist/leaflet.css';
+ import {
+-  FileText,
+   Mail,
+   BookUser,
+-  CheckCircle2,
+   Newspaper,
+   BookOpen,
+   Handshake,
+-  Settings,
+-  Map as MapIcon,
+   Loader2,
+   ArrowRight,
++  Map as MapIcon,
+ } from 'lucide-react';
+ import { api } from '../../lib/api';
+ import { useAuth } from '../context/AuthContext';
+-import type {
+-  Message,
+-  RessortissantStats,
+-  Demande,
+-  Actualite,
+-  GuideSection,
+-  Partenaire,
+-  Tarif,
+-  DocumentTypeRequis,
+-} from './types';
++import type { Message, Actualite, GuideSection, Partenaire } from './types';
++import type { PointCarte } from './types';
++
++const CENTRE_COTONOU: [number, number] = [6.3703, 2.3912];
++const STATUT_COULEUR: Record<string, string> = {
++  actif: '#009739',
++  inactif: '#94a3b8',
++  suspendu: '#ef3340',
++};
+ 
+ interface Overview {
+   messagesNonLus: number;
+   messagesTotal: number;
+-  ressortissantsActifs: number;
+   ressortissantsTotal: number;
+-  demandesEnAttente: number;
+-  demandesPretes: number;
+-  demandesTotal: number;
++  ressortissantsParStatut: Record<string, number>;
+   actualitesBrouillons: number;
+   actualitesTotal: number;
+   guideDocuments: number;
+   guideSections: number;
+   partenairesActifs: number;
+   partenairesTotal: number;
+-  villesCouvertes: number;
+-  tarifsActifs: number;
+-  documentsRequisActifs: number;
++}
++
++interface RessortissantsStats {
++  total: number;
++  par_statut: Record<string, number>;
++  par_ville: Record<string, number>;
+ }
+ 
+ export function Dashboard() {
+   const { user } = useAuth();
+   const [data, setData] = useState<Overview | null>(null);
++  const [points, setPoints] = useState<PointCarte[] | null>(null);
+   const [error, setError] = useState<string | null>(null);
+ 
+   useEffect(() => {
+@@ -55,44 +54,24 @@ export function Dashboard() {
+ 
+     (async () => {
+       try {
+-        const [
+-          messages,
+-          ressortissantsStats,
+-          demandesReponse,
+-          actualites,
+-          guide,
+-          partenairesActifs,
+-          partenairesInactifs,
+-          tarifs,
+-          documentsRequis,
+-        ] = await Promise.all([
+-          api.get<Message[]>('/v1/messages'),
+-          api.get<RessortissantStats>('/v1/admin/ressortissants/statistiques'),
+-          // NOTE : /v1/admin/demandes pagine côté serveur (20/page par défaut) et
+-          // renvoie {items, meta} sous data (même forme que le registre) — meta.total
+-          // sera exploité par la vraie page Demandes ; ce large par_page n'est qu'un
+-          // aperçu pour le tableau de bord.
+-          api.get<{ items: Demande[] }>('/v1/admin/demandes?par_page=200'),
+-          api.get<Actualite[]>('/v1/actualites'),
+-          api.get<GuideSection[]>('/v1/guide?all=1'),
+-          api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
+-          api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
+-          api.get<Tarif[]>('/v1/admin/tarifs'),
+-          api.get<DocumentTypeRequis[]>('/v1/admin/document-types-requis'),
+-        ]);
++        const [messages, ressortissantsStats, actualites, guide, partenairesActifs, partenairesInactifs, carte] =
++          await Promise.all([
++            api.get<Message[]>('/v1/messages'),
++            api.get<RessortissantsStats>('/v1/admin/ressortissants/statistiques'),
++            api.get<Actualite[]>('/v1/actualites'),
++            api.get<GuideSection[]>('/v1/guide?all=1'),
++            api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
++            api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
++            api.get<{ par_quartier: unknown[]; points: PointCarte[] }>('/v1/admin/ressortissants/carte'),
++          ]);
+ 
+         if (cancelled) return;
+ 
+-        const demandes = demandesReponse.items;
+-
+         setData({
+           messagesNonLus: messages.filter((m) => m.statut === 'non_lu').length,
+           messagesTotal: messages.length,
+-          ressortissantsActifs: ressortissantsStats.par_statut.actif ?? 0,
+           ressortissantsTotal: ressortissantsStats.total,
+-          demandesEnAttente: demandes.filter((d) => d.statut === 'recu' || d.statut === 'en_traitement').length,
+-          demandesPretes: demandes.filter((d) => d.statut === 'pret').length,
+-          demandesTotal: demandes.length,
++          ressortissantsParStatut: ressortissantsStats.par_statut,
+           actualitesBrouillons: actualites.filter((a) => a.statut === 'brouillon').length,
+           actualitesTotal: actualites.length,
+           guideDocuments: guide.reduce(
+@@ -102,10 +81,8 @@ export function Dashboard() {
+           guideSections: guide.length,
+           partenairesActifs: partenairesActifs.length,
+           partenairesTotal: partenairesActifs.length + partenairesInactifs.length,
+-          villesCouvertes: Object.keys(ressortissantsStats.par_ville).length,
+-          tarifsActifs: tarifs.filter((t) => t.est_actif).length,
+-          documentsRequisActifs: documentsRequis.filter((d) => d.est_actif).length,
+         });
++        setPoints(carte.points);
+       } catch {
+         if (!cancelled) setError('Impossible de charger les données du tableau de bord.');
+       }
+@@ -140,20 +117,8 @@ export function Dashboard() {
+         </div>
+       ) : (
+         <>
+-          {/* À traiter en priorité */}
+           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+-            <StatCard
+-              label="Demandes en attente"
+-              value={data.demandesEnAttente}
+-              icon={FileText}
+-              tone={data.demandesEnAttente > 0 ? 'gold' : 'green'}
+-            />
+-            <StatCard
+-              label="Dossiers prêts"
+-              value={data.demandesPretes}
+-              icon={CheckCircle2}
+-              tone={data.demandesPretes > 0 ? 'gold' : 'green'}
+-            />
++            <StatCard label="Ressortissants inscrits" value={data.ressortissantsTotal} icon={BookUser} tone="green" />
+             <StatCard
+               label="Messages non lus"
+               value={data.messagesNonLus}
+@@ -161,43 +126,82 @@ export function Dashboard() {
+               tone={data.messagesNonLus > 0 ? 'red' : 'green'}
+             />
+             <StatCard
+-              label="Ressortissants inscrits"
+-              value={data.ressortissantsActifs}
+-              icon={BookUser}
+-              tone="green"
++              label="Actualités en brouillon"
++              value={data.actualitesBrouillons}
++              icon={Newspaper}
++              tone={data.actualitesBrouillons > 0 ? 'gold' : 'green'}
+             />
++            <StatCard label="Partenaires actifs" value={data.partenairesActifs} icon={Handshake} tone="green" />
++          </div>
++
++          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
++            <div className="lg:col-span-2 bg-white border border-brand-green-100 rounded-xl overflow-hidden">
++              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
++                <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
++                  <MapIcon className="w-4 h-4 text-brand-green-600" /> Registre — carte des ressortissants
++                </h2>
++                <Link to="/admin/carte" className="text-xs text-brand-green-600 hover:underline flex items-center gap-1">
++                  Carte complète <ArrowRight className="w-3 h-3" />
++                </Link>
++              </div>
++              <div style={{ height: 300 }}>
++                {points === null ? (
++                  <div className="h-full flex items-center justify-center text-slate-400">
++                    <Loader2 className="w-5 h-5 animate-spin" />
++                  </div>
++                ) : points.length === 0 ? (
++                  <div className="h-full flex items-center justify-center text-slate-400 text-sm text-center px-8">
++                    Aucun ressortissant géolocalisé pour l'instant.
++                  </div>
++                ) : (
++                  <MapContainer center={CENTRE_COTONOU} zoom={11} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
++                    <TileLayer
++                      attribution='&copy; OpenStreetMap'
++                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
++                    />
++                    {points.map((p) => (
++                      <CircleMarker
++                        key={p.id}
++                        center={[p.latitude, p.longitude]}
++                        radius={6}
++                        pathOptions={{
++                          color: STATUT_COULEUR[p.statut] ?? '#94a3b8',
++                          fillColor: STATUT_COULEUR[p.statut] ?? '#94a3b8',
++                          fillOpacity: 0.8,
++                        }}
++                      />
++                    ))}
++                  </MapContainer>
++                )}
++              </div>
++            </div>
++
++            <div className="bg-white border border-brand-green-100 rounded-xl p-5">
++              <h2 className="text-sm font-semibold text-slate-900 mb-4">Registre par statut</h2>
++              <div className="space-y-3">
++                {(['actif', 'inactif', 'suspendu'] as const).map((statut) => (
++                  <div key={statut} className="flex items-center justify-between text-sm">
++                    <span className="flex items-center gap-2 text-slate-600 capitalize">
++                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STATUT_COULEUR[statut] }} />
++                      {statut}
++                    </span>
++                    <span className="font-semibold text-slate-900">{data.ressortissantsParStatut[statut] ?? 0}</span>
++                  </div>
++                ))}
++              </div>
++              <Link
++                to="/admin/registre"
++                className="mt-5 inline-flex items-center gap-1 text-xs text-brand-green-600 hover:underline"
++              >
++                Voir le registre <ArrowRight className="w-3 h-3" />
++              </Link>
++            </div>
+           </div>
+ 
+-          {/* Tous les modules */}
+           <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
+             Modules
+           </h2>
+           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+-            <ModuleCard
+-              to="/admin/demandes"
+-              icon={FileText}
+-              title="Demandes"
+-              stat={`${data.demandesTotal} dossier${data.demandesTotal > 1 ? 's' : ''} au total`}
+-              badge={data.demandesEnAttente}
+-            />
+-            <ModuleCard
+-              to="/admin/registre"
+-              icon={BookUser}
+-              title="Registre consulaire"
+-              stat={`${data.ressortissantsActifs} actif${data.ressortissantsActifs > 1 ? 's' : ''} / ${data.ressortissantsTotal}`}
+-            />
+-            <ModuleCard
+-              to="/admin/carte"
+-              icon={MapIcon}
+-              title="Carte interactive"
+-              stat={`${data.villesCouvertes} ville${data.villesCouvertes > 1 ? 's' : ''} couverte${data.villesCouvertes > 1 ? 's' : ''}`}
+-            />
+-            <ModuleCard
+-              to="/admin/configuration"
+-              icon={Settings}
+-              title="Configuration"
+-              stat={`${data.tarifsActifs} tarif${data.tarifsActifs > 1 ? 's' : ''} · ${data.documentsRequisActifs} pièce${data.documentsRequisActifs > 1 ? 's' : ''} requise${data.documentsRequisActifs > 1 ? 's' : ''}`}
+-            />
+             <ModuleCard
+               to="/admin/messages"
+               icon={Mail}
+@@ -293,4 +297,4 @@ function ModuleCard({
+       <ArrowRight className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-1.5 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-green-600" />
+     </Link>
+   );
+-}
+\ No newline at end of file
++}
