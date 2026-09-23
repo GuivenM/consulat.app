@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, Trash2, Mail, ShieldCheck, Clock, KeyRound } from 'lucide-react';
+import { Loader2, Trash2, Mail, ShieldCheck, Clock, KeyRound, UserPlus } from 'lucide-react';
 import { api, ApiError } from '../../../lib/api';
 import { useAuth, AdminRole } from '../../context/AuthContext';
 import { Button } from '../../components/ui/button';
@@ -21,6 +21,16 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { Switch } from '../../components/ui/switch';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '../../components/ui/dialog';
 import { toast } from 'sonner';
 
 interface UtilisateurAdmin {
@@ -44,10 +54,17 @@ const ROLES: { value: AdminRole; label: string }[] = [
   { value: 'agent', label: 'Agent' },
 ];
 
+const FORMULAIRE_VIDE = { prenom: '', nom: '', email: '', telephone: '', role: 'agent' as AdminRole };
+
 export function AdminUtilisateurs() {
   const { user: moi } = useAuth();
   const [utilisateurs, setUtilisateurs] = useState<UtilisateurAdmin[] | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+
+  const [creationOuverte, setCreationOuverte] = useState(false);
+  const [form, setForm] = useState(FORMULAIRE_VIDE);
+  const [erreurs, setErreurs] = useState<Record<string, string[]>>({});
+  const [creationEnCours, setCreationEnCours] = useState(false);
 
   useEffect(() => {
     load();
@@ -61,6 +78,31 @@ export function AdminUtilisateurs() {
       toast.error(err instanceof ApiError ? err.message : 'Impossible de charger les utilisateurs.');
     }
   }
+
+  async function creer() {
+    setCreationEnCours(true);
+    setErreurs({});
+    try {
+      const cree = await api.post<UtilisateurAdmin>('/v1/utilisateurs', {
+        prenom: form.prenom.trim(),
+        nom: form.nom.trim(),
+        email: form.email.trim(),
+        telephone: form.telephone.trim() || undefined,
+        role: form.role,
+      });
+      setUtilisateurs((prev) => (prev ? [...prev, cree] : [cree]));
+      toast.success(`Compte créé. Un email d'activation a été envoyé à ${cree.email}.`);
+      setCreationOuverte(false);
+      setForm(FORMULAIRE_VIDE);
+    } catch (err) {
+      if (err instanceof ApiError && err.errors) setErreurs(err.errors);
+      toast.error(err instanceof ApiError ? err.message : 'Impossible de créer le compte.');
+    } finally {
+      setCreationEnCours(false);
+    }
+  }
+
+  const formulaireValide = form.prenom.trim() && form.nom.trim() && form.email.trim();
 
   async function changerRole(u: UtilisateurAdmin, role: AdminRole) {
     setBusyId(u.id);
@@ -123,6 +165,9 @@ export function AdminUtilisateurs() {
             Comptes ayant accès à l'espace d'administration.
           </p>
         </div>
+        <Button onClick={() => setCreationOuverte(true)} className="gap-2">
+          <UserPlus className="w-4 h-4" /> Nouvel utilisateur
+        </Button>
       </div>
 
       {utilisateurs === null ? (
@@ -239,6 +284,68 @@ export function AdminUtilisateurs() {
           </Table>
         </div>
       )}
+
+      <Dialog open={creationOuverte} onOpenChange={(open) => !creationEnCours && setCreationOuverte(open)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nouvel utilisateur</DialogTitle>
+            <DialogDescription>
+              La personne recevra par email un lien (valable 7 jours) pour choisir son mot de passe.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="u-prenom">Prénom</Label>
+                <Input id="u-prenom" value={form.prenom} onChange={(e) => setForm({ ...form, prenom: e.target.value })} />
+                {erreurs.prenom && <p className="text-xs text-red-600">{erreurs.prenom[0]}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="u-nom">Nom</Label>
+                <Input id="u-nom" value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} />
+                {erreurs.nom && <p className="text-xs text-red-600">{erreurs.nom[0]}</p>}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="u-email">Email</Label>
+              <Input id="u-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              {erreurs.email && <p className="text-xs text-red-600">{erreurs.email[0]}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="u-tel">Téléphone (facultatif)</Label>
+              <Input id="u-tel" value={form.telephone} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
+              {erreurs.telephone && <p className="text-xs text-red-600">{erreurs.telephone[0]}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Rôle</Label>
+              <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v as AdminRole })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLES.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {erreurs.role && <p className="text-xs text-red-600">{erreurs.role[0]}</p>}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" disabled={creationEnCours} onClick={() => setCreationOuverte(false)}>
+              Annuler
+            </Button>
+            <Button disabled={creationEnCours || !formulaireValide} onClick={creer}>
+              {creationEnCours && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Créer le compte
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
