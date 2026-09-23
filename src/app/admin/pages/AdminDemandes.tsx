@@ -10,6 +10,7 @@ import {
   X as XIcon,
   ArrowRight,
   Ban,
+  Banknote,
 } from 'lucide-react';
 import { api, ApiError, openFile } from '../../../lib/api';
 import { Badge } from '../../components/ui/badge';
@@ -38,7 +39,7 @@ import {
   SheetTitle,
 } from '../../components/ui/sheet';
 import { toast } from 'sonner';
-import type { Demande, StatutDemande, DemandeDocumentAdmin } from '../types';
+import type { Demande, StatutDemande, DemandeDocumentAdmin, ModeGuichet } from '../types';
 
 interface Meta {
   total: number;
@@ -85,6 +86,13 @@ const DOC_STATUT_COULEUR: Record<string, string> = {
   en_attente: 'bg-slate-100 text-slate-600 border-slate-200',
   valide: 'bg-brand-green-50 text-brand-green-700 border-brand-green-200',
   rejete: 'bg-brand-red-50 text-brand-red-700 border-brand-red-200',
+};
+
+const MODE_GUICHET_LABEL: Record<ModeGuichet, string> = {
+  especes: 'Espèces',
+  mobile_money: 'Mobile Money',
+  virement: 'Virement',
+  carte: 'Carte bancaire',
 };
 
 export function AdminDemandes() {
@@ -320,8 +328,38 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
   const [motifRejetDoc, setMotifRejetDoc] = useState('');
   const [docEnCours, setDocEnCours] = useState<number | null>(null);
 
+  const [formGuichetOuvert, setFormGuichetOuvert] = useState(false);
+  const [mode, setMode] = useState<ModeGuichet | ''>('');
+  const [numeroRecu, setNumeroRecu] = useState('');
+  const [nomPayeur, setNomPayeur] = useState('');
+  const [telephonePayeur, setTelephonePayeur] = useState('');
+  const [encaissementEnCours, setEncaissementEnCours] = useState(false);
+
   const clos = demande.statut === 'retire' || demande.statut === 'rejete';
   const prochain = PROCHAIN_STATUT[demande.statut];
+
+  async function encaisser() {
+    setEncaissementEnCours(true);
+    try {
+      await api.post(`/v1/admin/demandes/${demande.id}/paiement-guichet`, {
+        mode,
+        numero_recu: numeroRecu,
+        nom_payeur: nomPayeur || undefined,
+        telephone_payeur: telephonePayeur || undefined,
+      });
+      toast.success('Paiement enregistré.');
+      setFormGuichetOuvert(false);
+      setMode('');
+      setNumeroRecu('');
+      setNomPayeur('');
+      setTelephonePayeur('');
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Impossible d'enregistrer le paiement.");
+    } finally {
+      setEncaissementEnCours(false);
+    }
+  }
 
   async function changerStatut(statut: StatutDemande, motifRejet?: string) {
     setEnCours(true);
@@ -401,6 +439,86 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
           Motif du rejet : {demande.motif_rejet}
         </p>
       )}
+
+      {/* Paiement */}
+      <div>
+        <h4 className="text-sm font-bold text-slate-700 mb-2">Paiement</h4>
+
+        {(demande.paiements ?? []).length > 0 && (
+          <div className="space-y-1.5 mb-2">
+            {(demande.paiements ?? []).map((p) => (
+              <div key={p.id} className="flex items-center justify-between text-xs bg-slate-50 rounded-lg px-3 py-2">
+                <div className="text-slate-600">
+                  {p.canal_label}{p.mode_label ? ` · ${p.mode_label}` : ''}
+                  {p.numero_recu && <span className="font-mono text-slate-400"> · {p.numero_recu}</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-800 font-medium">{p.montant.toLocaleString('fr-FR')} {p.devise}</span>
+                  <Badge variant="outline" className={p.statut === 'reussi' ? 'bg-brand-green-50 text-brand-green-700 border-brand-green-200' : 'bg-slate-100 text-slate-600 border-slate-200'}>
+                    {p.statut === 'reussi' ? 'Réussi' : p.statut}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {demande.paiement_statut !== 'paye' && !clos && (
+          !formGuichetOuvert ? (
+            <Button variant="outline" size="sm" onClick={() => setFormGuichetOuvert(true)}>
+              <Banknote className="w-3.5 h-3.5 mr-1.5" /> Encaisser au guichet
+            </Button>
+          ) : (
+            <div className="bg-slate-50 rounded-xl p-3 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={mode} onValueChange={(v) => setMode(v as ModeGuichet)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Mode de paiement" /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(MODE_GUICHET_LABEL).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="N° de reçu"
+                  value={numeroRecu}
+                  onChange={(e) => setNumeroRecu(e.target.value)}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Nom du payeur (optionnel)"
+                  value={nomPayeur}
+                  onChange={(e) => setNomPayeur(e.target.value)}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Téléphone (optionnel)"
+                  value={telephonePayeur}
+                  onChange={(e) => setTelephonePayeur(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+              <p className="text-xs text-slate-400">
+                Montant encaissé : {demande.montant.toLocaleString('fr-FR')} {demande.devise} (forfait {demande.delai_label.toLowerCase()})
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-brand-green-600 hover:bg-brand-green-700"
+                  disabled={!mode || !numeroRecu.trim() || encaissementEnCours}
+                  onClick={encaisser}
+                >
+                  {encaissementEnCours ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Check className="w-3.5 h-3.5 mr-1" />}
+                  Confirmer l'encaissement
+                </Button>
+                <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setFormGuichetOuvert(false)}>
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
 
       {/* Pièces */}
       <div>

@@ -468,6 +468,23 @@ export interface Demande {
   note_interne?: string | null;
   traite_par?: string | null;
   documents?: DemandeDocumentAdmin[];
+  paiements?: PaiementAdmin[];
+}
+
+export type ModeGuichet = 'especes' | 'mobile_money' | 'virement' | 'carte';
+
+export interface PaiementAdmin {
+  id: number;
+  montant: number;
+  devise: string;
+  statut: string;
+  canal: 'en_ligne' | 'guichet';
+  canal_label: string;
+  mode: ModeGuichet | null;
+  mode_label: string | null;
+  numero_recu: string | null;
+  date_encaissement: string | null;
+  created_at: string;
 }
 
 export interface DemandeDocumentAdmin {
