@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { Services } from './pages/Services';
 import { Guide } from './pages/Guide';
 import { News } from './pages/News';
 import { NewsDetail } from './pages/NewsDetail';
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
+            <Route path="services" element={<Services />} />
             <Route path="guide" element={<Guide />} />
             <Route path="news" element={<News />} />
             <Route path="news/:id" element={<NewsDetail />} />

@@ -29,15 +29,15 @@ export function Navbar() {
   const navLinks = [
     { name: 'Accueil', path: '/' },
     { name: 'Le Consulat', path: '/about' },
+    { name: 'Services consulaires', path: '/services' },
     { name: 'Guide', path: '/guide' },
     { name: 'Actualités', path: '/news' },
     { name: 'Contacts', path: '/contact' },
   ];
-  // Note : cette liste correspond encore à l'ancienne arborescence AJDCB.
-  // Elle doit être remplacée par les 11 pages du sitemap du consulat
-  // (Accueil, Le Consulat, Le Consul Honoraire, Services consulaires,
-  // Congo-Bénin & Diplomatie économique, Culture & Patrimoine, Diaspora,
-  // Actualités & Médiathèque, Agenda, FAQ, Contact) dans une prochaine passe.
+  // Note : cette liste correspond encore en partie à l'ancienne arborescence
+  // AJDCB. Il reste à ajouter Le Consul Honoraire, Congo-Bénin & Diplomatie
+  // économique, Culture & Patrimoine, Diaspora, Agenda et FAQ, et à fusionner
+  // Guide/Actualités avec Médiathèque, pour arriver aux 10 pages du sitemap.
 
   return (
     <>
