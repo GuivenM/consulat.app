@@ -8,6 +8,8 @@ import { Services } from './pages/Services';
 import { CongoBenin } from './pages/CongoBenin';
 import { Diaspora } from './pages/Diaspora';
 import { CulturePatrimoine } from './pages/Culture';
+import { Agenda } from './pages/Agenda';
+import { Faq } from './pages/Faq';
 import { Guide } from './pages/Guide';
 import { News } from './pages/News';
 import { NewsDetail } from './pages/NewsDetail';
@@ -76,6 +78,8 @@ export default function App() {
             <Route path="guide" element={<Guide />} />
             <Route path="news" element={<News />} />
             <Route path="news/:id" element={<NewsDetail />} />
+            <Route path="agenda" element={<Agenda />} />
+            <Route path="faq" element={<Faq />} />
             <Route path="contact" element={<Contact />} />
             <Route path="mentions-legales" element={<MentionsLegales />} />
             <Route path="confidentialite" element={<PolitiqueConfidentialite />} />

@@ -35,24 +35,39 @@ export function Navbar() {
         { name: 'Le Consul Honoraire', path: '/consul-honoraire' },
       ],
     },
-    { name: 'Services consulaires', path: '/services' },
-    { name: 'Congo-Bénin', path: '/congo-benin' },
+    {
+      name: 'Services',
+      children: [
+        { name: 'Services consulaires', path: '/services' },
+        { name: 'Guide', path: '/guide' },
+      ],
+    },
     {
       name: 'Communauté',
       children: [
-        { name: 'Actualités', path: '/news' },
+        { name: 'Congo-Bénin', path: '/congo-benin' },
         { name: 'Diaspora', path: '/diaspora' },
         { name: 'Culture & Patrimoine', path: '/culture' },
       ],
     },
-    // { name: 'Guide', path: '/guide' }, 
-    
-    { name: 'Contacts', path: '/contact' },
+    {
+      name: 'Actualités',
+      children: [
+        { name: 'Actualités', path: '/news' },
+        { name: 'Agenda', path: '/agenda' },
+      ],
+    },
+    {
+      name: 'Contact',
+      children: [
+        { name: 'Nous contacter', path: '/contact' },
+        { name: 'Questions fréquentes', path: '/faq' },
+      ],
+    },
   ];
-  // Note : il reste à ajouter Agenda et FAQ, et à fusionner Guide/Actualités
-  // avec Médiathèque, pour arriver aux 10 pages du sitemap. Le pattern
-  // "children" ci-dessus permet de les rattacher à un groupe existant plutôt
-  // que de rallonger la barre.
+  // 7 entrées visibles au maximum : les 10 pages du sitemap tiennent toutes
+  // dedans grâce aux sous-menus ci-dessus. Un futur ajout doit rejoindre un
+  // groupe existant plutôt que d'ajouter une 8e entrée.
 
   return (
     <>

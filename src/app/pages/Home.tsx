@@ -470,8 +470,8 @@ export function Home() {
                 <h2 className="text-4xl font-bold text-slate-900 mb-2">Agenda</h2>
                 <div className="h-1.5 w-24 bg-brand-gold-400 rounded-full"></div>
               </div>
-              <Link to="/news" className="px-6 py-3 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
-                Voir toutes les actualités
+              <Link to="/agenda" className="px-6 py-3 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
+                Voir tout l'agenda
               </Link>
             </div>
 
