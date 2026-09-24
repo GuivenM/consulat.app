@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { ConsulHonoraire } from './pages/ConsulHonoraire';
 import { Services } from './pages/Services';
 import { CongoBenin } from './pages/CongoBenin';
 import { Diaspora } from './pages/Diaspora';
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
+            <Route path="consul-honoraire" element={<ConsulHonoraire />} />
             <Route path="services" element={<Services />} />
             <Route path="congo-benin" element={<CongoBenin />} />
             <Route path="diaspora" element={<Diaspora />} />

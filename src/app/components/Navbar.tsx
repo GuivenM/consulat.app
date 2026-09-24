@@ -28,25 +28,31 @@ export function Navbar() {
 
   const navLinks: { name: string; path?: string; children?: { name: string; path: string }[] }[] = [
     { name: 'Accueil', path: '/' },
-    { name: 'Le Consulat', path: '/about' },
+    {
+      name: 'Le Consulat',
+      children: [
+        { name: 'Présentation', path: '/about' },
+        { name: 'Le Consul Honoraire', path: '/consul-honoraire' },
+      ],
+    },
     { name: 'Services consulaires', path: '/services' },
     { name: 'Congo-Bénin', path: '/congo-benin' },
     {
       name: 'Communauté',
       children: [
+        { name: 'Actualités', path: '/news' },
         { name: 'Diaspora', path: '/diaspora' },
         { name: 'Culture & Patrimoine', path: '/culture' },
       ],
     },
-    { name: 'Guide', path: '/guide' },
-    { name: 'Actualités', path: '/news' },
+    // { name: 'Guide', path: '/guide' }, 
+    
     { name: 'Contacts', path: '/contact' },
   ];
-  // Note : il reste à ajouter Le Consul Honoraire (probablement sous "Le
-  // Consulat"), Agenda et FAQ, et à fusionner Guide/Actualités avec
-  // Médiathèque, pour arriver aux 10 pages du sitemap. Le pattern "children"
-  // ci-dessus permet de les rattacher à un groupe existant plutôt que de
-  // rallonger la barre.
+  // Note : il reste à ajouter Agenda et FAQ, et à fusionner Guide/Actualités
+  // avec Médiathèque, pour arriver aux 10 pages du sitemap. Le pattern
+  // "children" ci-dessus permet de les rattacher à un groupe existant plutôt
+  // que de rallonger la barre.
 
   return (
     <>
