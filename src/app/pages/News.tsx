@@ -10,6 +10,7 @@ interface Actualite {
   titre: string;
   description: string | null;
   image_url: string | null;
+  photos_urls?: string[];
   type: string;
   type_label: string;
   date: string; // created_at formaté d/m/Y par l'API
@@ -21,6 +22,7 @@ const FILTRES = [
   { label: 'Événements', value: 'evenement' },
   { label: 'Éducation', value: 'education' },
   { label: 'Culture', value: 'culture' },
+  { label: 'Médiathèque', value: 'media' },
 ];
 
 export function News() {
@@ -37,7 +39,14 @@ export function News() {
       .finally(() => setLoading(false));
   }, []);
 
-  const items = filtre ? actualites.filter((a) => a.type === filtre) : actualites;
+  const items = filtre && filtre !== 'media' ? actualites.filter((a) => a.type === filtre) : actualites;
+
+  // Médiathèque : agrège la photo de couverture + les photos jointes de
+  // chaque actualité, chacune reliée à son actualité d'origine.
+  const photosMedia = actualites.flatMap((a) => {
+    const urls = [a.image_url, ...(a.photos_urls ?? [])].filter((u): u is string => !!u);
+    return Array.from(new Set(urls)).map((url) => ({ url, actualite: a }));
+  });
 
   return (
     <div className="bg-slate-50 min-h-screen pt-32 pb-20">
@@ -71,11 +80,36 @@ export function News() {
           <div className="text-center py-20 text-slate-500">{error}</div>
         )}
 
-        {!loading && !error && items.length === 0 && (
+        {!loading && !error && filtre !== 'media' && items.length === 0 && (
           <div className="text-center py-20 text-slate-500">Aucune actualité pour le moment.</div>
         )}
 
-        {/* Bento Grid Layout for News */}
+        {!loading && !error && filtre === 'media' && photosMedia.length === 0 && (
+          <div className="text-center py-20 text-slate-500">Aucune photo pour le moment.</div>
+        )}
+
+        {!loading && !error && filtre === 'media' ? (
+          /* Médiathèque : grille photo, chaque vignette renvoie vers l'actualité d'origine */
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {photosMedia.map((p, i) => (
+              <Link
+                key={`${p.actualite.id}-${i}`}
+                to={`/news/${p.actualite.id}`}
+                className="group relative aspect-square rounded-2xl overflow-hidden block bg-slate-100"
+              >
+                <Zoomable
+                  src={p.url}
+                  alt={p.actualite.titre}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end p-3 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-xs font-semibold line-clamp-2">{p.actualite.titre}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+        /* Bento Grid Layout for News */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[300px]">
           {items.map((item, index) => (
             <motion.div
@@ -122,6 +156,7 @@ export function News() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
