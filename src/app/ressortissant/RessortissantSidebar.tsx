@@ -16,7 +16,7 @@ export function RessortissantSidebar() {
   if (!ressortissant) return null;
 
   return (
-    <aside className="bg-white rounded-3xl border border-slate-100 p-5">
+    <aside className="hidden lg:block bg-white rounded-3xl border border-slate-100 p-5">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
           {ressortissant.photo ? (
@@ -64,5 +64,37 @@ export function RessortissantSidebar() {
         ))}
       </nav>
     </aside>
+  );
+}
+
+// Mobile uniquement : barre de navigation fixe en bas, pour éviter d'avoir à
+// re-scroller la sidebar complète sur chaque page (voir RessortissantLayout).
+export function RessortissantMobileNav() {
+  const { ressortissant } = useRessortissantAuth();
+
+  if (!ressortissant) return null;
+
+  return (
+    <nav
+      className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 flex"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      {navItems.map(({ label, path, icon: Icon, end }) => (
+        <NavLink
+          key={path}
+          to={path}
+          end={end}
+          className={({ isActive }) =>
+            cn(
+              'flex-1 flex flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors',
+              isActive ? 'text-brand-green-700' : 'text-slate-500'
+            )
+          }
+        >
+          <Icon className="w-5 h-5" />
+          {label}
+        </NavLink>
+      ))}
+    </nav>
   );
 }
