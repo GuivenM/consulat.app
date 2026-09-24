@@ -10,7 +10,7 @@ interface ContactForm {
   prenom: string;
   email: string;
   telephone: string;
-  objet: 'question' | 'partenariat' | 'adhesion' | 'urgence' | 'autre';
+  objet: 'question' | 'partenariat' | 'service_consulaire' | 'urgence' | 'autre';
   message: string;
   organisation: string;
   type_organisation: '' | 'institution' | 'ong' | 'entreprise' | 'media' | 'universite' | 'association';
@@ -113,7 +113,7 @@ export function Contact() {
                 <select className="w-full px-6 py-4 rounded-xl border border-transparent bg-white focus:ring-2 focus:ring-brand-green-500 transition-all outline-none" {...register('objet', { required: true })}>
                   <option value="question">Question</option>
                   <option value="partenariat">Partenariat</option>
-                  <option value="adhesion">Adhésion</option>
+                  <option value="service_consulaire">Question sur une démarche</option>
                   <option value="urgence">Urgence</option>
                   <option value="autre">Autre</option>
                 </select>

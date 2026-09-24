@@ -299,7 +299,7 @@ export interface Membre {
 export type ObjetMessage =
   | 'question'
   | 'partenariat'
-  | 'adhesion'
+  | 'service_consulaire'
   | 'urgence'
   | 'information'
   | 'reclamation'

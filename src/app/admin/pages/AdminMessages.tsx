@@ -40,7 +40,7 @@ const STATUT_BADGE: Record<StatutMessage, string> = {
 const OBJET_LABELS: Record<ObjetMessage, string> = {
   question: 'Question',
   partenariat: 'Demande de partenariat',
-  adhesion: "Demande d'adhésion",
+  service_consulaire: 'Question sur une démarche',
   urgence: 'Urgence communautaire',
   information: "Demande d'information",
   reclamation: 'Réclamation',
