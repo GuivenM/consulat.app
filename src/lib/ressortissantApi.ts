@@ -1,7 +1,7 @@
 // Client HTTP pour l'espace consulaire (ressortissants). Séparé de lib/api.ts
-// (admin) et lib/memberApi.ts (espace membre AJDCB) : Ressortissant est un
-// modèle Sanctum à part entière, avec son propre token — les trois espaces
-// peuvent coexister dans le même navigateur sans se déconnecter l'un l'autre.
+// (admin) : Ressortissant est un modèle Sanctum à part entière, avec son
+// propre token — les deux espaces peuvent coexister dans le même navigateur
+// sans se déconnecter l'un l'autre.
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8000/api';
 const TOKEN_KEY = 'consulat_ressortissant_token';

@@ -2,7 +2,7 @@
 
 Application web du **Consulat Honoraire de la République du Congo au Bénin** : site public, **espace consulaire** des ressortissants (inscription, demandes de carte consulaire / laissez-passer, suivi de dossier) et **espace d'administration** pour les agents. Consomme l'API [consulat.api](https://github.com/GuivenM/consulat.api).
 
-> Le projet est né d'un clone du site de l'AJDCB, lui-même issu d'une maquette Figma. Il en reste des traces (voir « Points d'attention »).
+> Le projet est né d'un clone du site de l'AJDCB, lui-même issu d'une maquette Figma.
 
 ## Stack
 
@@ -82,7 +82,6 @@ Vérifier avant la mise en ligne que `VITE_API_URL` pointe sur l'API de producti
 
 ## Points d'attention
 
-- **Espace « membre » hérité de l'AJDCB.** Les routes `/membre/*`, `/activer-compte`, `src/app/member/` et `src/lib/memberApi.ts` visent des endpoints qui n'existent plus dans l'API du consulat. Ce code est mort et peut être supprimé.
-- **`README-ajdcb.app.md`** est l'ancien README de l'AJDCB : à supprimer.
+- **`FedaPayButton`** (`src/app/components/`) n'est utilisé nulle part : reliquat de l'AJDCB, en attente du paiement en ligne des demandes (non disponible côté API pour l'instant).
 - **Pas de tests** automatisés côté frontend.
 - Les types TypeScript de l'API sont écrits à la main (`admin/types.ts`, `ressortissant/types.ts`) : les tenir à jour quand une réponse de l'API change.

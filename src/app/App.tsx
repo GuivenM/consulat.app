@@ -16,7 +16,6 @@ import { MentionsLegales } from './pages/MentionsLegales';
 import { PolitiqueConfidentialite } from './pages/PolitiqueConfidentialite';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
-import { MemberAuthProvider } from './context/MemberAuthContext';
 import { RessortissantAuthProvider } from './context/RessortissantAuthContext';
 import { ImageLightboxProvider } from './components/ImageLightbox';
 import { AdminLogin } from './admin/AdminLogin';
@@ -35,14 +34,6 @@ import { AdminGuide } from './admin/pages/AdminGuide';
 import { AdminPartenaires } from './admin/pages/AdminPartenaires';
 import { AdminUtilisateurs } from './admin/pages/AdminUtilisateurs';
 import { AdminJournal } from './admin/pages/AdminJournal';
-import { MemberLogin } from './member/MemberLogin';
-import { MotDePasseOublieMembre } from './member/MotDePasseOublieMembre';
-import { ActivationCompte } from './member/ActivationCompte';
-import { MemberLayout } from './member/MemberLayout';
-import { MemberProtectedRoute } from './member/MemberProtectedRoute';
-import { MemberDashboard } from './member/MemberDashboard';
-import { MemberEvenements } from './member/MemberEvenements';
-import { MemberProfil } from './member/MemberProfil';
 import { Inscription } from './ressortissant/Inscription';
 import { VerificationEmail } from './ressortissant/VerificationEmail';
 import { RessortissantLogin } from './ressortissant/Login';
@@ -71,7 +62,6 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-      <MemberAuthProvider>
       <RessortissantAuthProvider>
       <ImageLightboxProvider>
         <Routes>
@@ -113,18 +103,6 @@ export default function App() {
             </Route>
           </Route>
 
-          <Route path="/membre/login" element={<MemberLogin />} />
-          <Route path="/mot-de-passe-oublie" element={<MotDePasseOublieMembre />} />
-          <Route path="/activer-compte" element={<ActivationCompte />} />
-
-          <Route element={<MemberProtectedRoute />}>
-            <Route path="/membre" element={<MemberLayout />}>
-              <Route index element={<MemberDashboard />} />
-              <Route path="evenements" element={<MemberEvenements />} />
-              <Route path="profil" element={<MemberProfil />} />
-            </Route>
-          </Route>
-
           <Route path="/espace-consulaire/inscription" element={<Inscription />} />
           <Route path="/verifier-email" element={<VerificationEmail />} />
           <Route path="/espace-consulaire/login" element={<RessortissantLogin />} />
@@ -142,7 +120,6 @@ export default function App() {
         </Routes>
       </ImageLightboxProvider>
       </RessortissantAuthProvider>
-      </MemberAuthProvider>
       </AuthProvider>
       <Toaster position="top-right" richColors />
     </BrowserRouter>
