@@ -102,7 +102,7 @@ export function AdminActualites() {
 
   async function load() {
     try {
-      const data = await api.get<Actualite[]>('/v1/actualites');
+      const data = await api.get<Actualite[]>('/v1/actualites?all=1');
       setActualites(data);
     } catch {
       toast.error('Impossible de charger les actualités.');

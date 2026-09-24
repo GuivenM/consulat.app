@@ -58,7 +58,7 @@ export function Dashboard() {
           await Promise.all([
             api.get<Message[]>('/v1/messages'),
             api.get<RessortissantsStats>('/v1/admin/ressortissants/statistiques'),
-            api.get<Actualite[]>('/v1/actualites'),
+            api.get<Actualite[]>('/v1/actualites?all=1'),
             api.get<GuideSection[]>('/v1/guide?all=1'),
             api.get<Partenaire[]>('/v1/partenaires?statut=actif'),
             api.get<Partenaire[]>('/v1/partenaires?statut=inactif'),
