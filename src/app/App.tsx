@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Services } from './pages/Services';
+import { CongoBenin } from './pages/CongoBenin';
 import { Diaspora } from './pages/Diaspora';
 import { CulturePatrimoine } from './pages/Culture';
 import { Guide } from './pages/Guide';
@@ -77,6 +78,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="services" element={<Services />} />
+            <Route path="congo-benin" element={<CongoBenin />} />
             <Route path="diaspora" element={<Diaspora />} />
             <Route path="culture" element={<CulturePatrimoine />} />
             <Route path="guide" element={<Guide />} />

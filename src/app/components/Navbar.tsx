@@ -30,6 +30,7 @@ export function Navbar() {
     { name: 'Accueil', path: '/' },
     { name: 'Le Consulat', path: '/about' },
     { name: 'Services consulaires', path: '/services' },
+    { name: 'Congo-Bénin', path: '/congo-benin' },
     {
       name: 'Communauté',
       children: [
@@ -42,10 +43,10 @@ export function Navbar() {
     { name: 'Contacts', path: '/contact' },
   ];
   // Note : il reste à ajouter Le Consul Honoraire (probablement sous "Le
-  // Consulat"), Congo-Bénin & Diplomatie économique, Agenda et FAQ, et à
-  // fusionner Guide/Actualités avec Médiathèque, pour arriver aux 10 pages
-  // du sitemap. Le pattern "children" ci-dessus permet de les rattacher à
-  // un groupe existant plutôt que de rallonger la barre.
+  // Consulat"), Agenda et FAQ, et à fusionner Guide/Actualités avec
+  // Médiathèque, pour arriver aux 10 pages du sitemap. Le pattern "children"
+  // ci-dessus permet de les rattacher à un groupe existant plutôt que de
+  // rallonger la barre.
 
   return (
     <>

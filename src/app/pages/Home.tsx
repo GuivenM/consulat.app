@@ -9,19 +9,11 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { api, ApiError } from '../../lib/api';
 import { Actualite } from '../admin/types';
 
-// "Ressortissants inscrits" est calculé en direct via l'API (voir useEffect
-// plus bas). "Services consulaires" est un fait connu du cahier des charges
-// (carte consulaire + laissez-passer) : à mettre à jour si l'offre évolue.
-const STATS_EDITORIALES = {
-  servicesConsulaires: "2",
-};
-
-// Reprend 4 des grandes rubriques du site (voir le sitemap validé) — les liens
-// pointent vers /about en attendant que ces pages dédiées existent.
+// Reprend 4 des grandes rubriques du site (voir le sitemap validé).
 const axes = [
   {
     title: "Services consulaires",
-    to: "/guide",
+    to: "/services",
     icon: <Users className="w-8 h-8" />,
     desc: "Registre consulaire, carte consulaire, laissez-passer et informations pratiques.",
     color: "from-brand-gold-400 to-orange-500",
@@ -29,7 +21,7 @@ const axes = [
   },
   {
     title: "Diplomatie économique",
-    to: "/about",
+    to: "/congo-benin",
     icon: <Handshake className="w-8 h-8" />,
     desc: "Relations Congo–Bénin, coopération et opportunités d'affaires.",
     color: "from-brand-green-400 to-brand-green-600",
@@ -37,7 +29,7 @@ const axes = [
   },
   {
     title: "Culture & Patrimoine",
-    to: "/about",
+    to: "/culture",
     icon: <Globe className="w-8 h-8" />,
     desc: "Histoire, musique, danse et littérature congolaises.",
     color: "from-brand-gold-400 to-brand-gold-600",
@@ -45,7 +37,7 @@ const axes = [
   },
   {
     title: "Diaspora",
-    to: "/about",
+    to: "/diaspora",
     icon: <GraduationCap className="w-8 h-8" />,
     desc: "Vie de la communauté congolaise au Bénin et ses talents.",
     color: "from-brand-red-400 to-brand-red-600",
@@ -79,7 +71,7 @@ const besoins = [
     title: "Je veux investir ou proposer un partenariat",
     desc: "Entrer en relation avec le Consulat pour un projet Congo–Bénin.",
     icon: <Briefcase className="w-6 h-6" />,
-    to: "/contact", // TODO : page "Diplomatie économique" quand elle existera
+    to: "/congo-benin",
   },
   {
     title: "Je cherche une information institutionnelle",
@@ -124,7 +116,6 @@ export function Home() {
   const [actualites, setActualites] = useState<Actualite[]>([]);
   const [loadingActualites, setLoadingActualites] = useState(true);
   const [evenements, setEvenements] = useState<Actualite[]>([]);
-  const [stats, setStats] = useState<{ membres_actifs: number; partenaires_actifs: number } | null>(null);
 
   useEffect(() => {
     api
@@ -151,15 +142,6 @@ export function Home() {
             .slice(0, 3)
         );
       })
-      .catch((err) => {
-        if (!(err instanceof ApiError)) console.error(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    api
-      .get<{ membres_actifs: number; partenaires_actifs: number }>('/v1/statistiques-publiques')
-      .then(setStats)
       .catch((err) => {
         if (!(err instanceof ApiError)) console.error(err);
       });
@@ -238,27 +220,6 @@ export function Home() {
             </motion.div>
           </div>
         </div>
-
-        {/* Floating Stats Card - Absolute positioned at bottom right on desktop */}
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="hidden lg:block absolute bottom-12 right-12 bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl max-w-sm"
-        >
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {stats ? stats.membres_actifs : <Loader2 className="w-6 h-6 animate-spin" />}
-              </div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Ressortissants inscrits</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white mb-1">{STATS_EDITORIALES.servicesConsulaires}</div>
-              <div className="text-xs text-slate-400 uppercase tracking-wide">Services consulaires</div>
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* 
