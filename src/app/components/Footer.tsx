@@ -162,7 +162,7 @@ export function Footer() {
                  <MapPin size={16} className="text-brand-green-600" /> Cotonou, Bénin
                </div>
                <div className="flex items-center gap-3">
-                 <Mail size={16} className="text-brand-green-600" /> contact@consulat-congo-benin.org
+                 <Mail size={16} className="text-brand-green-600" /> contact@consulatcongo-benin.com
                </div>
             </div>
           </div>

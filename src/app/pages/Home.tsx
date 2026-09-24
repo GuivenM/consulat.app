@@ -102,9 +102,9 @@ const CONSUL = {
 // TODO : remplacer par les coordonnées officielles (même TODO dans Contact.tsx et Footer.tsx).
 // `whatsapp` : numéro au format international, sans « + » ni espaces (ex. "22901000000").
 const CONTACT = {
-  email: "contact@consulat-congo-benin.org",
-  telephone: "",
-  whatsapp: "",
+  email: "contact@consulatcongo-benin.com",
+  telephone: "2290157575733",
+  whatsapp: "2290157575733",
 };
 
 const contactItems: { label: string; href: string; icon: React.ReactNode }[] = [];
