@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, FilePlus2, FileText, ChevronRight } from 'lucide-react';
+import { Loader2, FilePlus2, FileText, ChevronRight, AlertCircle } from 'lucide-react';
 import { ressortissantApi, ApiError } from '../../lib/ressortissantApi';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { Button } from '../components/ui/button';
@@ -68,6 +68,11 @@ export function RessortissantDashboard() {
                 <div className="font-semibold text-slate-800">{TYPE_LABEL[d.type] ?? d.type}</div>
                 <div className="text-xs text-slate-400 font-mono">{d.numero_dossier} · déposée le {d.date_depot}</div>
               </div>
+              {(d.pieces_a_corriger ?? 0) > 0 && !['retire', 'rejete'].includes(d.statut) && (
+                <Badge variant="outline" className="bg-brand-red-50 text-brand-red-700 border-brand-red-200 gap-1">
+                  <AlertCircle className="w-3 h-3" /> {d.pieces_a_corriger} pièce(s) à corriger
+                </Badge>
+              )}
               <Badge variant="outline" className={STATUT_COULEUR[d.statut]}>{d.statut_label}</Badge>
               <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
             </Link>

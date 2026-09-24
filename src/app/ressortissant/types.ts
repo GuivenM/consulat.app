@@ -27,6 +27,7 @@ export interface Demande {
   devise: string;
   paiement_statut: 'en_attente' | 'paye';
   documents_complets: boolean;
+  pieces_a_corriger?: number;
   date_depot: string | null;
   date_disponibilite_prevue: string | null;
   date_pret: string | null;

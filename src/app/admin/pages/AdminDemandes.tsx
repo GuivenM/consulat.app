@@ -12,7 +12,7 @@ import {
   Ban,
   Banknote,
 } from 'lucide-react';
-import { api, ApiError, openFile } from '../../../lib/api';
+import { api, ApiError, openFile, fetchFileUrl } from '../../../lib/api';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -38,6 +38,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from '../../components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { Demande, StatutDemande, DemandeDocumentAdmin, ModeGuichet } from '../types';
 
@@ -305,16 +315,81 @@ export function AdminDemandes() {
             </SheetTitle>
           </SheetHeader>
 
-          {loadingDetail || !viewing ? (
-            <div className="flex justify-center py-16 text-slate-400">
-              <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-          ) : (
-            <DetailDossier demande={viewing} onChanged={rafraichir} />
-          )}
+          {/* SheetContent n'a aucune marge intérieure : sans ce conteneur le
+              contenu colle aux bords du panneau (SheetHeader porte déjà p-4). */}
+          <div className="px-4 pb-8">
+            {loadingDetail || !viewing ? (
+              <div className="flex justify-center py-16 text-slate-400">
+                <Loader2 className="w-8 h-8 animate-spin" />
+              </div>
+            ) : (
+              <DetailDossier demande={viewing} onChanged={rafraichir} />
+            )}
+          </div>
         </SheetContent>
       </Sheet>
     </div>
+  );
+}
+
+function estImage(doc: DemandeDocumentAdmin): boolean {
+  return (
+    (doc.mime ?? '').startsWith('image/') ||
+    /\.(jpe?g|png|webp|gif)$/i.test(doc.nom_original ?? '')
+  );
+}
+
+/**
+ * Miniature d'une pièce image. Le fichier est sur un disque privé : on le
+ * récupère avec le token (fetchFileUrl) puis on l'affiche depuis une URL
+ * blob, révoquée au démontage. Un clic l'ouvre en grand dans un onglet.
+ */
+function ApercuImage({ doc, onOuvrir }: { doc: DemandeDocumentAdmin; onOuvrir: () => void }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [erreur, setErreur] = useState(false);
+
+  useEffect(() => {
+    let annule = false;
+    let url: string | null = null;
+    setSrc(null);
+    setErreur(false);
+
+    fetchFileUrl(doc.fichier_url)
+      .then((u) => {
+        if (annule) {
+          URL.revokeObjectURL(u);
+          return;
+        }
+        url = u;
+        setSrc(u);
+      })
+      .catch(() => !annule && setErreur(true));
+
+    return () => {
+      annule = true;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [doc.id, doc.fichier_url]);
+
+  if (erreur) {
+    return <p className="text-xs text-slate-400 mt-2">Aperçu indisponible.</p>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onOuvrir}
+      title="Ouvrir en grand"
+      className="mt-2 block w-full rounded-lg bg-slate-50 border border-slate-100 overflow-hidden"
+    >
+      {src ? (
+        <img src={src} alt={doc.label} className="w-full max-h-64 object-contain" />
+      ) : (
+        <div className="h-32 flex items-center justify-center text-slate-300">
+          <Loader2 className="w-5 h-5 animate-spin" />
+        </div>
+      )}
+    </button>
   );
 }
 
@@ -327,6 +402,8 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
   const [docEnRejet, setDocEnRejet] = useState<number | null>(null);
   const [motifRejetDoc, setMotifRejetDoc] = useState('');
   const [docEnCours, setDocEnCours] = useState<number | null>(null);
+  const [confirmerToutValider, setConfirmerToutValider] = useState(false);
+  const [toutValiderEnCours, setToutValiderEnCours] = useState(false);
 
   const [formGuichetOuvert, setFormGuichetOuvert] = useState(false);
   const [mode, setMode] = useState<ModeGuichet | ''>('');
@@ -393,6 +470,22 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
       toast.error(err instanceof ApiError ? err.message : 'Impossible de mettre à jour la pièce.');
     } finally {
       setDocEnCours(null);
+    }
+  }
+
+  const piecesEnAttente = (demande.documents ?? []).filter((d) => d.statut === 'en_attente');
+
+  async function validerTout() {
+    setToutValiderEnCours(true);
+    try {
+      const res = await api.post<{ validees: number }>(`/v1/admin/demandes/${demande.id}/documents/valider-tout`);
+      toast.success(`${res.validees} pièce(s) validée(s).`);
+      setConfirmerToutValider(false);
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Impossible de valider les pièces.');
+    } finally {
+      setToutValiderEnCours(false);
     }
   }
 
@@ -522,13 +615,25 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
 
       {/* Pièces */}
       <div>
-        <h4 className="text-sm font-bold text-slate-700 mb-2">
-          Pièces {demande.documents_complets ? (
-            <span className="text-brand-green-600 font-normal">— dossier complet</span>
-          ) : (
-            <span className="text-brand-gold-600 font-normal">— incomplet</span>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <h4 className="text-sm font-bold text-slate-700">
+            Pièces {demande.documents_complets ? (
+              <span className="text-brand-green-600 font-normal">— dossier complet</span>
+            ) : (
+              <span className="text-brand-gold-600 font-normal">— incomplet</span>
+            )}
+          </h4>
+          {!clos && piecesEnAttente.length > 1 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs text-brand-green-700 border-brand-green-200 hover:bg-brand-green-50"
+              onClick={() => setConfirmerToutValider(true)}
+            >
+              <Check className="w-3.5 h-3.5 mr-1" /> Tout valider ({piecesEnAttente.length})
+            </Button>
           )}
-        </h4>
+        </div>
         <div className="space-y-2">
           {(demande.documents ?? []).map((doc) => (
             <div key={doc.id} className="bg-white border border-slate-100 rounded-xl p-3">
@@ -544,6 +649,8 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
                   </Button>
                 </div>
               </div>
+
+              {estImage(doc) && <ApercuImage doc={doc} onOuvrir={() => voirFichier(doc)} />}
 
               {doc.statut === 'en_attente' && (
                 <div className="flex items-center gap-2 mt-2">
@@ -662,6 +769,32 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
       {demande.traite_par && (
         <p className="text-xs text-slate-400 border-t border-slate-100 pt-3">Dernier traitement par {demande.traite_par}</p>
       )}
+
+      <AlertDialog open={confirmerToutValider} onOpenChange={(open) => !toutValiderEnCours && setConfirmerToutValider(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Valider toutes les pièces en attente ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {piecesEnAttente.length} pièce(s) seront marquées comme validées. Cette action ne peut pas être annulée
+              depuis cet écran : assurez-vous d'avoir vérifié chaque pièce.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={toutValiderEnCours}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={toutValiderEnCours}
+              onClick={(e) => {
+                e.preventDefault();
+                validerTout();
+              }}
+              className="bg-brand-green-600 hover:bg-brand-green-700"
+            >
+              {toutValiderEnCours && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Tout valider
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -114,9 +114,10 @@ export async function downloadFile(path: string, filenameFallback = 'export.csv'
 }
 
 // Ouverture d'un fichier privé (pièce d'un dossier) dans un nouvel onglet.
-// Même contrainte que downloadFile : un <a href> classique n'enverrait pas
-// le Bearer token, donc on récupère le blob nous-mêmes puis on l'ouvre.
-export async function openFile(path: string) {
+// Même contrainte que downloadFile : un <a href> ou un <img src> classique
+// n'enverrait pas le Bearer token, donc on récupère le blob nous-mêmes.
+// L'appelant est responsable de révoquer l'URL (URL.revokeObjectURL).
+export async function fetchFileUrl(path: string): Promise<string> {
   const token = getToken();
   const res = await fetch(`${API_URL}${path}`, {
     headers: {
@@ -135,8 +136,11 @@ export async function openFile(path: string) {
     throw new ApiError(message, res.status);
   }
 
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  return URL.createObjectURL(await res.blob());
+}
+
+export async function openFile(path: string) {
+  const url = await fetchFileUrl(path);
   window.open(url, '_blank');
   // Révocation différée : le nouvel onglet a besoin du temps de charger le
   // blob avant qu'on lui retire son URL.
