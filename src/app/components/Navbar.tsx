@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X, ChevronRight, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -26,20 +26,26 @@ export function Navbar() {
     setIsOpen(false);
   }, [location]);
 
-  const navLinks = [
+  const navLinks: { name: string; path?: string; children?: { name: string; path: string }[] }[] = [
     { name: 'Accueil', path: '/' },
     { name: 'Le Consulat', path: '/about' },
     { name: 'Services consulaires', path: '/services' },
-    { name: 'Diaspora', path: '/diaspora' },
-    { name: 'Culture & Patrimoine', path: '/culture' },
+    {
+      name: 'Communauté',
+      children: [
+        { name: 'Diaspora', path: '/diaspora' },
+        { name: 'Culture & Patrimoine', path: '/culture' },
+      ],
+    },
     { name: 'Guide', path: '/guide' },
     { name: 'Actualités', path: '/news' },
     { name: 'Contacts', path: '/contact' },
   ];
-  // Note : cette liste correspond encore en partie à l'ancienne arborescence
-  // AJDCB. Il reste à ajouter Le Consul Honoraire, Congo-Bénin & Diplomatie
-  // économique, Culture & Patrimoine, Diaspora, Agenda et FAQ, et à fusionner
-  // Guide/Actualités avec Médiathèque, pour arriver aux 10 pages du sitemap.
+  // Note : il reste à ajouter Le Consul Honoraire (probablement sous "Le
+  // Consulat"), Congo-Bénin & Diplomatie économique, Agenda et FAQ, et à
+  // fusionner Guide/Actualités avec Médiathèque, pour arriver aux 10 pages
+  // du sitemap. Le pattern "children" ci-dessus permet de les rattacher à
+  // un groupe existant plutôt que de rallonger la barre.
 
   return (
     <>
@@ -74,20 +80,52 @@ export function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) => cn(
-                    "relative px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-full hover:bg-white/10",
-                    isActive 
-                      ? (scrolled ? "text-brand-green-700 bg-brand-green-50" : "text-white bg-white/20 backdrop-blur-md") 
-                      : (scrolled ? "text-slate-600 hover:text-brand-green-700" : "text-white/80 hover:text-white")
-                  )}
-                >
-                  {link.name}
-                </NavLink>
-              ))}
+              {navLinks.map((link) =>
+                link.children ? (
+                  <div key={link.name} className="relative group">
+                    <button
+                      className={cn(
+                        "flex items-center gap-1 px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-full hover:bg-white/10",
+                        link.children.some((c) => c.path === location.pathname)
+                          ? (scrolled ? "text-brand-green-700 bg-brand-green-50" : "text-white bg-white/20 backdrop-blur-md")
+                          : (scrolled ? "text-slate-600 hover:text-brand-green-700" : "text-white/80 hover:text-white")
+                      )}
+                    >
+                      {link.name}
+                      <ChevronDown size={14} />
+                    </button>
+                    <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
+                      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 py-2 min-w-[200px]">
+                        {link.children.map((child) => (
+                          <NavLink
+                            key={child.path}
+                            to={child.path}
+                            className={({ isActive }) => cn(
+                              "block px-4 py-2.5 text-sm font-semibold transition-colors",
+                              isActive ? "text-brand-green-700 bg-brand-green-50" : "text-slate-600 hover:bg-slate-50 hover:text-brand-green-700"
+                            )}
+                          >
+                            {child.name}
+                          </NavLink>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <NavLink
+                    key={link.path}
+                    to={link.path!}
+                    className={({ isActive }) => cn(
+                      "relative px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-full hover:bg-white/10",
+                      isActive
+                        ? (scrolled ? "text-brand-green-700 bg-brand-green-50" : "text-white bg-white/20 backdrop-blur-md")
+                        : (scrolled ? "text-slate-600 hover:text-brand-green-700" : "text-white/80 hover:text-white")
+                    )}
+                  >
+                    {link.name}
+                  </NavLink>
+                )
+              )}
               <Link
                 to="/espace-consulaire/login"
                 className={cn(
@@ -128,21 +166,42 @@ export function Navbar() {
             <div className="flex flex-col gap-4">
               {navLinks.map((link, i) => (
                 <motion.div
-                  key={link.path}
+                  key={link.name}
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                 >
-                  <NavLink
-                    to={link.path}
-                    className={({ isActive }) => cn(
-                      "flex items-center justify-between p-4 text-xl font-bold border-b border-gray-100 transition-colors",
-                      isActive ? "text-brand-green-600" : "text-slate-800"
-                    )}
-                  >
-                    {link.name}
-                    <ChevronRight size={20} className="text-gray-300" />
-                  </NavLink>
+                  {link.children ? (
+                    <div className="border-b border-gray-100">
+                      <div className="p-4 pb-2 text-xl font-bold text-slate-800">{link.name}</div>
+                      <div className="pl-4 pb-2 flex flex-col">
+                        {link.children.map((child) => (
+                          <NavLink
+                            key={child.path}
+                            to={child.path}
+                            className={({ isActive }) => cn(
+                              "flex items-center justify-between py-3 text-lg font-semibold",
+                              isActive ? "text-brand-green-600" : "text-slate-600"
+                            )}
+                          >
+                            {child.name}
+                            <ChevronRight size={18} className="text-gray-300" />
+                          </NavLink>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <NavLink
+                      to={link.path!}
+                      className={({ isActive }) => cn(
+                        "flex items-center justify-between p-4 text-xl font-bold border-b border-gray-100 transition-colors",
+                        isActive ? "text-brand-green-600" : "text-slate-800"
+                      )}
+                    >
+                      {link.name}
+                      <ChevronRight size={20} className="text-gray-300" />
+                    </NavLink>
+                  )}
                 </motion.div>
               ))}
               <motion.div 
