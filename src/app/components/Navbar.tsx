@@ -30,6 +30,8 @@ export function Navbar() {
     { name: 'Accueil', path: '/' },
     { name: 'Le Consulat', path: '/about' },
     { name: 'Services consulaires', path: '/services' },
+    { name: 'Diaspora', path: '/diaspora' },
+    { name: 'Culture & Patrimoine', path: '/culture' },
     { name: 'Guide', path: '/guide' },
     { name: 'Actualités', path: '/news' },
     { name: 'Contacts', path: '/contact' },

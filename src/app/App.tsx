@@ -4,6 +4,8 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Services } from './pages/Services';
+import { Diaspora } from './pages/Diaspora';
+import { CulturePatrimoine } from './pages/Culture';
 import { Guide } from './pages/Guide';
 import { News } from './pages/News';
 import { NewsDetail } from './pages/NewsDetail';
@@ -51,6 +53,7 @@ import { NouvelleDemande } from './ressortissant/NouvelleDemande';
 import { DemandeDetail } from './ressortissant/DemandeDetail';
 import { Profil } from './ressortissant/Profil';
 
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -74,6 +77,8 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="services" element={<Services />} />
+            <Route path="diaspora" element={<Diaspora />} />
+            <Route path="culture" element={<CulturePatrimoine />} />
             <Route path="guide" element={<Guide />} />
             <Route path="news" element={<News />} />
             <Route path="news/:id" element={<NewsDetail />} />
