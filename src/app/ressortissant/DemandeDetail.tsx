@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Loader2, ArrowLeft, Clock, CheckCircle2, XCircle, PackageCheck } from 'lucide-react';
+import { Loader2, ArrowLeft, Clock, CheckCircle2, XCircle, PackageCheck, CreditCard } from 'lucide-react';
 import { ressortissantApi, ApiError } from '../../lib/ressortissantApi';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
@@ -26,6 +26,7 @@ export function DemandeDetail() {
   const { id } = useParams<{ id: string }>();
   const [demande, setDemande] = useState<Demande | null>(null);
   const [config, setConfig] = useState<DemandeConfiguration | null>(null);
+  const [paiementEnCours, setPaiementEnCours] = useState(false);
 
   const charger = useCallback(async () => {
     try {
@@ -39,6 +40,20 @@ export function DemandeDetail() {
   }, [id]);
 
   useEffect(() => { charger(); }, [charger]);
+
+  async function payerEnLigne() {
+    if (!demande) return;
+    setPaiementEnCours(true);
+    try {
+      const { checkout_url } = await ressortissantApi.post<{ checkout_url: string }>(
+        `/v1/ressortissant/demandes/${demande.id}/paiement-en-ligne`
+      );
+      window.location.href = checkout_url;
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Impossible d'initier le paiement pour le moment.");
+      setPaiementEnCours(false);
+    }
+  }
 
   if (!demande) {
     return <div className="flex justify-center py-20 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
@@ -100,6 +115,16 @@ export function DemandeDetail() {
             <div className="text-slate-800 font-medium">
               {demande.montant.toLocaleString('fr-FR')} {demande.devise} — {demande.paiement_statut === 'paye' ? 'payé' : 'en attente de paiement'}
             </div>
+            {demande.paiement_statut !== 'paye' && !['retire', 'rejete'].includes(demande.statut) && (
+              <button
+                onClick={payerEnLigne}
+                disabled={paiementEnCours}
+                className="mt-2 inline-flex items-center gap-2 bg-brand-green-600 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-brand-green-700 transition-colors disabled:opacity-60"
+              >
+                {paiementEnCours ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                Payer avec FedaPay
+              </button>
+            )}
           </div>
           <div>
             <div className="text-slate-400">Déposée le</div>

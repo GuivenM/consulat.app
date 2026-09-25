@@ -43,6 +43,7 @@ import { MotDePasseOublieRessortissant } from './ressortissant/MotDePasseOublie'
 import { ReinitialiserMotDePasse } from './ressortissant/ReinitialiserMotDePasse';
 import { RessortissantLayout } from './ressortissant/RessortissantLayout';
 import { RessortissantProtectedRoute } from './ressortissant/RessortissantProtectedRoute';
+import { PaiementRetour } from './ressortissant/PaiementRetour';
 import { RessortissantDashboard } from './ressortissant/Dashboard';
 import { NouvelleDemande } from './ressortissant/NouvelleDemande';
 import { DemandeDetail } from './ressortissant/DemandeDetail';
@@ -114,6 +115,9 @@ export default function App() {
           <Route path="/reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
 
           <Route element={<RessortissantProtectedRoute />}>
+            <Route path="/paiement/retour" element={<RessortissantLayout />}>
+              <Route index element={<PaiementRetour />} />
+            </Route>
             <Route path="/espace-consulaire" element={<RessortissantLayout />}>
               <Route index element={<RessortissantDashboard />} />
               <Route path="nouvelle-demande" element={<NouvelleDemande />} />
