@@ -11,6 +11,10 @@ import {
   Loader2,
   ArrowRight,
   Map as MapIcon,
+  FileClock,
+  PackageCheck,
+  AlertTriangle,
+  Wallet,
 } from 'lucide-react';
 import { api } from '../../lib/api';
 import { useAuth } from '../context/AuthContext';
@@ -43,14 +47,30 @@ interface RessortissantsStats {
   par_ville: Record<string, number>;
 }
 
+interface DashboardDemandes {
+  demandes: { a_traiter: number; pretes: number; en_retard: number };
+  encaissements: { jour: number; mois: number; devise: string };
+}
+
+const FORMAT_XOF = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+
 export function Dashboard() {
   const { user } = useAuth();
   const [data, setData] = useState<Overview | null>(null);
   const [points, setPoints] = useState<PointCarte[] | null>(null);
+  const [demandes, setDemandes] = useState<DashboardDemandes | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Séparé du reste : un dossier de traitement ne doit pas empêcher le
+  // reste du tableau de bord de s'afficher si cet appel échoue seul.
+  const [erreurDemandes, setErreurDemandes] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+
+    api
+      .get<DashboardDemandes>('/v1/admin/dashboard')
+      .then((res) => !cancelled && setDemandes(res))
+      .catch(() => !cancelled && setErreurDemandes(true));
 
     (async () => {
       try {
@@ -104,6 +124,52 @@ export function Dashboard() {
           {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
         </span>
       </div>
+
+      {erreurDemandes && (
+        <div className="mb-5 rounded-xl bg-brand-red-50 border border-brand-red-200 text-brand-red-700 text-sm px-4 py-3">
+          Impossible de charger les chiffres des demandes.
+        </div>
+      )}
+
+      {demandes && (
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Demandes</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <Link to="/admin/demandes">
+              <StatCard
+                label="Dossiers à traiter"
+                value={demandes.demandes.a_traiter}
+                icon={FileClock}
+                tone={demandes.demandes.a_traiter > 0 ? 'gold' : 'green'}
+              />
+            </Link>
+            <Link to="/admin/demandes">
+              <StatCard label="Prêts à retirer" value={demandes.demandes.pretes} icon={PackageCheck} tone="green" />
+            </Link>
+            <Link to="/admin/demandes">
+              <StatCard
+                label="En retard"
+                value={demandes.demandes.en_retard}
+                icon={AlertTriangle}
+                tone={demandes.demandes.en_retard > 0 ? 'red' : 'green'}
+              />
+            </Link>
+            <div className="bg-white border border-brand-green-100 rounded-xl p-[18px]">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Encaissé aujourd'hui</span>
+                <Wallet className="w-4 h-4 text-brand-green-600" />
+              </div>
+              <div className="text-2xl font-bold text-slate-900 mt-2">
+                {FORMAT_XOF.format(demandes.encaissements.jour)}
+                <span className="text-sm font-normal text-slate-400"> {demandes.encaissements.devise}</span>
+              </div>
+              <div className="text-xs text-slate-400 mt-1">
+                {FORMAT_XOF.format(demandes.encaissements.mois)} {demandes.encaissements.devise} ce mois-ci
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-5 rounded-xl bg-brand-red-50 border border-brand-red-200 text-brand-red-700 text-sm px-4 py-3">
