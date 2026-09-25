@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronRight, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -12,7 +12,9 @@ export function cn(...inputs: (string | undefined | null | false)[]) {
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,7 +26,28 @@ export function Navbar() {
 
   useEffect(() => {
     setIsOpen(false);
+    setOpenDropdown(null);
   }, [location]);
+
+  // Ferme le dropdown ouvert si on clique/touche en dehors de la nav
+  // (indispensable puisque les menus s'ouvrent désormais au clic,
+  // et pas seulement au survol souris).
+  useEffect(() => {
+    if (!openDropdown) return;
+
+    const handleOutside = (e: MouseEvent | TouchEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [openDropdown]);
 
   const navLinks: { name: string; path?: string; children?: { name: string; path: string }[] }[] = [
     { name: 'Accueil', path: '/' },
@@ -82,7 +105,7 @@ export function Navbar() {
             : "bg-transparent py-6"
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={navRef}>
           <div className="flex justify-between items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
@@ -104,8 +127,18 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) =>
                 link.children ? (
-                  <div key={link.name} className="relative group">
+                  <div
+                    key={link.name}
+                    className="relative"
+                    onMouseEnter={() => setOpenDropdown(link.name)}
+                    onMouseLeave={() => setOpenDropdown((prev) => (prev === link.name ? null : prev))}
+                  >
                     <button
+                      type="button"
+                      onClick={() =>
+                        setOpenDropdown((prev) => (prev === link.name ? null : link.name))
+                      }
+                      aria-expanded={openDropdown === link.name}
                       className={cn(
                         "flex items-center gap-1 px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-full hover:bg-white/10",
                         link.children.some((c) => c.path === location.pathname)
@@ -114,24 +147,41 @@ export function Navbar() {
                       )}
                     >
                       {link.name}
-                      <ChevronDown size={14} />
+                      <ChevronDown
+                        size={14}
+                        className={cn(
+                          "transition-transform duration-200",
+                          openDropdown === link.name && "rotate-180"
+                        )}
+                      />
                     </button>
-                    <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
-                      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 py-2 min-w-[200px]">
-                        {link.children.map((child) => (
-                          <NavLink
-                            key={child.path}
-                            to={child.path}
-                            className={({ isActive }) => cn(
-                              "block px-4 py-2.5 text-sm font-semibold transition-colors",
-                              isActive ? "text-brand-green-700 bg-brand-green-50" : "text-slate-600 hover:bg-slate-50 hover:text-brand-green-700"
-                            )}
-                          >
-                            {child.name}
-                          </NavLink>
-                        ))}
-                      </div>
-                    </div>
+                    <AnimatePresence>
+                      {openDropdown === link.name && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute left-0 top-full pt-2"
+                        >
+                          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 py-2 min-w-[200px]">
+                            {link.children.map((child) => (
+                              <NavLink
+                                key={child.path}
+                                to={child.path}
+                                onClick={() => setOpenDropdown(null)}
+                                className={({ isActive }) => cn(
+                                  "block px-4 py-2.5 text-sm font-semibold transition-colors",
+                                  isActive ? "text-brand-green-700 bg-brand-green-50" : "text-slate-600 hover:bg-slate-50 hover:text-brand-green-700"
+                                )}
+                              >
+                                {child.name}
+                              </NavLink>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ) : (
                   <NavLink
