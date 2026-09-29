@@ -66,14 +66,15 @@ export function Navbar() {
       ],
     },
     {
-      name: 'Communauté',
+      name: 'Diaspora',
       children: [
-        { name: 'Diaspora', path: '/diaspora' },
+        { name: 'Congo-Bénin', path: '/congo-benin' },
+        { name: 'Communaute', path: '/diaspora' },
         { name: 'Culture & Patrimoine', path: '/culture' },
       ],
     },
     
-        { name: 'Congo-Bénin', path: '/congo-benin' },
+        
     {
       name: 'Actualités',
       children: [

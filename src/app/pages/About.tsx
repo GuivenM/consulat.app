@@ -14,7 +14,7 @@ export function About() {
            </div>
            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Le Consulat</h1>
            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-             Découvrez les missions et l'organisation du Consulat Honoraire de la République du Congo au Bénin,
+             Découvrez les missions et l'organisation du Consulat Honoraire de la République du Congo près la République du Bénin,
              au service de la communauté congolaise au Bénin.
            </p>
         </div>

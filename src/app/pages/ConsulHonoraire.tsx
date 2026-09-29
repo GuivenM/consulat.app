@@ -7,9 +7,9 @@ import { Users, Handshake, ShieldCheck, ArrowRight } from 'lucide-react';
 // le Consulat (parcours, date de nomination, etc.) — non inventés ici.
 const CONSUL = {
   nom: 'Dr. Fidèle Elenga',
-  titre: 'Consul Honoraire de la République du Congo au Bénin',
+  titre: 'Consul Honoraire de la République du Congo près la République du Bénin',
   citation:
-    "Notre mission est de contribuer à rapprocher la République du Congo de la République du Bénin, tout en restant au plus près de nos compatriotes et de leurs préoccupations.",
+    "Notre mission est de contribuer à rapprocher la République du Congo de la République près la République du Bénin, tout en restant au plus près de nos compatriotes et de leurs préoccupations.",
   photo: null as string | null,
 };
 
@@ -71,7 +71,7 @@ export function ConsulHonoraire() {
             {
               icon: <Users className="w-7 h-7" />,
               title: 'Assistance aux ressortissants',
-              desc: "Accompagner les Congolais établis au Bénin dans leurs démarches consulaires et les orienter en cas de difficulté.",
+              desc: "Accompagner les congolais établis au Bénin dans leurs démarches consulaires et les orienter en cas de difficulté.",
             },
             {
               icon: <Handshake className="w-7 h-7" />,

@@ -92,7 +92,7 @@ const besoins = [
 // déposer le fichier dans /public et renseigner `photo` (ex. "/consul.jpeg").
 const CONSUL = {
   nom: "Dr. Fidèle Elenga",
-  titre: "Consul Honoraire de la République du Congo au Bénin",
+  titre: "Consul Honoraire de la République du Congo près la République du Bénin",
   photo: null as string | null,
   citation:
     "Notre mission est de contribuer à rapprocher la République du Congo de la République du Bénin, tout en restant au plus près de nos compatriotes et de leurs préoccupations.",
@@ -256,13 +256,13 @@ export function Home() {
             >
               <h2 className="text-sm font-bold text-brand-green-600 uppercase tracking-widest mb-4">Qui sommes-nous ?</h2>
               <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                Un service public de proximité pour la <span className="text-brand-gold-500">communauté congolaise</span>.
+                Un service public de proximité pour la <span className="text-brand-gold-500">communauté congolaise au Bénin</span>.
               </h3>
               <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                Porté par le Consulat Honoraire de la République du Congo au Bénin, ce site est un espace de services et d'information pour la communauté congolaise.
+                Porté par le Consulat Honoraire de la République du Congo près Bénin, ce site est un espace de services et d'information pour la communauté congolaise au Bénin.
               </p>
               <p className="text-lg text-slate-600 mb-10 leading-relaxed">
-                Inscription au registre consulaire, carte consulaire, laissez-passer, informations pratiques : nous accompagnons chaque ressortissant dans ses démarches, où qu'il se trouve au Bénin.
+                Inscription au registre consulaire, carte consulaire, laissez-passer, informations pratiques : nous accompagnons chaque ressortissant dans ses démarches, où qu'il se trouve sur le territoire béninois.
               </p>
               
               <Link to="/about" className="inline-flex items-center gap-2 text-brand-green-800 font-bold border-b-2 border-brand-green-800 pb-1 hover:text-brand-green-600 hover:border-brand-green-600 transition-all">
