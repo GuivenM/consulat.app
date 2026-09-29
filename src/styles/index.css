@@ -1,3 +1,25 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* Reçu de paiement et récapitulatif de caisse : à l'impression, seul
+   l'élément marqué print-recu (ou print-recap) doit apparaître — le reste
+   de l'application (sidebar, en-têtes, overlay du dialogue) est masqué. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-recu,
+  .print-recu *,
+  .print-recap,
+  .print-recap * {
+    visibility: visible;
+  }
+  .print-recu,
+  .print-recap {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

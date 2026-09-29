@@ -31,6 +31,7 @@ import { AdminDemandes } from './admin/pages/AdminDemandes';
 import { AdminRegistre } from './admin/pages/AdminRegistre';
 import { AdminConfiguration } from './admin/pages/AdminConfiguration';
 import { AdminCarte } from './admin/pages/AdminCarte';
+import { AdminCaisse } from './admin/pages/AdminCaisse';
 import { AdminActualites } from './admin/pages/AdminActualites';
 import { AdminGuide } from './admin/pages/AdminGuide';
 import { AdminPartenaires } from './admin/pages/AdminPartenaires';
@@ -98,6 +99,7 @@ export default function App() {
               <Route path="registre" element={<AdminRegistre />} />
               <Route path="configuration" element={<AdminConfiguration />} />
               <Route path="carte" element={<AdminCarte />} />
+              <Route path="caisse" element={<AdminCaisse />} />
               <Route path="actualites" element={<AdminActualites />} />
               <Route path="guide" element={<AdminGuide />} />
               <Route path="partenaires" element={<AdminPartenaires />} />

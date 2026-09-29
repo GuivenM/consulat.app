@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, X, Phone, Mail, MapPin, BadgeCheck } from 'lucide-react';
+import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, Phone, Mail, MapPin, BadgeCheck, Pencil, Save } from 'lucide-react';
 import { api, ApiError, downloadFile } from '../../../lib/api';
+import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Textarea } from '../../components/ui/textarea';
 import { VilleSelect } from '../../components/VilleSelect';
 import {
   Select,
@@ -60,6 +63,17 @@ export function AdminRegistre() {
   const [viewing, setViewing] = useState<Ressortissant | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const { hasRole } = useAuth();
+  const peutModifier = hasRole('super_admin', 'admin');
+
+  // Édition : formulaire de correction, séparé de `viewing` pour ne
+  // committer qu'au clic sur Enregistrer plutôt qu'à chaque frappe.
+  const [edition, setEdition] = useState(false);
+  const [form, setForm] = useState<Partial<Ressortissant>>({});
+  const [nouveauStatut, setNouveauStatut] = useState<StatutRessortissant>('actif');
+  const [motif, setMotif] = useState('');
+  const [erreurs, setErreurs] = useState<Record<string, string[]>>({});
+  const [enregistrement, setEnregistrement] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setRechercheDebounced(recherche), 400);
@@ -96,6 +110,7 @@ export function AdminRegistre() {
 
   async function ouvrirDetail(id: number) {
     setLoadingDetail(true);
+    setEdition(false);
     try {
       const r = await api.get<Ressortissant>(`/v1/admin/ressortissants/${id}`);
       setViewing(r);
@@ -103,6 +118,48 @@ export function AdminRegistre() {
       toast.error(err instanceof ApiError ? err.message : 'Impossible de charger la fiche.');
     } finally {
       setLoadingDetail(false);
+    }
+  }
+
+  function commencerEdition() {
+    if (!viewing) return;
+    setForm({
+      nom: viewing.nom,
+      prenom: viewing.prenom,
+      telephone: viewing.telephone,
+      whatsapp: viewing.whatsapp,
+      ville: viewing.ville,
+      quartier: viewing.quartier,
+      adresse: viewing.adresse,
+      nationalite: viewing.nationalite,
+      profession: viewing.profession,
+    });
+    setNouveauStatut(viewing.statut);
+    setMotif(viewing.motif_inactivation || '');
+    setErreurs({});
+    setEdition(true);
+  }
+
+  async function enregistrer() {
+    if (!viewing) return;
+    setEnregistrement(true);
+    setErreurs({});
+    try {
+      const payload: Record<string, unknown> = { ...form };
+      if (nouveauStatut !== viewing.statut) {
+        payload.statut = nouveauStatut;
+        payload.motif_inactivation = nouveauStatut === 'actif' ? null : motif.trim();
+      }
+      const maj = await api.patch<Ressortissant>(`/v1/admin/ressortissants/${viewing.id}`, payload);
+      setViewing(maj);
+      setRessortissants((liste) => liste?.map((r) => (r.id === maj.id ? { ...r, ...maj } : r)) ?? liste);
+      toast.success('Fiche mise à jour.');
+      setEdition(false);
+    } catch (err) {
+      if (err instanceof ApiError && err.errors) setErreurs(err.errors);
+      toast.error(err instanceof ApiError ? err.message : 'Impossible de mettre à jour la fiche.');
+    } finally {
+      setEnregistrement(false);
     }
   }
 
@@ -227,13 +284,96 @@ export function AdminRegistre() {
       )}
 
       <Dialog open={!!viewing || loadingDetail} onOpenChange={(open) => !open && setViewing(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Fiche ressortissant</DialogTitle>
+            <DialogTitle className="flex items-center justify-between gap-2 pr-6">
+              Fiche ressortissant
+              {peutModifier && viewing && !edition && (
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={commencerEdition}>
+                  <Pencil className="w-3.5 h-3.5 mr-1" /> Corriger
+                </Button>
+              )}
+            </DialogTitle>
           </DialogHeader>
           {loadingDetail || !viewing ? (
             <div className="flex justify-center py-10 text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          ) : edition ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Prénom</Label>
+                  <Input value={form.prenom || ''} onChange={(e) => setForm({ ...form, prenom: e.target.value })} />
+                  {erreurs.prenom && <p className="text-xs text-brand-red-600">{erreurs.prenom[0]}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Nom</Label>
+                  <Input value={form.nom || ''} onChange={(e) => setForm({ ...form, nom: e.target.value })} />
+                  {erreurs.nom && <p className="text-xs text-brand-red-600">{erreurs.nom[0]}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Téléphone</Label>
+                  <Input value={form.telephone || ''} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>WhatsApp</Label>
+                  <Input value={form.whatsapp || ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
+                </div>
+                <div className="space-y-1.5 col-span-2">
+                  <Label>Ville</Label>
+                  <VilleSelect value={form.ville || null} onChange={(v) => setForm({ ...form, ville: v })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Quartier</Label>
+                  <Input value={form.quartier || ''} onChange={(e) => setForm({ ...form, quartier: e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Nationalité</Label>
+                  <Input value={form.nationalite || ''} onChange={(e) => setForm({ ...form, nationalite: e.target.value })} />
+                </div>
+                <div className="space-y-1.5 col-span-2">
+                  <Label>Adresse</Label>
+                  <Input value={form.adresse || ''} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
+                </div>
+                <div className="space-y-1.5 col-span-2">
+                  <Label>Profession</Label>
+                  <Input value={form.profession || ''} onChange={(e) => setForm({ ...form, profession: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="space-y-1.5 border-t border-slate-100 pt-4">
+                <Label>Statut du compte</Label>
+                <Select value={nouveauStatut} onValueChange={(v) => setNouveauStatut(v as StatutRessortissant)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="actif">Actif</SelectItem>
+                    <SelectItem value="inactif">Inactif</SelectItem>
+                    <SelectItem value="suspendu">Suspendu</SelectItem>
+                  </SelectContent>
+                </Select>
+                {nouveauStatut !== 'actif' && (
+                  <div className="pt-1.5">
+                    <Textarea
+                      placeholder="Motif (obligatoire pour inactif ou suspendu)"
+                      value={motif}
+                      onChange={(e) => setMotif(e.target.value)}
+                      rows={2}
+                    />
+                    {erreurs.motif_inactivation && <p className="text-xs text-brand-red-600 mt-1">{erreurs.motif_inactivation[0]}</p>}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" disabled={enregistrement} onClick={() => setEdition(false)}>
+                  Annuler
+                </Button>
+                <Button disabled={enregistrement} onClick={enregistrer}>
+                  {enregistrement ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  Enregistrer
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">

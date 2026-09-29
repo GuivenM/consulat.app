@@ -49,6 +49,7 @@ import {
   AlertDialogTitle,
 } from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { RecuPaiement } from '../components/RecuPaiement';
 import type { Demande, StatutDemande, DemandeDocumentAdmin, ModeGuichet } from '../types';
 
 interface Meta {
@@ -411,6 +412,7 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
   const [nomPayeur, setNomPayeur] = useState('');
   const [telephonePayeur, setTelephonePayeur] = useState('');
   const [encaissementEnCours, setEncaissementEnCours] = useState(false);
+  const [recuAffiche, setRecuAffiche] = useState<number | null>(null);
 
   const clos = demande.statut === 'retire' || demande.statut === 'rejete';
   const prochain = PROCHAIN_STATUT[demande.statut];
@@ -418,7 +420,7 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
   async function encaisser() {
     setEncaissementEnCours(true);
     try {
-      await api.post(`/v1/admin/demandes/${demande.id}/paiement-guichet`, {
+      const res = await api.post<{ id: number }>(`/v1/admin/demandes/${demande.id}/paiement-guichet`, {
         mode,
         numero_recu: numeroRecu,
         nom_payeur: nomPayeur || undefined,
@@ -430,6 +432,7 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
       setNumeroRecu('');
       setNomPayeur('');
       setTelephonePayeur('');
+      setRecuAffiche(res.id);
       onChanged();
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Impossible d'enregistrer le paiement.");
@@ -550,6 +553,15 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
                   <Badge variant="outline" className={p.statut === 'reussi' ? 'bg-brand-green-50 text-brand-green-700 border-brand-green-200' : 'bg-slate-100 text-slate-600 border-slate-200'}>
                     {p.statut === 'reussi' ? 'Réussi' : p.statut}
                   </Badge>
+                  {p.statut === 'reussi' && (
+                    <button
+                      type="button"
+                      onClick={() => setRecuAffiche(p.id)}
+                      className="text-xs text-brand-green-700 underline underline-offset-2 hover:text-brand-green-800"
+                    >
+                      Reçu
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -795,6 +807,8 @@ function DetailDossier({ demande, onChanged }: { demande: Demande; onChanged: ()
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {recuAffiche && <RecuPaiement paiementId={recuAffiche} onClose={() => setRecuAffiche(null)} />}
     </div>
   );
 }

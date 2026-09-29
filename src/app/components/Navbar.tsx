@@ -52,7 +52,7 @@ export function Navbar() {
   const navLinks: { name: string; path?: string; children?: { name: string; path: string }[] }[] = [
     { name: 'Accueil', path: '/' },
     {
-      name: 'Le Consulat',
+      name: 'Consulat',
       children: [
         { name: 'Présentation', path: '/about' },
         { name: 'Le Consul Honoraire', path: '/consul-honoraire' },
@@ -68,11 +68,12 @@ export function Navbar() {
     {
       name: 'Communauté',
       children: [
-        { name: 'Congo-Bénin', path: '/congo-benin' },
         { name: 'Diaspora', path: '/diaspora' },
         { name: 'Culture & Patrimoine', path: '/culture' },
       ],
     },
+    
+        { name: 'Congo-Bénin', path: '/congo-benin' },
     {
       name: 'Actualités',
       children: [
