@@ -11,14 +11,24 @@ export function cn(...inputs: (string | undefined | null | false)[]) {
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);   // ← renommé
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const navRef = useRef<HTMLDivElement>(null);
 
+  // Pages sans hero sombre : la navbar doit rester en style "solide" dès le haut
+  const lightPages = [
+    /^\/news\/[^/]+$/,   // détail d'une actualité
+    /^\/guide$/,
+    /^\/news$/,
+    /^\/contact$/,
+  ];
+  const forceSolid = lightPages.some((re) => re.test(location.pathname));
+  const scrolled = hasScrolled || forceSolid;                // ← même nom qu'avant
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setHasScrolled(window.scrollY > 20);                   // ← renommé
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);

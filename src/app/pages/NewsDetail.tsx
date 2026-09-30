@@ -136,18 +136,38 @@ function Galerie({
   const visibles = photos.slice(0, 4);
   const restantes = photos.length - visibles.length;
 
-  return (
-    <div className="grid grid-cols-2 gap-2 mb-8 rounded-3xl overflow-hidden aspect-video">
-      <button onClick={() => onOpen(0)} className="relative row-span-2 bg-slate-200">
-        <img src={photos[0]} alt={titre} className="w-full h-full object-cover" />
+    return (
+    <div className="grid grid-cols-2 grid-rows-1 gap-2 mb-8 rounded-3xl overflow-hidden aspect-video">
+      <button
+        onClick={() => onOpen(0)}
+        className="relative min-h-0 overflow-hidden bg-slate-200"
+      >
+        <img
+          src={photos[0]}
+          alt={titre}
+          className="absolute inset-0 w-full h-full object-cover object-top"
+        />
       </button>
-      <div className="grid grid-rows-2 gap-2 h-full">
+
+      <div
+        className={`grid gap-2 min-h-0 ${
+          visibles.length === 2 ? 'grid-rows-1' : visibles.length === 3 ? 'grid-rows-2' : 'grid-rows-3'
+        }`}
+      >
         {visibles.slice(1).map((url, i) => {
           const index = i + 1;
           const estDerniereVisible = index === visibles.length - 1 && restantes > 0;
           return (
-            <button key={url} onClick={() => onOpen(index)} className="relative bg-slate-200">
-              <img src={url} alt={`${titre} — photo ${index + 1}`} className="w-full h-full object-cover" />
+            <button
+              key={url}
+              onClick={() => onOpen(index)}
+              className="relative min-h-0 overflow-hidden bg-slate-200"
+            >
+              <img
+                src={url}
+                alt={`${titre} — photo ${index + 1}`}
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
               {estDerniereVisible && (
                 <span className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xl font-bold">
                   +{restantes}
