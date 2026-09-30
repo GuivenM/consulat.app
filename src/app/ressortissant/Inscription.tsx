@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { VilleSelect } from '../components/VilleSelect';
+import { QuartierSelect } from '../components/QuartierSelect';
 import {
   Select,
   SelectContent,
@@ -285,12 +286,12 @@ export function Inscription() {
               </div>
               <div>
                 <Label>Ville *</Label>
-                <VilleSelect value={form.ville || null} onChange={(v) => set('ville', v || '')} placeholder="Sélectionner…" />
+                <VilleSelect value={form.ville || null} onChange={(v) => setForm((f) => ({ ...f, ville: v || '', quartier: v === f.ville ? f.quartier : '' }))} placeholder="Sélectionner…" />
                 {err('ville') && <p className="text-xs text-brand-red-600 mt-1">{err('ville')}</p>}
               </div>
               <div>
                 <Label>Quartier *</Label>
-                <Input required value={form.quartier} onChange={(e) => set('quartier', e.target.value)} />
+                <QuartierSelect required ville={form.ville || null} value={form.quartier || null} onChange={(q) => set('quartier', q)} />
                 {err('quartier') && <p className="text-xs text-brand-red-600 mt-1">{err('quartier')}</p>}
               </div>
               <div className="sm:col-span-2">

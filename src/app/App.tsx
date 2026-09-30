@@ -8,6 +8,7 @@ import { ConsulHonoraire } from './pages/ConsulHonoraire';
 import { Services } from './pages/Services';
 import { CongoBenin } from './pages/CongoBenin';
 import { Communaute } from './pages/Communaute';
+import { RealisationDetail } from './pages/RealisationDetail';
 import { CulturePatrimoine } from './pages/Culture';
 import { Agenda } from './pages/Agenda';
 import { Faq } from './pages/Faq';
@@ -78,6 +79,7 @@ export default function App() {
             <Route path="services" element={<Services />} />
             <Route path="congo-benin" element={<CongoBenin />} />
             <Route path="communaute" element={<Communaute />} />
+            <Route path="realisations/:id" element={<RealisationDetail />} />
             <Route path="diaspora" element={<Navigate to="/communaute" replace />} />
             <Route path="culture" element={<CulturePatrimoine />} />
             <Route path="guide" element={<Guide />} />

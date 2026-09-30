@@ -256,8 +256,11 @@ export interface Realisation {
   rubrique_label: string;
   titre: string;
   description: string | null;
+  contenu: string | null;
   photo: string | null;
   photo_url: string | null;
+  photos: { id: number; url: string }[];
+  photos_urls: string[];
   date_realisation: string | null;
   publie: boolean;
   ordre: number;

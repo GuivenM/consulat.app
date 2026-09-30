@@ -195,8 +195,7 @@ export function Home() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-lg md:text-2xl text-slate-300 mb-12 max-w-2xl leading-relaxed font-light"
             >
-              Le Consulat Honoraire de la République du Congo au Bénin accompagne les ressortissants congolais
-              dans leurs démarches consulaires et renforce les liens entre nos deux pays.
+              Le Consulat Honoraire du Congo près le Bénin accompagne ses ressortissants et renforce la coopération entre les deux pays, sous l’impulsion des Présidents Denis SASSOU N’GUESSO et Romuald WADAGNI.
             </motion.p>
             
             <motion.div 
@@ -238,7 +237,7 @@ export function Home() {
             >
                <div className="absolute -inset-4 bg-gradient-to-tr from-brand-green-100 to-brand-gold-100 rounded-[2rem] rotate-3 opacity-70"></div>
                <ImageWithFallback 
-                 src="/us.jpeg" 
+                 src="/us.jpeg?v=4" 
                  alt="Communauté congolaise au Bénin" 
                  className="relative rounded-[1.5rem] shadow-2xl w-full object-cover aspect-[4/3]"
                />

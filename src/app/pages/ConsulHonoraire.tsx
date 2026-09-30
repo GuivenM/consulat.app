@@ -10,7 +10,7 @@ const CONSUL = {
   titre: 'Consul Honoraire de la République du Congo près la République du Bénin',
   citation:
     "Notre mission est de contribuer à rapprocher la République du Congo de la République près la République du Bénin, tout en restant au plus près de nos compatriotes et de leurs préoccupations.",
-  photo: null as string | null,
+  photo: '/consul.png',
 };
 
 export function ConsulHonoraire() {
@@ -36,7 +36,7 @@ export function ConsulHonoraire() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white border border-slate-100 rounded-3xl shadow-xl p-8 flex flex-col items-center text-center"
           >
-            <div className="w-32 h-32 rounded-full bg-slate-100 mb-6 flex items-center justify-center overflow-hidden">
+            <div className="w-64 h-64 rounded-full bg-slate-100 mb-6 flex items-center justify-center overflow-hidden">
               {CONSUL.photo ? (
                 <img src={CONSUL.photo} alt={CONSUL.nom} className="w-full h-full object-cover" />
               ) : (

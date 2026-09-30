@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface Realisation {
@@ -58,8 +59,9 @@ export function RealisationsGrid({ rubrique, titre, intro }: RealisationsGridPro
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: (i % 3) * 0.1 }}
-              className="bg-white border border-slate-100 rounded-3xl shadow-xl overflow-hidden flex flex-col"
+              className="bg-white border border-slate-100 rounded-3xl shadow-xl overflow-hidden"
             >
+             <Link to={`/realisations/${r.id}`} className="group flex flex-col h-full">
               {r.photo_url && (
                 <img src={r.photo_url} alt={r.titre} loading="lazy" className="w-full h-56 object-cover" />
               )}
@@ -71,9 +73,13 @@ export function RealisationsGrid({ rubrique, titre, intro }: RealisationsGridPro
                 )}
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{r.titre}</h3>
                 {r.description && (
-                  <p className="text-slate-500 leading-relaxed whitespace-pre-line">{r.description}</p>
+                  <p className="text-slate-500 leading-relaxed whitespace-pre-line line-clamp-3">{r.description}</p>
                 )}
+                <span className="mt-auto pt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-green-600 group-hover:gap-3 transition-all">
+                  En savoir plus <ArrowRight className="w-4 h-4" />
+                </span>
               </div>
+             </Link>
             </motion.article>
           );
         })}

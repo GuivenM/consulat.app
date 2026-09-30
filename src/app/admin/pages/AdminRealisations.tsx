@@ -36,18 +36,26 @@ interface FormState {
   rubrique: RubriqueRealisation;
   titre: string;
   description: string;
+  contenu: string;
   dateRealisation: string;
   publie: boolean;
   photoFile: File | null;
+  photosExistantes: { id: number; url: string }[];
+  photosSupprimees: number[];
+  nouvellesPhotos: File[];
 }
 
 const emptyForm = (rubrique: RubriqueRealisation = 'communaute'): FormState => ({
   rubrique,
   titre: '',
   description: '',
+  contenu: '',
   dateRealisation: '',
   publie: true,
   photoFile: null,
+  photosExistantes: [],
+  photosSupprimees: [],
+  nouvellesPhotos: [],
 });
 
 export function AdminRealisations() {
@@ -82,9 +90,13 @@ export function AdminRealisations() {
       rubrique: r.rubrique,
       titre: r.titre,
       description: r.description ?? '',
+      contenu: r.contenu ?? '',
       dateRealisation: r.date_realisation ?? '',
       publie: r.publie,
       photoFile: null,
+      photosExistantes: r.photos ?? [],
+      photosSupprimees: [],
+      nouvellesPhotos: [],
     });
     setEditing(r);
   }
@@ -100,9 +112,12 @@ export function AdminRealisations() {
       fd.append('rubrique', form.rubrique);
       fd.append('titre', form.titre);
       fd.append('description', form.description);
+      fd.append('contenu', form.contenu);
       fd.append('date_realisation', form.dateRealisation);
       fd.append('publie', form.publie ? '1' : '0');
       if (form.photoFile) fd.append('photo', await compressImage(form.photoFile));
+      for (const f of form.nouvellesPhotos) fd.append('photos[]', await compressImage(f));
+      form.photosSupprimees.forEach((id) => fd.append('photos_supprimees[]', String(id)));
 
       if (editing === 'new') {
         await api.postForm<Realisation>('/v1/realisations', fd, 'POST');
@@ -226,8 +241,13 @@ export function AdminRealisations() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="realisation-description">Description</Label>
+              <Label htmlFor="realisation-description">Résumé (affiché sur la carte)</Label>
               <Textarea id="realisation-description" rows={4} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="realisation-contenu">Texte complet (page de détail)</Label>
+              <Textarea id="realisation-contenu" rows={8} value={form.contenu} onChange={(e) => setForm((f) => ({ ...f, contenu: e.target.value }))} />
             </div>
 
             <div className="space-y-1.5">
@@ -236,13 +256,53 @@ export function AdminRealisations() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="realisation-photo">Photo</Label>
+              <Label htmlFor="realisation-photo">Photo de couverture</Label>
               <Input
                 id="realisation-photo"
                 type="file"
                 accept="image/jpeg,image/png,image/jpg,image/webp"
                 onChange={(e) => setForm((f) => ({ ...f, photoFile: e.target.files?.[0] || null }))}
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="realisation-photos">Galerie (10 photos max)</Label>
+              {form.photosExistantes.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {form.photosExistantes.map((p) => {
+                    const retiree = form.photosSupprimees.includes(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        title={retiree ? 'Annuler la suppression' : 'Retirer cette photo'}
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            photosSupprimees: retiree
+                              ? f.photosSupprimees.filter((id) => id !== p.id)
+                              : [...f.photosSupprimees, p.id],
+                          }))
+                        }
+                        className={`relative w-16 h-16 rounded-lg overflow-hidden border ${retiree ? 'opacity-30 border-brand-red-500' : 'border-slate-200'}`}
+                      >
+                        <img src={p.url} alt="" className="w-full h-full object-cover" />
+                        {retiree && <Trash2 className="absolute inset-0 m-auto w-5 h-5 text-brand-red-600" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <Input
+                id="realisation-photos"
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                onChange={(e) => setForm((f) => ({ ...f, nouvellesPhotos: Array.from(e.target.files ?? []) }))}
+              />
+              {form.nouvellesPhotos.length > 0 && (
+                <p className="text-xs text-slate-400">{form.nouvellesPhotos.length} photo(s) à ajouter</p>
+              )}
             </div>
 
             <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">

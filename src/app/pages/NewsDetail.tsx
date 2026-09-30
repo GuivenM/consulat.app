@@ -113,7 +113,7 @@ export function NewsDetail() {
  * côte, 3+ → une grande + une colonne de vignettes (avec compteur "+N" sur
  * la dernière si la galerie est plus fournie que ce qu'affiche la grille).
  */
-function Galerie({
+export function Galerie({
   photos,
   titre,
   onOpen,
@@ -181,7 +181,7 @@ function Galerie({
   );
 }
 
-function Lightbox({
+export function Lightbox({
   photos,
   index,
   onClose,

@@ -8,6 +8,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { VilleSelect } from '../../components/VilleSelect';
+import { QuartierSelect } from '../../components/QuartierSelect';
 import {
   Select,
   SelectContent,
@@ -330,11 +331,11 @@ export function AdminRegistre() {
                 </div>
                 <div className="space-y-1.5 col-span-2">
                   <Label>Ville</Label>
-                  <VilleSelect value={form.ville || null} onChange={(v) => setForm({ ...form, ville: v })} />
+                  <VilleSelect value={form.ville || null} onChange={(v) => setForm({ ...form, ville: v, quartier: v === form.ville ? form.quartier : '' })} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Quartier</Label>
-                  <Input value={form.quartier || ''} onChange={(e) => setForm({ ...form, quartier: e.target.value })} />
+                  <QuartierSelect ville={form.ville || null} value={form.quartier || null} onChange={(q) => setForm({ ...form, quartier: q })} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Nationalité</Label>
