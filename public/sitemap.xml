@@ -2,52 +2,52 @@
 <!-- TODO : remplacer le domaine placeholder ci-dessous par le vrai nom de domaine du consulat une fois connu -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://consulat-congo-benin.example/</loc>
+    <loc>https://consulatcongo-benin.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/about</loc>
+    <loc>https://consulatcongo-benin.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/actions</loc>
+    <loc>https://consulatcongo-benin.com/actions</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/actions/solidarite</loc>
+    <loc>https://consulatcongo-benin.com/actions/solidarite</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/actions/education</loc>
+    <loc>https://consulatcongo-benin.com/actions/education</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/actions/culture</loc>
+    <loc>https://consulatcongo-benin.com/actions/culture</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/actions/communication</loc>
+    <loc>https://consulatcongo-benin.com/actions/communication</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/guide</loc>
+    <loc>https://consulatcongo-benin.com/guide</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/news</loc>
+    <loc>https://consulatcongo-benin.com/news</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://consulat-congo-benin.example/contact</loc>
+    <loc>https://consulatcongo-benin.com/contact</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

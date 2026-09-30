@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /membre
 
 # TODO : remplacer par le vrai nom de domaine du consulat une fois connu
-Sitemap: https://consulat-congo-benin.example/sitemap.xml
+Sitemap: https://consulatcongo-benin.com/sitemap.xml
