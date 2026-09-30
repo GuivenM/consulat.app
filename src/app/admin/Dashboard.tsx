@@ -20,6 +20,7 @@ import { api } from '../../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { Message, Actualite, GuideSection, Partenaire } from './types';
 import type { PointCarte } from './types';
+import { DEMANDES_ENABLED } from '../../lib/features';
 
 const CENTRE_COTONOU: [number, number] = [6.3703, 2.3912];
 const STATUT_COULEUR: Record<string, string> = {
@@ -67,10 +68,12 @@ export function Dashboard() {
   useEffect(() => {
     let cancelled = false;
 
-    api
-      .get<DashboardDemandes>('/v1/admin/dashboard')
-      .then((res) => !cancelled && setDemandes(res))
-      .catch(() => !cancelled && setErreurDemandes(true));
+    if (DEMANDES_ENABLED) {
+      api
+        .get<DashboardDemandes>('/v1/admin/dashboard')
+        .then((res) => !cancelled && setDemandes(res))
+        .catch(() => !cancelled && setErreurDemandes(true));
+    }
 
     (async () => {
       try {

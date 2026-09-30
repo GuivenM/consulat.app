@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Music, Palette, UtensilsCrossed } from 'lucide-react';
+import { RealisationsGrid } from '../components/RealisationsGrid';
 
 export function CulturePatrimoine() {
   return (
@@ -52,6 +53,13 @@ export function CulturePatrimoine() {
             </motion.div>
           ))}
         </div>
+
+        {/* Éléments de culture & patrimoine (gérés depuis l'admin) */}
+        <RealisationsGrid
+          rubrique="culture_patrimoine"
+          titre="Culture & patrimoine à découvrir"
+          intro="Les expressions culturelles et le patrimoine portés par la communauté congolaise au Bénin."
+        />
 
         <div className="max-w-3xl mx-auto text-center border-t border-slate-100 pt-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Un évènement culturel à proposer ?</h2>

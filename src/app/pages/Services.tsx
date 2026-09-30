@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { CreditCard, FileText, CheckCircle2, Clock, ArrowRight, Loader2 } from 'lucide-react';
+import { CreditCard, FileText, CheckCircle2, Clock, Loader2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 
 interface DelaiInfo {
@@ -78,8 +78,7 @@ export function Services() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Services consulaires</h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Carte consulaire, laissez-passer : les pièces à fournir et les délais, avant de créer votre demande
-            dans l'espace consulaire.
+            Carte consulaire, laissez-passer : les pièces à fournir, les tarifs et les délais.
           </p>
         </div>
       </div>
@@ -170,13 +169,13 @@ export function Services() {
                   </div>
                 )}
 
-                <Link
-                  to="/espace-consulaire/login"
-                  className="mt-auto inline-flex items-center justify-center gap-2 bg-brand-green-600 text-white font-bold py-4 rounded-2xl hover:bg-brand-green-700 transition-colors"
-                >
-                  Faire ma demande
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                <p className="mt-auto text-sm text-slate-500 bg-slate-50 rounded-2xl p-4">
+                  Les demandes ne se font pas encore en ligne. Pour déposer votre dossier,{' '}
+                  <Link to="/contact" className="text-brand-green-600 font-semibold hover:underline">
+                    contactez le Consulat
+                  </Link>
+                  .
+                </p>
               </motion.div>
             );
           })}
@@ -185,7 +184,7 @@ export function Services() {
         <div className="max-w-3xl mx-auto text-center mt-20">
           <p className="text-slate-500">
             Vous n'êtes pas encore inscrit au registre consulaire ? L'inscription est gratuite et se fait en
-            quelques minutes depuis l'espace consulaire, avant toute demande.
+            quelques minutes depuis l'espace consulaire.
           </p>
         </div>
       </div>

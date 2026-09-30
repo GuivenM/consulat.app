@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Loader2, MapPin, CheckCircle2 } from 'lucide-react';
+import { Loader2, MapPin, CheckCircle2, Upload, FileText } from 'lucide-react';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { ApiError } from '../../lib/ressortissantApi';
+import { compressImage } from '../../lib/compressImage';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -19,16 +20,20 @@ const EMPTY = {
   nom: '', prenom: '', sexe: '', date_naissance: '', lieu_naissance: '', nationalite: '',
   profession: '', situation_matrimoniale: '',
   type_piece: '', numero_piece: '', date_expiration_piece: '',
+  possede_carte_consulaire: '', numero_carte_consulaire: '',
   whatsapp: '', telephone: '',
   ville: '', quartier: '', adresse: '', date_arrivee: '',
   contact_urgence_nom: '', contact_urgence_telephone: '',
   email: '', password: '', password_confirmation: '',
 };
 
+const TAILLE_MAX_PIECE = 5 * 1024 * 1024; // 5 Mo, aligné sur la validation API
+
 export function Inscription() {
   const { inscrire, isAuthenticated } = useRessortissantAuth();
   const [form, setForm] = useState(EMPTY);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [pieceFichier, setPieceFichier] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
@@ -48,10 +53,33 @@ export function Inscription() {
     );
   }
 
+  async function choisirPiece(file: File | undefined) {
+    if (!file) return;
+    const fichier = file.type.startsWith('image/') ? await compressImage(file) : file;
+    if (fichier.size > TAILLE_MAX_PIECE) {
+      setFieldErrors((f) => ({ ...f, piece_fichier: ['La pièce ne doit pas dépasser 5 Mo.'] }));
+      return;
+    }
+    setFieldErrors((f) => {
+      const { piece_fichier: _ignore, ...reste } = f;
+      return reste;
+    });
+    setPieceFichier(fichier);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
+
+    const manquants: Record<string, string[]> = {};
+    if (!form.type_piece) manquants.type_piece = ["Choisissez le type de pièce."];
+    if (!pieceFichier) manquants.piece_fichier = ["Joignez la copie de votre pièce d'identité (PDF ou image)."];
+    if (!form.possede_carte_consulaire) manquants.possede_carte_consulaire = ['Indiquez si vous possédez la carte consulaire.'];
+    if (Object.keys(manquants).length > 0) {
+      setFieldErrors(manquants);
+      return;
+    }
 
     if (form.password !== form.password_confirmation) {
       setFieldErrors({ password: ['Les mots de passe ne correspondent pas.'] });
@@ -62,11 +90,13 @@ export function Inscription() {
     try {
       const payload: Record<string, unknown> = { ...form, ...coords };
       // Champs optionnels vides -> non envoyés (le backend les traite en `nullable`)
-      Object.keys(payload).forEach((k) => {
-        if (payload[k] === '') delete payload[k];
+      const formData = new FormData();
+      Object.entries(payload).forEach(([k, v]) => {
+        if (v !== '' && v !== null && v !== undefined) formData.append(k, String(v));
       });
+      if (pieceFichier) formData.append('piece_fichier', pieceFichier, pieceFichier.name);
 
-      const message = await inscrire(payload);
+      const message = await inscrire(formData);
       setSucces(message);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -106,7 +136,7 @@ export function Inscription() {
           </div>
           <h1 className="text-slate-900 text-2xl font-bold text-center">Inscription au registre consulaire</h1>
           <p className="text-slate-500 text-sm mt-1 text-center">
-            Obligatoire avant toute demande de carte consulaire ou de laissez-passer.
+            Faites-vous recenser auprès du Consulat pour rester joignable et faciliter vos démarches.
           </p>
         </div>
 
@@ -175,16 +205,18 @@ export function Inscription() {
             <h2 className="font-bold text-slate-800">Pièce d'identité</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label>Type de pièce</Label>
+                <Label>Type de pièce *</Label>
                 <Select value={form.type_piece} onValueChange={(v) => set('type_piece', v)}>
                   <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="passeport">Passeport</SelectItem>
                     <SelectItem value="cni">Carte nationale d'identité</SelectItem>
+                    <SelectItem value="cip_etranger">CIP Étranger</SelectItem>
                     <SelectItem value="carte_consulaire">Carte consulaire</SelectItem>
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>
+                {err('type_piece') && <p className="text-xs text-brand-red-600 mt-1">{err('type_piece')}</p>}
               </div>
               <div>
                 <Label>Numéro de la pièce</Label>
@@ -194,6 +226,49 @@ export function Inscription() {
                 <Label>Date d'expiration</Label>
                 <Input type="date" value={form.date_expiration_piece} onChange={(e) => set('date_expiration_piece', e.target.value)} />
               </div>
+              <div className="sm:col-span-2">
+                <Label>Copie de la pièce (PDF ou image, 5 Mo max) *</Label>
+                <label className="mt-1.5 flex items-center gap-3 border border-dashed border-slate-300 rounded-xl px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors">
+                  {pieceFichier ? <FileText className="w-4 h-4 text-brand-green-600 shrink-0" /> : <Upload className="w-4 h-4 text-slate-400 shrink-0" />}
+                  <span className="text-sm text-slate-600 truncate">
+                    {pieceFichier ? pieceFichier.name : 'Choisir un fichier'}
+                  </span>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    className="hidden"
+                    onChange={(e) => choisirPiece(e.target.files?.[0])}
+                  />
+                </label>
+                {err('piece_fichier') && <p className="text-xs text-brand-red-600 mt-1">{err('piece_fichier')}</p>}
+              </div>
+              <div className="sm:col-span-2">
+                <Label>Possédez-vous la carte consulaire ? *</Label>
+                <div className="flex gap-6 mt-1.5">
+                  {[
+                    { v: '1', label: 'Oui' },
+                    { v: '0', label: 'Non' },
+                  ].map(({ v, label }) => (
+                    <label key={v} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="possede_carte_consulaire"
+                        value={v}
+                        checked={form.possede_carte_consulaire === v}
+                        onChange={() => set('possede_carte_consulaire', v)}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                {err('possede_carte_consulaire') && <p className="text-xs text-brand-red-600 mt-1">{err('possede_carte_consulaire')}</p>}
+              </div>
+              {form.possede_carte_consulaire === '1' && (
+                <div>
+                  <Label>Numéro de la carte consulaire</Label>
+                  <Input value={form.numero_carte_consulaire} onChange={(e) => set('numero_carte_consulaire', e.target.value)} />
+                </div>
+              )}
             </div>
           </section>
 

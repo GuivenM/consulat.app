@@ -16,11 +16,13 @@ import {
   Settings,
   Map as MapIcon,
   Wallet,
+  Images,
 } from 'lucide-react';
 import { useAuth, AdminRole } from '../context/AuthContext';
 import { cn } from '../components/Navbar';
 import { NotificationBell } from './components/NotificationBell';
 import { useAdminNotifications } from './hooks/useAdminNotifications';
+import { DEMANDES_ENABLED } from '../../lib/features';
 
 interface NavItem {
   label: string;
@@ -29,21 +31,24 @@ interface NavItem {
   comingSoon?: boolean;
   // Rôles autorisés à voir cet item dans le menu. Omis = tous les rôles staff standards.
   roles?: AdminRole[];
+  // Masqué tant que les demandes en ligne sont désactivées (lib/features.ts).
+  demandes?: boolean;
 }
 
 const STAFF_ROLES: AdminRole[] = ['super_admin', 'admin', 'agent'];
 
 const navItems: NavItem[] = [
   { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, roles: STAFF_ROLES },
-  { label: 'Demandes', path: '/admin/demandes', icon: FileText, roles: ['super_admin', 'admin', 'agent'] },
+  { label: 'Demandes', path: '/admin/demandes', icon: FileText, roles: ['super_admin', 'admin', 'agent'], demandes: true },
   { label: 'Messages', path: '/admin/messages', icon: Mail, roles: STAFF_ROLES },
   { label: 'Actualités', path: '/admin/actualites', icon: Newspaper, roles: STAFF_ROLES },
   { label: 'Registre consulaire', path: '/admin/registre', icon: BookUser, roles: ['super_admin', 'admin', 'agent'] },
   { label: 'Carte', path: '/admin/carte', icon: MapIcon, roles: ['super_admin', 'admin', 'agent'] },
-  { label: 'Caisse', path: '/admin/caisse', icon: Wallet, roles: ['super_admin', 'admin', 'agent'] },
+  { label: 'Caisse', path: '/admin/caisse', icon: Wallet, roles: ['super_admin', 'admin', 'agent'], demandes: true },
   { label: 'Configuration', path: '/admin/configuration', icon: Settings, roles: ['super_admin', 'admin'] },
   { label: 'Guide', path: '/admin/guide', icon: BookOpen, roles: STAFF_ROLES },
   { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, roles: STAFF_ROLES },
+  { label: 'Réalisations', path: '/admin/realisations', icon: Images, roles: STAFF_ROLES },
   { label: 'Utilisateurs', path: '/admin/utilisateurs', icon: ShieldCheck, roles: ['super_admin'] },
   { label: 'Journal', path: '/admin/journal', icon: History, roles: ['super_admin'] },
 ];
@@ -54,7 +59,9 @@ export function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { messagesNonLus, demandesEnAttente, loading, items, total } = useAdminNotifications();
 
-  const visibleNavItems = navItems.filter((item) => !item.roles || hasRole(...item.roles));
+  const visibleNavItems = navItems.filter(
+    (item) => (DEMANDES_ENABLED || !item.demandes) && (!item.roles || hasRole(...item.roles))
+  );
 
   const navBadges: Record<string, number> = {
     '/admin/messages': messagesNonLus,

@@ -3,12 +3,15 @@ import { NavLink } from 'react-router-dom';
 import { Home, FilePlus2, UserCircle, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { cn } from '../components/Navbar';
+import { DEMANDES_ENABLED } from '../../lib/features';
 
+// `demandes` : entrées masquées tant que les demandes en ligne sont désactivées
+// (voir lib/features.ts) ; l'accueil redirige alors vers le profil.
 const navItems = [
-  { label: 'Accueil', path: '/espace-consulaire', icon: Home, end: true },
-  { label: 'Nouvelle demande', path: '/espace-consulaire/nouvelle-demande', icon: FilePlus2 },
-  { label: 'Mon profil', path: '/espace-consulaire/profil', icon: UserCircle },
-];
+  { label: 'Accueil', path: '/espace-consulaire', icon: Home, end: true, demandes: true },
+  { label: 'Nouvelle demande', path: '/espace-consulaire/nouvelle-demande', icon: FilePlus2, demandes: true },
+  { label: 'Mon profil', path: '/espace-consulaire/profil', icon: UserCircle, demandes: false },
+].filter((item) => DEMANDES_ENABLED || !item.demandes);
 
 export function RessortissantSidebar() {
   const { ressortissant } = useRessortissantAuth();

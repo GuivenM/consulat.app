@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '../../../lib/api';
 import type { Demande, Message } from '../types';
+import { DEMANDES_ENABLED } from '../../../lib/features';
 
 export type NotificationType = 'demande' | 'message';
 
@@ -37,7 +38,9 @@ export function useAdminNotifications(): NotificationsState {
   const charger = useCallback(async () => {
     try {
       const [demandesData, messagesData] = await Promise.all([
-        api.get<{ items: Demande[] }>('/v1/admin/demandes?statut=recu&par_page=50'),
+        DEMANDES_ENABLED
+          ? api.get<{ items: Demande[] }>('/v1/admin/demandes?statut=recu&par_page=50')
+          : Promise.resolve({ items: [] as Demande[] }),
         api.get<Message[]>('/v1/messages'),
       ]);
       setDemandesRecues(demandesData.items);

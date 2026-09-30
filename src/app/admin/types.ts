@@ -248,6 +248,23 @@ export interface Partenaire {
   updated_at: string;
 }
 
+export type RubriqueRealisation = 'communaute' | 'culture_patrimoine';
+
+export interface Realisation {
+  id: number;
+  rubrique: RubriqueRealisation;
+  rubrique_label: string;
+  titre: string;
+  description: string | null;
+  photo: string | null;
+  photo_url: string | null;
+  date_realisation: string | null;
+  publie: boolean;
+  ordre: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export type StatutAction = 'actif' | 'inactif' | 'a_venir' | 'termine';
 export type SectionAction = 'solidarite' | 'education' | 'culture' | 'communication';
 
@@ -357,6 +374,10 @@ export interface Ressortissant {
   situation_matrimoniale?: string | null;
   type_piece?: string | null;
   numero_piece?: string | null;
+  piece_fichier_disponible?: boolean;
+  piece_fichier_nom?: string | null;
+  possede_carte_consulaire?: boolean | null;
+  numero_carte_consulaire?: string | null;
   date_expiration_piece?: string | null;
   adresse?: string | null;
   latitude?: number | null;

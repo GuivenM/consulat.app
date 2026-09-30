@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { DEMANDES_ENABLED } from '../lib/features';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { ConsulHonoraire } from './pages/ConsulHonoraire';
 import { Services } from './pages/Services';
 import { CongoBenin } from './pages/CongoBenin';
-import { Diaspora } from './pages/Diaspora';
+import { Communaute } from './pages/Communaute';
 import { CulturePatrimoine } from './pages/Culture';
 import { Agenda } from './pages/Agenda';
 import { Faq } from './pages/Faq';
@@ -35,6 +36,7 @@ import { AdminCaisse } from './admin/pages/AdminCaisse';
 import { AdminActualites } from './admin/pages/AdminActualites';
 import { AdminGuide } from './admin/pages/AdminGuide';
 import { AdminPartenaires } from './admin/pages/AdminPartenaires';
+import { AdminRealisations } from './admin/pages/AdminRealisations';
 import { AdminUtilisateurs } from './admin/pages/AdminUtilisateurs';
 import { AdminJournal } from './admin/pages/AdminJournal';
 import { Inscription } from './ressortissant/Inscription';
@@ -75,7 +77,8 @@ export default function App() {
             <Route path="consul-honoraire" element={<ConsulHonoraire />} />
             <Route path="services" element={<Services />} />
             <Route path="congo-benin" element={<CongoBenin />} />
-            <Route path="diaspora" element={<Diaspora />} />
+            <Route path="communaute" element={<Communaute />} />
+            <Route path="diaspora" element={<Navigate to="/communaute" replace />} />
             <Route path="culture" element={<CulturePatrimoine />} />
             <Route path="guide" element={<Guide />} />
             <Route path="news" element={<News />} />
@@ -95,14 +98,15 @@ export default function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="messages" element={<AdminMessages />} />
-              <Route path="demandes" element={<AdminDemandes />} />
+              {DEMANDES_ENABLED && <Route path="demandes" element={<AdminDemandes />} />}
               <Route path="registre" element={<AdminRegistre />} />
               <Route path="configuration" element={<AdminConfiguration />} />
               <Route path="carte" element={<AdminCarte />} />
-              <Route path="caisse" element={<AdminCaisse />} />
+              {DEMANDES_ENABLED && <Route path="caisse" element={<AdminCaisse />} />}
               <Route path="actualites" element={<AdminActualites />} />
               <Route path="guide" element={<AdminGuide />} />
               <Route path="partenaires" element={<AdminPartenaires />} />
+              <Route path="realisations" element={<AdminRealisations />} />
               <Route element={<ProtectedRoute roles={['super_admin']} />}>
                 <Route path="utilisateurs" element={<AdminUtilisateurs />} />
                 <Route path="journal" element={<AdminJournal />} />
@@ -117,13 +121,18 @@ export default function App() {
           <Route path="/reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
 
           <Route element={<RessortissantProtectedRoute />}>
-            <Route path="/paiement/retour" element={<RessortissantLayout />}>
-              <Route index element={<PaiementRetour />} />
-            </Route>
+            {DEMANDES_ENABLED && (
+              <Route path="/paiement/retour" element={<RessortissantLayout />}>
+                <Route index element={<PaiementRetour />} />
+              </Route>
+            )}
             <Route path="/espace-consulaire" element={<RessortissantLayout />}>
-              <Route index element={<RessortissantDashboard />} />
-              <Route path="nouvelle-demande" element={<NouvelleDemande />} />
-              <Route path="demandes/:id" element={<DemandeDetail />} />
+              <Route
+                index
+                element={DEMANDES_ENABLED ? <RessortissantDashboard /> : <Navigate to="/espace-consulaire/profil" replace />}
+              />
+              {DEMANDES_ENABLED && <Route path="nouvelle-demande" element={<NouvelleDemande />} />}
+              {DEMANDES_ENABLED && <Route path="demandes/:id" element={<DemandeDetail />} />}
               <Route path="profil" element={<Profil />} />
             </Route>
           </Route>

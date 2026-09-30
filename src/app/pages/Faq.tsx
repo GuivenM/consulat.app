@@ -24,12 +24,12 @@ const FAQ_ITEMS: { question: string; reponse: React.ReactNode }[] = [
   {
     question: 'Combien de temps prend le traitement de ma demande ?',
     reponse:
-      "Le délai dépend de l'option choisie au moment du dépôt (traitement standard, 24h ou même jour). Ces délais sont indiqués sur la page Services consulaires.",
+      "Le délai dépend de l'option choisie (traitement standard, 24h ou même jour). Ces délais sont indiqués sur la page Services consulaires.",
   },
   {
-    question: 'Comment suivre ma demande une fois déposée ?',
+    question: 'Puis-je déposer ma demande en ligne ?',
     reponse:
-      "Une fois connecté à l'espace consulaire, votre demande apparaît avec son statut à jour (en cours, validée, prête au retrait, etc.).",
+      "Pas pour le moment : le dépôt des demandes en ligne n'est pas encore ouvert. Consultez la page Services consulaires pour connaître les pièces à fournir, puis contactez le Consulat.",
   },
   {
     question: "Je n'ai pas reçu mon email de vérification, que faire ?",

@@ -69,7 +69,7 @@ export function Navbar() {
       name: 'Diaspora',
       children: [
         { name: 'Congo-Bénin', path: '/congo-benin' },
-        { name: 'Communaute', path: '/diaspora' },
+        { name: 'Communauté', path: '/communaute' },
         { name: 'Culture & Patrimoine', path: '/culture' },
       ],
     },

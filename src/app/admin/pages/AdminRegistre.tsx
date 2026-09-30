@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, Phone, Mail, MapPin, BadgeCheck, Pencil, Save } from 'lucide-react';
-import { api, ApiError, downloadFile } from '../../../lib/api';
+import { api, ApiError, downloadFile, openFile } from '../../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
@@ -31,6 +31,14 @@ import {
 } from '../../components/ui/dialog';
 import { toast } from 'sonner';
 import type { Ressortissant, StatutRessortissant } from '../types';
+
+const TYPE_PIECE_LABEL: Record<string, string> = {
+  passeport: 'Passeport',
+  cni: "Carte nationale d'identité",
+  cip_etranger: 'CIP Étranger',
+  carte_consulaire: 'Carte consulaire',
+  autre: 'Autre',
+};
 
 interface Meta {
   total: number;
@@ -402,8 +410,33 @@ export function AdminRegistre() {
                 {viewing.nationalite && <div className="text-slate-500">Nationalité : <span className="text-slate-800">{viewing.nationalite}</span></div>}
                 {viewing.date_naissance && <div className="text-slate-500">Né(e) le : <span className="text-slate-800">{viewing.date_naissance}</span></div>}
                 {viewing.type_piece && (
+                  <div className="text-slate-500 col-span-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span>
+                      Pièce : <span className="text-slate-800">{TYPE_PIECE_LABEL[viewing.type_piece] ?? viewing.type_piece} {viewing.numero_piece}</span>
+                    </span>
+                    {viewing.piece_fichier_disponible && (
+                      <button
+                        type="button"
+                        className="text-brand-green-600 font-medium hover:underline"
+                        onClick={() =>
+                          openFile(`/v1/admin/ressortissants/${viewing.id}/piece`).catch((err) =>
+                            toast.error(err instanceof ApiError ? err.message : "Impossible d'ouvrir la pièce.")
+                          )
+                        }
+                      >
+                        Voir la pièce jointe
+                      </button>
+                    )}
+                  </div>
+                )}
+                {typeof viewing.possede_carte_consulaire === 'boolean' && (
                   <div className="text-slate-500 col-span-2">
-                    Pièce : <span className="text-slate-800">{viewing.type_piece} {viewing.numero_piece}</span>
+                    Carte consulaire :{' '}
+                    <span className="text-slate-800">
+                      {viewing.possede_carte_consulaire
+                        ? `Oui${viewing.numero_carte_consulaire ? ` (n° ${viewing.numero_carte_consulaire})` : ''}`
+                        : 'Non'}
+                    </span>
                   </div>
                 )}
               </div>

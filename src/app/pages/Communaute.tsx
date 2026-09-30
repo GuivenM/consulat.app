@@ -2,15 +2,16 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Users, HeartHandshake, Globe2, ArrowRight } from 'lucide-react';
+import { RealisationsGrid } from '../components/RealisationsGrid';
 
-export function Diaspora() {
+export function Communaute() {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
       <div className="bg-slate-900 pt-32 pb-20 rounded-b-[3rem] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-green-900/50 to-slate-900/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Diaspora</h1>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">Communauté</h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
             La communauté congolaise au Bénin : sa vie associative, ses solidarités, et les liens qu'elle entretient
             avec la République du Congo.
@@ -53,6 +54,13 @@ export function Diaspora() {
             </motion.div>
           ))}
         </div>
+
+        {/* Réalisations de la communauté (gérées depuis l'admin) */}
+        <RealisationsGrid
+          rubrique="communaute"
+          titre="Réalisations de la communauté"
+          intro="Les initiatives et projets portés par la communauté congolaise au Bénin."
+        />
 
         {/* CTA registre */}
         <div className="max-w-4xl mx-auto text-center mb-20">

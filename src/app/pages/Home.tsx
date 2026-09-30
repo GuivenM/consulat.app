@@ -36,8 +36,8 @@ const axes = [
     bg: "bg-brand-gold-50"
   },
   {
-    title: "Diaspora",
-    to: "/diaspora",
+    title: "Communauté",
+    to: "/communaute",
     icon: <GraduationCap className="w-8 h-8" />,
     desc: "Vie de la communauté congolaise au Bénin et ses talents.",
     color: "from-brand-red-400 to-brand-red-600",
@@ -62,10 +62,10 @@ const besoins = [
     to: "/guide",
   },
   {
-    title: "Je dépose ou je suis une demande",
-    desc: "Carte consulaire, laissez-passer : dépôt et suivi de mon dossier.",
+    title: "Je prépare une démarche",
+    desc: "Carte consulaire, laissez-passer : pièces à fournir, tarifs et délais.",
     icon: <FileText className="w-6 h-6" />,
-    to: "/espace-consulaire/login",
+    to: "/services",
   },
   {
     title: "Je veux investir ou proposer un partenariat",
@@ -528,7 +528,7 @@ export function Home() {
               Besoin d'un service consulaire ?
             </h2>
             <p className="text-xl text-brand-green-100 mb-12 max-w-2xl mx-auto font-light">
-              Inscrivez-vous au registre consulaire pour déposer une demande de carte consulaire ou de laissez-passer, et suivre son avancement.
+              Consultez les pièces à fournir pour la carte consulaire et le laissez-passer, et inscrivez-vous au registre consulaire pour rester joignable par le Consulat.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

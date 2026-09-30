@@ -30,7 +30,7 @@ interface RessortissantAuthContextValue {
   ressortissant: RessortissantUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  inscrire: (donnees: Record<string, unknown>) => Promise<string>;
+  inscrire: (donnees: Record<string, unknown> | FormData) => Promise<string>;
   verifierEmail: (token: string) => Promise<void>;
   renvoyerVerification: (email: string) => Promise<string>;
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
@@ -66,8 +66,12 @@ export function RessortissantAuthProvider({ children }: { children: React.ReactN
     loadMe();
   }, [loadMe]);
 
-  const inscrire = useCallback(async (donnees: Record<string, unknown>) => {
-    const data = await ressortissantApi.post<{ message: string }>('/v1/ressortissant/auth/inscrire', donnees);
+  const inscrire = useCallback(async (donnees: Record<string, unknown> | FormData) => {
+    // FormData : l'inscription joint la pièce d'identité (multipart).
+    const data =
+      donnees instanceof FormData
+        ? await ressortissantApi.postForm<{ message: string }>('/v1/ressortissant/auth/inscrire', donnees)
+        : await ressortissantApi.post<{ message: string }>('/v1/ressortissant/auth/inscrire', donnees);
     return data.message;
   }, []);
 
