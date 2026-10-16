@@ -47,7 +47,7 @@ export function Footer() {
             <div className="flex gap-4">
               {/* TODO : remplacer par les vrais comptes sociaux du consulat une fois connus */}
               {[
-                { Icon: Facebook, href: null, label: 'Facebook (bientôt)' },
+                { Icon: Facebook, href: 'https://www.facebook.com/ConsulatHonoraireduCongoBrazzavilleAuBenin', label: 'Facebook' },
                 { Icon: Instagram, href: null, label: 'Instagram (bientôt)' },
                 { Icon: Youtube, href: null, label: 'YouTube (bientôt)' },
               ].map(({ Icon, href, label }, i) =>
@@ -84,8 +84,13 @@ export function Footer() {
                 { label: 'Accueil', to: '/' },
                 { label: 'Le Consulat', to: '/about' },
                 { label: 'Nos Actions', to: '/actions' },
+                { label: 'Services consulaires', to: '/services' },
                 { label: 'Guide', to: '/guide' },
+                { label: 'Communauté', to: '/communaute' },
+                { label: 'Culture & Patrimoine', to: '/culture' },
                 { label: 'Actualités', to: '/news' },
+                { label: 'Contact', to: '/contact' },
+                { label: 'Questions fréquentes', to: '/faq' },
               ].map(({ label, to }, i) => (
                 <li key={i}>
                   <Link to={to} className="hover:text-brand-green-500 transition-colors flex items-center gap-2 group">
@@ -101,10 +106,10 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h3 className="text-white font-bold mb-6">Légal</h3>
             <ul className="space-y-4">
-              {[
+              {([
                 { label: 'Mentions légales', to: '/mentions-legales' },
                 { label: 'Politique de confidentialité', to: '/confidentialite' },
-              ].map(({ label, to, external }, i) => (
+              ] as { label: string; to: string; external?: boolean }[]).map(({ label, to, external }, i) => (
                 <li key={i}>
                   {external ? (
                     <a href={to} target="_blank" rel="noopener noreferrer" className="hover:text-brand-green-500 transition-colors">
