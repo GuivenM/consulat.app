@@ -42,6 +42,8 @@ const OBJET_LABELS: Record<ObjetMessage, string> = {
   partenariat: 'Demande de partenariat',
   service_consulaire: 'Question sur une démarche',
   urgence: 'Urgence communautaire',
+  audience: "Demande d'audience",
+  sos: 'SOS - demande d\'aide',
   information: "Demande d'information",
   reclamation: 'Réclamation',
   autre: 'Autre',
@@ -104,7 +106,8 @@ export function AdminMessages() {
       list = list.filter(
         (m) =>
           `${m.prenom} ${m.nom}`.toLowerCase().includes(q) ||
-          m.email.toLowerCase().includes(q) ||
+          (m.email ?? '').toLowerCase().includes(q) ||
+          m.telephone.toLowerCase().includes(q) ||
           m.message.toLowerCase().includes(q)
       );
     }
@@ -150,6 +153,23 @@ export function AdminMessages() {
       setReponse('');
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Erreur lors de l'envoi.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  // Message sans e-mail (ex. SOS) : pas de réponse écrite possible, on
+  // enregistre simplement qu'il a été traité (rappel téléphonique).
+  async function marquerTraite() {
+    if (!selected) return;
+    setSending(true);
+    try {
+      const updated = await api.put<Message>(`/v1/messages/${selected.id}`, { statut: 'repondu' });
+      setMessages((prev) => prev?.map((x) => (x.id === updated.id ? updated : x)) ?? null);
+      setSelected(updated);
+      toast.success('Message marqué comme traité.');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Erreur lors de la mise à jour.');
     } finally {
       setSending(false);
     }
@@ -248,10 +268,16 @@ export function AdminMessages() {
                     <div className="font-medium text-slate-900">
                       {m.prenom} {m.nom}
                     </div>
-                    <div className="text-xs text-slate-400">{m.email}</div>
+                    <div className="text-xs text-slate-400">{m.email ?? m.telephone}</div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-slate-600">
-                    {OBJET_LABELS[m.objet]}
+                    {m.objet === 'sos' ? (
+                      <Badge variant="outline" className="bg-brand-red-50 text-brand-red-600 border-brand-red-200 font-semibold">
+                        {OBJET_LABELS[m.objet]}
+                      </Badge>
+                    ) : (
+                      OBJET_LABELS[m.objet]
+                    )}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-slate-500 text-sm">
                     {new Date(m.created_at).toLocaleString('fr-FR')}
@@ -306,13 +332,52 @@ export function AdminMessages() {
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
                   <div>
                     <p className="text-slate-400 text-xs">Email</p>
-                    <p className="text-slate-700">{selected.email}</p>
+                    <p className="text-slate-700">{selected.email ?? 'Non renseigné'}</p>
                   </div>
                   <div>
                     <p className="text-slate-400 text-xs">Téléphone</p>
                     <p className="text-slate-700">{selected.telephone}</p>
                   </div>
                 </dl>
+
+                {(selected.date_souhaitee || selected.type_aide || selected.localisation) && (
+                  <div
+                    className={`rounded-xl p-3 space-y-2 ${selected.objet === 'sos' ? 'bg-brand-red-50' : 'bg-slate-50'}`}
+                  >
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+                      {selected.date_souhaitee && (
+                        <div>
+                          <p className="text-slate-400 text-xs">Date souhaitée</p>
+                          <p className="text-slate-700">
+                            {new Date(selected.date_souhaitee).toLocaleDateString('fr-FR', { dateStyle: 'long' })}
+                          </p>
+                        </div>
+                      )}
+                      {selected.type_aide && (
+                        <div className="col-span-2">
+                          <p className="text-slate-400 text-xs">Type d'aide</p>
+                          <p className="text-slate-700 font-medium">{selected.type_aide_label}</p>
+                        </div>
+                      )}
+                      {selected.localisation && (
+                        <div className="col-span-2">
+                          <p className="text-slate-400 text-xs">Localisation indiquée</p>
+                          <p className="text-slate-700">{selected.localisation}</p>
+                          {selected.latitude !== null && selected.longitude !== null && (
+                            <a
+                              href={`https://www.google.com/maps?q=${selected.latitude},${selected.longitude}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-brand-green-700 hover:underline text-sm"
+                            >
+                              Voir la position GPS sur la carte
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                )}
 
                 {selected.objet === 'partenariat' && selected.organisation && (
                   <div className="bg-slate-50 rounded-xl p-3 space-y-2">
@@ -394,7 +459,13 @@ export function AdminMessages() {
                   </div>
                 )}
 
-                {canReply && selected.statut !== 'repondu' && (
+                {canReply && selected.statut !== 'repondu' && !selected.email && (
+                  <p className="text-sm text-slate-500 bg-slate-50 rounded-xl p-3">
+                    Aucun e-mail n'a été fourni : rappelez la personne au {selected.telephone}, puis marquez le message comme traité.
+                  </p>
+                )}
+
+                {canReply && selected.statut !== 'repondu' && !!selected.email && (
                   <div className="pt-2">
                     <Textarea
                       value={reponse}
@@ -406,7 +477,15 @@ export function AdminMessages() {
                 )}
               </div>
 
-              {canReply && selected.statut !== 'repondu' && (
+              {canReply && selected.statut !== 'repondu' && !selected.email && (
+                <DialogFooter>
+                  <Button disabled={sending} onClick={marquerTraite} className="bg-brand-green-600 hover:bg-brand-green-700">
+                    <CheckCircle2 className="w-4 h-4" /> Marquer comme traité
+                  </Button>
+                </DialogFooter>
+              )}
+
+              {canReply && selected.statut !== 'repondu' && !!selected.email && (
                 <DialogFooter>
                   <Button
                     disabled={sending || !reponse.trim()}

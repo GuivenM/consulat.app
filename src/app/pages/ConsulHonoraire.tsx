@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Users, Handshake, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Users, Handshake, ShieldCheck, ArrowRight, CalendarCheck } from 'lucide-react';
+import { AudienceRequestForm } from '../components/AudienceRequestForm';
 
 // Portrait et biographie détaillée à compléter avec les éléments validés par
 // le Consulat (parcours, date de nomination, etc.) — non inventés ici.
@@ -25,6 +26,13 @@ export function ConsulHonoraire() {
             Représentant de la République du Congo au Bénin, au service de la communauté congolaise et des
             relations bilatérales entre les deux pays.
           </p>
+          <a
+            href="#audience"
+            className="inline-flex items-center gap-2 mt-8 bg-brand-green-600 text-white font-bold px-8 py-4 rounded-2xl hover:bg-brand-green-700 transition-colors"
+          >
+            <CalendarCheck className="w-5 h-5" />
+            Demander une audience
+          </a>
         </div>
       </div>
 
@@ -99,6 +107,9 @@ export function ConsulHonoraire() {
             </motion.div>
           ))}
         </div>
+
+        {/* Demande d'audience */}
+        <AudienceRequestForm />
 
         {/* CTA */}
         <div className="max-w-3xl mx-auto text-center border-t border-slate-100 pt-16">

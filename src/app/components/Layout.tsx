@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { SosButton } from './SosButton';
 import { Outlet } from 'react-router-dom';
 
 export function Layout() {
@@ -11,6 +12,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <SosButton />
     </div>
   );
 }

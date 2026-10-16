@@ -316,11 +316,15 @@ export interface Membre {
   created_at: string;
   updated_at: string;
 }
+export type StatutMessage = 'non_lu' | 'lu' | 'repondu';
+
 export type ObjetMessage =
   | 'question'
   | 'partenariat'
   | 'service_consulaire'
   | 'urgence'
+  | 'audience'
+  | 'sos'
   | 'information'
   | 'reclamation'
   | 'autre';
@@ -329,10 +333,16 @@ export interface Message {
   id: number;
   nom: string;
   prenom: string;
-  email: string;
+  email: string | null;
   telephone: string;
   objet: ObjetMessage;
   message: string;
+  date_souhaitee: string | null;
+  type_aide: string | null;
+  type_aide_label: string | null;
+  localisation: string | null;
+  latitude: number | null;
+  longitude: number | null;
   organisation: string | null;
   type_organisation: TypePartenaire | null;
   secteur_activite: string | null;
