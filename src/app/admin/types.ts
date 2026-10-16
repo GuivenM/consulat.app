@@ -343,6 +343,11 @@ export interface Message {
   localisation: string | null;
   latitude: number | null;
   longitude: number | null;
+  piece_type: string | null;
+  piece_type_label: string | null;
+  piece_numero: string | null;
+  piece_fichier_disponible: boolean;
+  piece_fichier_nom: string | null;
   organisation: string | null;
   type_organisation: TypePartenaire | null;
   secteur_activite: string | null;

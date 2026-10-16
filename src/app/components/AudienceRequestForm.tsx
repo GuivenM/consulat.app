@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { CalendarCheck, CheckCircle2, Loader2, Send } from 'lucide-react';
+import { CalendarCheck, CheckCircle2, FileText, Loader2, Send, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, ApiError } from '../../lib/api';
+import { compressImage } from '../../lib/compressImage';
 
 const CHAMP =
   'w-full px-5 py-3.5 rounded-xl border border-transparent bg-white focus:ring-2 focus:ring-brand-green-500 transition-all outline-none';
 
-const VIDE = { prenom: '', nom: '', email: '', telephone: '', date_souhaitee: '', message: '' };
+const VIDE = {
+  prenom: '', nom: '', email: '', telephone: '', date_souhaitee: '', message: '',
+  piece_type: '', piece_numero: '',
+};
+
+const TYPES_PIECE = [
+  { value: 'passeport', label: 'Passeport' },
+  { value: 'cni', label: "Carte nationale d'identité" },
+  { value: 'cip_etranger', label: 'CIP Étranger' },
+];
+
+const TAILLE_MAX_PIECE = 5 * 1024 * 1024; // 5 Mo, aligné sur la validation API
 
 // Demande d'audience auprès du Consul Honoraire. Passe par le circuit des
 // messages (objet « audience ») : le Consulat répond par e-mail pour fixer
@@ -17,20 +29,44 @@ export function AudienceRequestForm() {
   const [loading, setLoading] = useState(false);
   const [envoye, setEnvoye] = useState(false);
   const [erreurs, setErreurs] = useState<Record<string, string[]>>({});
+  const [pieceFichier, setPieceFichier] = useState<File | null>(null);
 
   const set = (k: keyof typeof VIDE, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const aujourdhui = new Date().toISOString().slice(0, 10);
 
+  async function choisirPiece(file: File | undefined) {
+    if (!file) return;
+    const fichier = file.type.startsWith('image/') ? await compressImage(file) : file;
+    if (fichier.size > TAILLE_MAX_PIECE) {
+      setErreurs((er) => ({ ...er, piece_fichier: ['La pièce ne doit pas dépasser 5 Mo.'] }));
+      return;
+    }
+    setErreurs((er) => {
+      const { piece_fichier: _ignore, ...reste } = er;
+      return reste;
+    });
+    setPieceFichier(fichier);
+  }
+
   async function envoyer(e: React.FormEvent) {
     e.preventDefault();
+    if (!pieceFichier) {
+      setErreurs({ piece_fichier: ["Joignez la copie de votre pièce d'identité (PDF ou image)."] });
+      return;
+    }
     setLoading(true);
     setErreurs({});
     try {
-      const payload: Record<string, string> = { ...form, objet: 'audience' };
-      if (!payload.date_souhaitee) delete payload.date_souhaitee;
-      await api.post('/v1/messages', payload);
+      // Multipart : la pièce d'identité est jointe à la demande.
+      const fd = new FormData();
+      Object.entries({ ...form, objet: 'audience' }).forEach(([k, v]) => {
+        if (v !== '') fd.append(k, v);
+      });
+      fd.append('piece_fichier', pieceFichier, pieceFichier.name);
+      await api.postForm('/v1/messages', fd);
       setEnvoye(true);
       setForm(VIDE);
+      setPieceFichier(null);
     } catch (err) {
       if (err instanceof ApiError && err.errors) setErreurs(err.errors);
       toast.error(err instanceof ApiError ? err.message : "Impossible d'envoyer la demande pour l'instant.");
@@ -96,6 +132,42 @@ export function AudienceRequestForm() {
                 <input required className={CHAMP} placeholder="+229 00 00 00 00" value={form.telephone} onChange={(e) => set('telephone', e.target.value)} />
                 {erreur('telephone')}
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="text-sm font-bold text-slate-900 ml-1">Pièce d'identité</label>
+                <select required className={CHAMP} value={form.piece_type} onChange={(e) => set('piece_type', e.target.value)}>
+                  <option value="">Type de pièce…</option>
+                  {TYPES_PIECE.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+                {erreur('piece_type')}
+              </div>
+              <div>
+                <label className="text-sm font-bold text-slate-900 ml-1">N° de la pièce</label>
+                <input className={CHAMP} value={form.piece_numero} onChange={(e) => set('piece_numero', e.target.value)} />
+                {erreur('piece_numero')}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-slate-900 ml-1">Copie de la pièce (PDF ou image, 5 Mo max)</label>
+              <label className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 cursor-pointer hover:bg-slate-100 transition-colors">
+                {pieceFichier ? <FileText className="w-4 h-4 text-brand-green-600 shrink-0" /> : <Upload className="w-4 h-4 text-slate-400 shrink-0" />}
+                <span className="text-sm text-slate-600 truncate">{pieceFichier ? pieceFichier.name : 'Choisir un fichier'}</span>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  className="hidden"
+                  onChange={(e) => choisirPiece(e.target.files?.[0])}
+                />
+              </label>
+              {erreur('piece_fichier')}
+              <p className="text-xs text-slate-400 mt-1 ml-1">
+                Cette pièce sert uniquement à identifier le demandeur ; elle n'est consultable que par le Consulat.
+              </p>
             </div>
 
             <div>

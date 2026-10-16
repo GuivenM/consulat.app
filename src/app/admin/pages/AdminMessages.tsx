@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Loader2, Trash2, Eye, Send, Search, ArrowUp, ArrowDown, ArrowUpDown, UserPlus, CheckCircle2 } from 'lucide-react';
-import { api, ApiError } from '../../../lib/api';
+import { api, ApiError, openFile } from '../../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import type { Message, StatutMessage, ObjetMessage, Partenaire } from '../types';
 import { Button } from '../../components/ui/button';
@@ -340,7 +340,7 @@ export function AdminMessages() {
                   </div>
                 </dl>
 
-                {(selected.date_souhaitee || selected.type_aide || selected.localisation) && (
+                {(selected.date_souhaitee || selected.type_aide || selected.localisation || selected.piece_type) && (
                   <div
                     className={`rounded-xl p-3 space-y-2 ${selected.objet === 'sos' ? 'bg-brand-red-50' : 'bg-slate-50'}`}
                   >
@@ -351,6 +351,27 @@ export function AdminMessages() {
                           <p className="text-slate-700">
                             {new Date(selected.date_souhaitee).toLocaleDateString('fr-FR', { dateStyle: 'long' })}
                           </p>
+                        </div>
+                      )}
+                      {selected.piece_type && (
+                        <div className="col-span-2">
+                          <p className="text-slate-400 text-xs">Pièce d'identité</p>
+                          <p className="text-slate-700">
+                            {selected.piece_type_label} {selected.piece_numero}
+                          </p>
+                          {selected.piece_fichier_disponible && (
+                            <button
+                              type="button"
+                              className="text-brand-green-700 hover:underline text-sm"
+                              onClick={() =>
+                                openFile(`/v1/messages/${selected.id}/piece`).catch((err) =>
+                                  toast.error(err instanceof ApiError ? err.message : "Impossible d'ouvrir la pièce.")
+                                )
+                              }
+                            >
+                              Voir la pièce jointe
+                            </button>
+                          )}
                         </div>
                       )}
                       {selected.type_aide && (
