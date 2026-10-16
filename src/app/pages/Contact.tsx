@@ -59,12 +59,11 @@ export function Contact() {
               Que vous ayez une question sur nos services consulaires, souhaitiez devenir partenaire ou simplement nous contacter, notre équipe est à votre écoute.
             </p>
 
-            {/* TODO : coordonnées à remplacer par celles, réelles, du consulat (adresse, email, téléphone) */}
             <div className="space-y-8 mb-12">
               {[
-                { icon: <MapPin />, title: "Adresse", desc: "Cotonou, Bénin" },
-                { icon: <Mail />, title: "Email", desc: "contact@consulat-congo-benin.org" },
-                { icon: <Phone />, title: "Téléphone", desc: "+229 00 00 00 00" }
+                { icon: <MapPin />, title: "Adresse", desc: "lot 654-655 JERICHO, Cotonou, Bénin" },
+                { icon: <Mail />, title: "Email", desc: "contact@consulatcongo-benin.com" },
+                { icon: <Phone />, title: "Téléphone", desc: "+229 01 66 24 62 68" }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-6">
                   <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-900">
