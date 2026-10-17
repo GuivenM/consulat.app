@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, Settings, Plus, Trash2, Pencil, Check, X as XIcon, FileStack, Wallet } from 'lucide-react';
+import { Loader2, Settings, Plus, Trash2, Pencil, Check, X as XIcon, FileStack, Wallet, ListChecks } from 'lucide-react';
 import { api, ApiError } from '../../../lib/api';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { Badge } from '../../components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
@@ -31,14 +32,11 @@ import {
 } from '../../components/ui/dialog';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
-import type { Tarif, DocumentTypeRequis, DelaiDemande } from '../types';
+import type { Tarif, DocumentTypeRequis, DelaiDemande, ServiceConsulaire } from '../types';
 
-// Les deux types connus du cahier des charges — le champ reste un texte libre
-// côté API pour absorber de futurs types sans migration.
-const TYPES_DEMANDE = [
-  { value: 'carte_consulaire', label: 'Carte consulaire' },
-  { value: 'laissez_passer', label: 'Laissez-passer' },
-];
+// Un « type » de demande correspond à un service créé dans l'onglet Services
+// (value = code du service, label = son nom).
+type TypeOption = { value: string; label: string };
 
 const DELAI_LABEL: Record<DelaiDemande, string> = {
   '3_jours': '3 jours',
@@ -49,15 +47,33 @@ const DELAI_LABEL: Record<DelaiDemande, string> = {
 export function AdminConfiguration() {
   const { hasRole } = useAuth();
   const canWrite = hasRole('super_admin', 'admin');
+  const [services, setServices] = useState<ServiceConsulaire[] | null>(null);
+
+  async function chargerServices() {
+    try {
+      setServices(await api.get<ServiceConsulaire[]>('/v1/admin/services'));
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Impossible de charger les services.');
+      setServices((prev) => prev ?? []);
+    }
+  }
+
+  useEffect(() => { chargerServices(); }, []);
+
+  if (services === null) {
+    return <div className="flex justify-center py-20 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
+
+  const types: TypeOption[] = services.map((s) => ({ value: s.code, label: s.nom }));
 
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <Settings className="w-6 h-6 text-slate-400" /> Configuration des demandes
+          <Settings className="w-6 h-6 text-slate-400" /> Configuration des services
         </h1>
         <p className="text-slate-500 text-sm mt-1">
-          Tarifs et pièces à fournir par type de demande — modifiables ici sans déploiement.
+          Services proposés, tarifs et pièces à fournir — modifiables ici sans déploiement.
         </p>
       </div>
 
@@ -65,12 +81,16 @@ export function AdminConfiguration() {
         <TabsList>
           <TabsTrigger value="tarifs"><Wallet className="w-4 h-4 mr-1.5" /> Tarifs</TabsTrigger>
           <TabsTrigger value="documents"><FileStack className="w-4 h-4 mr-1.5" /> Pièces requises</TabsTrigger>
+          <TabsTrigger value="services"><ListChecks className="w-4 h-4 mr-1.5" /> Services</TabsTrigger>
         </TabsList>
         <TabsContent value="tarifs" className="mt-6">
-          <OngletTarifs canWrite={canWrite} />
+          <OngletTarifs canWrite={canWrite} types={types} />
         </TabsContent>
         <TabsContent value="documents" className="mt-6">
-          <OngletDocuments canWrite={canWrite} />
+          <OngletDocuments canWrite={canWrite} types={types} />
+        </TabsContent>
+        <TabsContent value="services" className="mt-6">
+          <OngletServices canWrite={canWrite} services={services} onChange={chargerServices} />
         </TabsContent>
       </Tabs>
     </div>
@@ -79,12 +99,12 @@ export function AdminConfiguration() {
 
 // ===================== Onglet Tarifs =====================
 
-function OngletTarifs({ canWrite }: { canWrite: boolean }) {
+function OngletTarifs({ canWrite, types }: { canWrite: boolean; types: TypeOption[] }) {
   const [tarifs, setTarifs] = useState<Tarif[] | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [montantEdit, setMontantEdit] = useState('');
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ type_demande: TYPES_DEMANDE[0].value, delai: '3_jours' as DelaiDemande, montant: '' });
+  const [form, setForm] = useState({ type_demande: types[0]?.value ?? '', delai: '3_jours' as DelaiDemande, montant: '' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => { load(); }, []);
@@ -153,7 +173,7 @@ function OngletTarifs({ canWrite }: { canWrite: boolean }) {
       });
       setTarifs((prev) => [...(prev ?? []), created]);
       setCreating(false);
-      setForm({ type_demande: TYPES_DEMANDE[0].value, delai: '3_jours', montant: '' });
+      setForm({ type_demande: types[0]?.value ?? '', delai: '3_jours', montant: '' });
       toast.success('Tarif ajouté.');
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Échec de l'ajout.");
@@ -182,7 +202,7 @@ function OngletTarifs({ canWrite }: { canWrite: boolean }) {
           {tarifs.map((t) => (
             <TableRow key={t.id}>
               <TableCell className="font-medium text-slate-800">
-                {TYPES_DEMANDE.find((x) => x.value === t.type_demande)?.label ?? t.type_demande}
+                {types.find((x) => x.value === t.type_demande)?.label ?? t.type_demande}
               </TableCell>
               <TableCell>{DELAI_LABEL[t.delai]}</TableCell>
               <TableCell>
@@ -232,7 +252,7 @@ function OngletTarifs({ canWrite }: { canWrite: boolean }) {
                 <Select value={form.type_demande} onValueChange={(v) => setForm((f) => ({ ...f, type_demande: v }))}>
                   <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                    {types.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -263,11 +283,11 @@ function OngletTarifs({ canWrite }: { canWrite: boolean }) {
 
 // ===================== Onglet Documents requis =====================
 
-const EMPTY_DOC_FORM = { type_demande: TYPES_DEMANDE[0].value, code_document: '', label: '', obligatoire: true };
+const EMPTY_DOC_FORM = { type_demande: '', code_document: '', label: '', obligatoire: true };
 
-function OngletDocuments({ canWrite }: { canWrite: boolean }) {
+function OngletDocuments({ canWrite, types }: { canWrite: boolean; types: TypeOption[] }) {
   const [documents, setDocuments] = useState<DocumentTypeRequis[] | null>(null);
-  const [typeFiltre, setTypeFiltre] = useState(TYPES_DEMANDE[0].value);
+  const [typeFiltre, setTypeFiltre] = useState(types[0]?.value ?? '');
   const [editing, setEditing] = useState<DocumentTypeRequis | 'new' | null>(null);
   const [form, setForm] = useState(EMPTY_DOC_FORM);
   const [saving, setSaving] = useState(false);
@@ -352,7 +372,7 @@ function OngletDocuments({ canWrite }: { canWrite: boolean }) {
         <Select value={typeFiltre} onValueChange={setTypeFiltre}>
           <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
           <SelectContent>
-            {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+            {types.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
           </SelectContent>
         </Select>
         {canWrite && (
@@ -402,7 +422,7 @@ function OngletDocuments({ canWrite }: { canWrite: boolean }) {
                   <Select value={form.type_demande} onValueChange={(v) => setForm((f) => ({ ...f, type_demande: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {TYPES_DEMANDE.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                      {types.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -425,6 +445,181 @@ function OngletDocuments({ canWrite }: { canWrite: boolean }) {
             <Button variant="ghost" onClick={() => setEditing(null)}>Annuler</Button>
             <Button onClick={enregistrer} disabled={saving}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+
+// ===================== Onglet Services =====================
+
+const EMPTY_SERVICE_FORM = { nom: '', description: '', ordre: '' };
+
+function OngletServices({
+  canWrite,
+  services,
+  onChange,
+}: {
+  canWrite: boolean;
+  services: ServiceConsulaire[];
+  onChange: () => Promise<void>;
+}) {
+  const [editing, setEditing] = useState<ServiceConsulaire | 'new' | null>(null);
+  const [form, setForm] = useState(EMPTY_SERVICE_FORM);
+  const [saving, setSaving] = useState(false);
+
+  function ouvrirCreation() {
+    setForm(EMPTY_SERVICE_FORM);
+    setEditing('new');
+  }
+
+  function ouvrirEdition(s: ServiceConsulaire) {
+    setForm({ nom: s.nom, description: s.description ?? '', ordre: String(s.ordre) });
+    setEditing(s);
+  }
+
+  async function enregistrer() {
+    if (!form.nom.trim()) {
+      toast.error('Le nom du service est requis.');
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload: Record<string, unknown> = { nom: form.nom.trim(), description: form.description.trim() || null };
+      if (form.ordre !== '') payload.ordre = Number(form.ordre);
+
+      if (editing === 'new') {
+        await api.post('/v1/admin/services', payload);
+        toast.success('Service ajouté. Ajoutez maintenant ses tarifs et ses pièces requises.');
+      } else if (editing) {
+        await api.put(`/v1/admin/services/${editing.id}`, payload);
+        toast.success('Service mis à jour.');
+      }
+      setEditing(null);
+      await onChange();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Échec de l'enregistrement.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleActif(s: ServiceConsulaire) {
+    try {
+      await api.put(`/v1/admin/services/${s.id}`, { est_actif: !s.est_actif });
+      await onChange();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Échec de la mise à jour.');
+    }
+  }
+
+  async function supprimer(s: ServiceConsulaire) {
+    if (!confirm(`Supprimer le service « ${s.nom} » avec ses ${s.nb_tarifs} tarif(s) et ses ${s.nb_pieces} pièce(s) requise(s) ?`)) return;
+    try {
+      await api.delete(`/v1/admin/services/${s.id}`);
+      toast.success('Service supprimé.');
+      await onChange();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Échec de la suppression.');
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4 gap-4">
+        <p className="text-sm text-slate-500">
+          Les services actifs s'affichent sur la page publique « Services consulaires », avec leurs tarifs et pièces à fournir.
+        </p>
+        {canWrite && (
+          <Button onClick={ouvrirCreation} className="bg-brand-green-600 hover:bg-brand-green-700 shrink-0">
+            <Plus className="w-4 h-4 mr-2" /> Ajouter un service
+          </Button>
+        )}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Service</TableHead>
+              <TableHead>Tarifs</TableHead>
+              <TableHead>Pièces</TableHead>
+              <TableHead>Actif</TableHead>
+              {canWrite && <TableHead className="text-right">Actions</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {services.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={canWrite ? 5 : 4} className="text-center text-slate-400 py-8">
+                  Aucun service pour l'instant.
+                </TableCell>
+              </TableRow>
+            ) : (
+              services.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell>
+                    <div className="font-medium text-slate-800">{s.nom}</div>
+                    <div className="text-xs text-slate-400">{s.code}</div>
+                    {s.description && <p className="text-sm text-slate-500 mt-1 line-clamp-2">{s.description}</p>}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{s.nb_tarifs}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{s.nb_pieces}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Switch checked={s.est_actif} disabled={!canWrite} onCheckedChange={() => toggleActif(s)} />
+                  </TableCell>
+                  {canWrite && (
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="ghost" onClick={() => ouvrirEdition(s)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => supprimer(s)}>
+                        <Trash2 className="w-4 h-4 text-brand-red-500" />
+                      </Button>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editing === 'new' ? 'Ajouter un service' : 'Modifier le service'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="service-nom">Nom du service</Label>
+              <Input id="service-nom" value={form.nom} onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))} placeholder="Ex. Légalisation de documents" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="service-description">Description (affichée sur le site)</Label>
+              <Textarea id="service-description" rows={4} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="service-ordre">Ordre d'affichage (facultatif)</Label>
+              <Input id="service-ordre" type="number" min={0} value={form.ordre} onChange={(e) => setForm((f) => ({ ...f, ordre: e.target.value }))} />
+            </div>
+            {editing === 'new' && (
+              <p className="text-xs text-slate-500">
+                Une fois le service créé, ajoutez ses tarifs et ses pièces requises dans les onglets « Tarifs » et « Pièces requises ».
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button disabled={saving} onClick={enregistrer} className="bg-brand-green-600 hover:bg-brand-green-700">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {editing === 'new' ? 'Ajouter' : 'Enregistrer'}
             </Button>
           </DialogFooter>
         </DialogContent>

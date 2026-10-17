@@ -26,6 +26,8 @@ interface PieceRequise {
 
 interface ServicePublic {
   type_demande: string;
+  nom?: string;
+  description?: string | null;
   tarif: TarifFourchette | null;
   pieces_requises: PieceRequise[];
 }
@@ -102,11 +104,12 @@ export function Services() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 -mt-32 relative z-20">
           {services?.map((service, i) => {
-            const meta = LABELS_TYPE[service.type_demande] ?? {
-              titre: service.type_demande,
-              description: '',
-              icon: <FileText className="w-6 h-6" />,
-            };
+            // Nom et description viennent de l'espace admin ; LABELS_TYPE ne
+            // fournit plus que l'icône des services historiques.
+            const meta = LABELS_TYPE[service.type_demande];
+            const titre = service.nom ?? meta?.titre ?? service.type_demande;
+            const description = service.description ?? meta?.description ?? '';
+            const icon = meta?.icon ?? <FileText className="w-6 h-6" />;
 
             return (
               <motion.div
@@ -117,11 +120,11 @@ export function Services() {
                 className="bg-white border border-slate-100 rounded-3xl shadow-xl p-8 md:p-10 flex flex-col"
               >
                 <div className="w-14 h-14 rounded-2xl bg-brand-green-50 text-brand-green-600 flex items-center justify-center mb-6">
-                  {meta.icon}
+                  {icon}
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-3">{meta.titre}</h2>
-                {meta.description && (
-                  <p className="text-slate-500 mb-6 leading-relaxed">{meta.description}</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3">{titre}</h2>
+                {description && (
+                  <p className="text-slate-500 mb-6 leading-relaxed whitespace-pre-line">{description}</p>
                 )}
 
                 {service.tarif && (

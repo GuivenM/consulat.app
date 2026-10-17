@@ -421,6 +421,17 @@ export interface RessortissantDemandeResume {
 
 export type DelaiDemande = '3_jours' | '24h' | 'meme_jour';
 
+export interface ServiceConsulaire {
+  id: number;
+  code: string;
+  nom: string;
+  description: string | null;
+  ordre: number;
+  est_actif: boolean;
+  nb_tarifs: number;
+  nb_pieces: number;
+}
+
 export interface Tarif {
   id: number;
   entity_id: number;
