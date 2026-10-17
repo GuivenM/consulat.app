@@ -1,5 +1,5 @@
 export type TypeDemande = 'carte_consulaire' | 'laissez_passer';
-export type DelaiDemande = '3_jours' | '24h' | 'meme_jour';
+export type DelaiDemande = 'meme_jour' | '24h' | '3_jours' | '1_semaine' | '2_semaines';
 export type StatutDemande = 'recu' | 'en_traitement' | 'pret' | 'retire' | 'rejete';
 export type StatutDocument = 'en_attente' | 'valide' | 'rejete';
 

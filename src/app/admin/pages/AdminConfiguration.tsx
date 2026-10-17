@@ -38,11 +38,33 @@ import type { Tarif, DocumentTypeRequis, DelaiDemande, ServiceConsulaire } from 
 // (value = code du service, label = son nom).
 type TypeOption = { value: string; label: string };
 
+// Du plus rapide au plus long : cet ordre est celui du menu des délais et du
+// tableau des tarifs, quel que soit l'ordre de création (doit rester
+// identique à Tarif::DELAIS côté API).
 const DELAI_LABEL: Record<DelaiDemande, string> = {
-  '3_jours': '3 jours',
-  '24h': '24 heures',
   meme_jour: 'Le jour même',
+  '24h': '24 heures',
+  '3_jours': '3 jours',
+  '1_semaine': '1 semaine',
+  '2_semaines': '2 semaines',
 };
+
+const ORDRE_DELAIS = Object.keys(DELAI_LABEL);
+
+// Tarifs groupés par service (dans l'ordre des services), puis par délai.
+function trierTarifs(liste: Tarif[], types: TypeOption[]): Tarif[] {
+  const rangType = (code: string) => {
+    const i = types.findIndex((t) => t.value === code);
+    return i === -1 ? 999 : i;
+  };
+  const rangDelai = (d: string) => {
+    const i = ORDRE_DELAIS.indexOf(d);
+    return i === -1 ? 99 : i;
+  };
+  return [...liste].sort(
+    (a, b) => rangType(a.type_demande) - rangType(b.type_demande) || rangDelai(a.delai) - rangDelai(b.delai)
+  );
+}
 
 export function AdminConfiguration() {
   const { hasRole } = useAuth();
@@ -112,7 +134,7 @@ function OngletTarifs({ canWrite, types }: { canWrite: boolean; types: TypeOptio
   async function load() {
     try {
       const data = await api.get<Tarif[]>('/v1/admin/tarifs');
-      setTarifs(data);
+      setTarifs(trierTarifs(data, types));
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Impossible de charger les tarifs.');
     }
@@ -171,7 +193,7 @@ function OngletTarifs({ canWrite, types }: { canWrite: boolean; types: TypeOptio
         delai: form.delai,
         montant: Number(form.montant),
       });
-      setTarifs((prev) => [...(prev ?? []), created]);
+      setTarifs((prev) => trierTarifs([...(prev ?? []), created], types));
       setCreating(false);
       setForm({ type_demande: types[0]?.value ?? '', delai: '3_jours', montant: '' });
       toast.success('Tarif ajouté.');

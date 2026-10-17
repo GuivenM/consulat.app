@@ -419,7 +419,7 @@ export interface RessortissantDemandeResume {
 
 // ===== Configuration : tarifs & pièces requises =====
 
-export type DelaiDemande = '3_jours' | '24h' | 'meme_jour';
+export type DelaiDemande = 'meme_jour' | '24h' | '3_jours' | '1_semaine' | '2_semaines';
 
 export interface ServiceConsulaire {
   id: number;
