@@ -455,6 +455,19 @@ export interface QuartierAgregat {
   total: number;
 }
 
+// Ressortissants sans GPS, regroupés au centre de leur quartier (ou, à défaut,
+// de leur commune) : position approximative.
+export interface PositionApproximative {
+  ville: string;
+  quartier: string | null;
+  precision: 'quartier' | 'ville';
+  latitude: number;
+  longitude: number;
+  total: number;
+  par_statut: Partial<Record<StatutRessortissant, number>>;
+  quartiers: Record<string, number>;
+}
+
 export interface PointCarte {
   id: number;
   nom_complet: string;

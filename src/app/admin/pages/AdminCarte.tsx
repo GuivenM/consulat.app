@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2, Map as MapIcon } from 'lucide-react';
 import { api, ApiError } from '../../../lib/api';
 import { Badge } from '../../components/ui/badge';
-import type { PointCarte, QuartierAgregat, StatutRessortissant } from '../types';
+import type { PointCarte, PositionApproximative, QuartierAgregat, StatutRessortissant } from '../types';
 
 // Centre approximatif de Cotonou — le point de départ le plus utile tant que
 // la grande majorité des ressortissants inscrits y résident.
@@ -22,9 +22,15 @@ const STATUT_LABEL: Record<StatutRessortissant, string> = {
   suspendu: 'Suspendu',
 };
 
+// Couleurs des repères approximatifs (sans GPS) : bleu = centre du quartier,
+// ambre = centre de la commune (quartier inconnu ou non renseigné).
+const COULEUR_APPROX = { quartier: '#2563eb', ville: '#f59e0b' };
+
 interface CarteData {
   par_quartier: QuartierAgregat[];
   points: PointCarte[];
+  approximatifs?: PositionApproximative[];
+  sans_position?: number;
 }
 
 export function AdminCarte() {
@@ -40,7 +46,7 @@ export function AdminCarte() {
         // Pas de toast bloquant ici : la page reste utilisable vide plutôt
         // que de planter si la géolocalisation n'est pas encore renseignée.
         console.error(err instanceof ApiError ? err.message : err);
-        setData({ par_quartier: [], points: [] });
+        setData({ par_quartier: [], points: [], approximatifs: [], sans_position: 0 });
       }
     })();
   }, []);
@@ -60,6 +66,11 @@ export function AdminCarte() {
     [data, filtreVille]
   );
 
+  const approxAffiches = useMemo(
+    () => (data?.approximatifs ?? []).filter((p) => !filtreVille || p.ville === filtreVille),
+    [data, filtreVille]
+  );
+
   if (data === null) {
     return <div className="flex justify-center py-20 text-slate-400"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
@@ -72,15 +83,16 @@ export function AdminCarte() {
         </h1>
         <p className="text-slate-500 text-sm mt-1">
           Vue interne, non anonymisée — la vitrine publique n'affiche qu'une agrégation par ville.
+          Les ressortissants sans position GPS apparaissent au centre de leur quartier (position approximative).
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 overflow-hidden" style={{ height: 520 }}>
-          {pointsAffiches.length === 0 ? (
+          {pointsAffiches.length === 0 && approxAffiches.length === 0 ? (
             <div className="h-full flex items-center justify-center text-slate-400 text-sm text-center px-8">
-              Aucun ressortissant géolocalisé pour l'instant — les points apparaîtront ici dès que
-              des coordonnées seront renseignées au registre.
+              Aucun ressortissant à afficher pour l'instant — ils apparaîtront ici dès qu'une ville ou
+              une position sera renseignée au registre.
             </div>
           ) : (
             <MapContainer center={CENTRE_COTONOU} zoom={12} style={{ height: '100%', width: '100%' }}>
@@ -88,6 +100,44 @@ export function AdminCarte() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              {approxAffiches.map((p) => {
+                const couleur = COULEUR_APPROX[p.precision];
+                return (
+                  <CircleMarker
+                    key={`${p.ville}-${p.quartier ?? '*'}`}
+                    center={[p.latitude, p.longitude]}
+                    radius={Math.min(32, 10 + Math.sqrt(p.total) * 4)}
+                    pathOptions={{ color: couleur, fillColor: couleur, fillOpacity: 0.3, dashArray: '4 4' }}
+                  >
+                    <Tooltip permanent direction="center" className="!bg-transparent !border-0 !shadow-none font-bold">
+                      {p.total}
+                    </Tooltip>
+                    <Popup>
+                      <div className="text-sm">
+                        <div className="font-semibold">
+                          {p.precision === 'quartier' ? `${p.quartier} (${p.ville})` : `${p.ville} · quartiers sans position`}
+                        </div>
+                        <div className="text-slate-500">
+                          {p.total} ressortissant{p.total > 1 ? 's' : ''} sans GPS — position approximative
+                        </div>
+                        <div className="mt-1">
+                          {(Object.keys(STATUT_LABEL) as StatutRessortissant[])
+                            .filter((s) => p.par_statut[s])
+                            .map((s) => `${STATUT_LABEL[s]} : ${p.par_statut[s]}`)
+                            .join(' · ')}
+                        </div>
+                        {p.precision === 'ville' && Object.keys(p.quartiers).length > 0 && (
+                          <ul className="mt-1 text-slate-500 list-disc pl-4">
+                            {Object.entries(p.quartiers).map(([nom, n]) => (
+                              <li key={nom}>{nom} ({n})</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
               {pointsAffiches.map((p) => (
                 <CircleMarker
                   key={p.id}
@@ -144,6 +194,19 @@ export function AdminCarte() {
                 {STATUT_LABEL[s]}
               </div>
             ))}
+          </div>
+          <div className="mt-2 flex flex-col gap-1 text-xs text-slate-500">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full border border-dashed" style={{ borderColor: COULEUR_APPROX.quartier, backgroundColor: `${COULEUR_APPROX.quartier}55` }} />
+              Sans GPS : centre du quartier (approximatif)
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full border border-dashed" style={{ borderColor: COULEUR_APPROX.ville, backgroundColor: `${COULEUR_APPROX.ville}55` }} />
+              Sans GPS : quartier inconnu, centre de la commune
+            </div>
+            {!!data.sans_position && (
+              <div>{data.sans_position} ressortissant(s) non localisable(s) (commune sans coordonnées)</div>
+            )}
           </div>
         </div>
       </div>
