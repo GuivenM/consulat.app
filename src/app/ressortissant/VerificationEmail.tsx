@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { ApiError } from '../../lib/ressortissantApi';
 
@@ -19,7 +20,10 @@ export function VerificationEmail() {
       return;
     }
     verifierEmail(token)
-      .then(() => setStatut('ok'))
+      .then(() => {
+        setStatut('ok');
+        toast.success('Votre e-mail est confirmé : bienvenue au registre consulaire !');
+      })
       .catch((err) => {
         setStatut('erreur');
         setMessage(err instanceof ApiError ? err.message : 'Lien de vérification invalide ou expiré.');
@@ -27,8 +31,11 @@ export function VerificationEmail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  // Pour l'instant, une fois l'e-mail confirmé on revient d'abord sur la
+  // vitrine du site (le ressortissant reste connecté : l'espace consulaire
+  // reste accessible depuis le site).
   if (isAuthenticated && statut !== 'chargement') {
-    return <Navigate to="/espace-consulaire" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (
@@ -44,12 +51,12 @@ export function VerificationEmail() {
           <>
             <CheckCircle2 className="w-14 h-14 text-brand-green-600 mx-auto mb-4" />
             <h1 className="text-xl font-bold text-slate-900 mb-2">Email vérifié</h1>
-            <p className="text-slate-500 text-sm mb-6">Votre inscription est confirmée, vous êtes connecté(e).</p>
+            <p className="text-slate-500 text-sm mb-6">Votre inscription est confirmée.</p>
             <button
-              onClick={() => navigate('/espace-consulaire', { replace: true })}
+              onClick={() => navigate('/', { replace: true })}
               className="text-brand-green-600 hover:underline text-sm font-medium"
             >
-              Accéder à mon espace
+              Retour à l'accueil
             </button>
           </>
         )}
