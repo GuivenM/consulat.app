@@ -9,6 +9,8 @@ import { Services } from './pages/Services';
 import { CongoBenin } from './pages/CongoBenin';
 import { Communaute } from './pages/Communaute';
 import { RealisationDetail } from './pages/RealisationDetail';
+import { Campagnes } from './ressortissant/Campagnes';
+import { AdminCampagnes } from './admin/pages/AdminCampagnes';
 import { CulturePatrimoine } from './pages/Culture';
 import { Agenda } from './pages/Agenda';
 import { Faq } from './pages/Faq';
@@ -109,6 +111,7 @@ export default function App() {
               <Route path="guide" element={<AdminGuide />} />
               <Route path="partenaires" element={<AdminPartenaires />} />
               <Route path="realisations" element={<AdminRealisations />} />
+              <Route path="campagnes" element={<AdminCampagnes />} />
               <Route element={<ProtectedRoute roles={['super_admin']} />}>
                 <Route path="utilisateurs" element={<AdminUtilisateurs />} />
                 <Route path="journal" element={<AdminJournal />} />
@@ -135,6 +138,7 @@ export default function App() {
               />
               {DEMANDES_ENABLED && <Route path="nouvelle-demande" element={<NouvelleDemande />} />}
               {DEMANDES_ENABLED && <Route path="demandes/:id" element={<DemandeDetail />} />}
+              <Route path="campagnes" element={<Campagnes />} />
               <Route path="profil" element={<Profil />} />
             </Route>
           </Route>

@@ -4,6 +4,7 @@ import { LogOut, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { Button } from '../components/ui/button';
 import { RessortissantSidebar, RessortissantMobileNav } from './RessortissantSidebar';
+import { CampagneBanner } from './CampagneBanner';
 
 export function RessortissantLayout() {
   const { logout, ressortissant } = useRessortissantAuth();
@@ -45,6 +46,7 @@ export function RessortissantLayout() {
       <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-6 items-start">
         <RessortissantSidebar />
         <main className="pb-20 lg:pb-0">
+          <CampagneBanner />
           <Outlet />
         </main>
       </div>

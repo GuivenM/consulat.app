@@ -58,3 +58,23 @@ export interface DemandeConfiguration {
   tarifs: TarifConfiguration[];
   documents_requis: DocumentRequisConfiguration[];
 }
+
+export interface InscriptionCampagne {
+  id: number;
+  campagne_id: number;
+  situation: string;
+  situation_label: string;
+  dispose_montant: boolean;
+  commentaire: string | null;
+}
+
+export interface CampagneRessortissant {
+  id: number;
+  titre: string;
+  description: string | null;
+  montant: number | null;
+  devise: string;
+  date_debut: string | null;
+  date_fin: string | null;
+  inscription: InscriptionCampagne | null;
+}

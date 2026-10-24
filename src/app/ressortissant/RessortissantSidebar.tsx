@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, FilePlus2, UserCircle, BadgeCheck, AlertTriangle } from 'lucide-react';
+import { Home, FilePlus2, UserCircle, Megaphone, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { useRessortissantAuth } from '../context/RessortissantAuthContext';
 import { cn } from '../components/Navbar';
 import { DEMANDES_ENABLED } from '../../lib/features';
@@ -10,6 +10,7 @@ import { DEMANDES_ENABLED } from '../../lib/features';
 const navItems = [
   { label: 'Accueil', path: '/espace-consulaire', icon: Home, end: true, demandes: true },
   { label: 'Nouvelle demande', path: '/espace-consulaire/nouvelle-demande', icon: FilePlus2, demandes: true },
+  { label: 'Campagnes', path: '/espace-consulaire/campagnes', icon: Megaphone, demandes: false },
   { label: 'Mon profil', path: '/espace-consulaire/profil', icon: UserCircle, demandes: false },
 ].filter((item) => DEMANDES_ENABLED || !item.demandes);
 

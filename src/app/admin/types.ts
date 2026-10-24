@@ -421,6 +421,36 @@ export interface RessortissantDemandeResume {
 
 export type DelaiDemande = 'meme_jour' | '24h' | '3_jours' | '1_semaine' | '2_semaines';
 
+export interface Campagne {
+  id: number;
+  titre: string;
+  description: string | null;
+  montant: number | null;
+  devise: string;
+  date_debut: string | null;
+  date_fin: string | null;
+  est_active: boolean;
+  est_ouverte: boolean;
+  inscriptions_count?: number;
+  inscriptions_avec_somme_count?: number;
+}
+
+export interface InscriptionCampagneAdmin {
+  id: number;
+  ressortissant_id: number;
+  numero_registre: string | null;
+  nom_complet: string | null;
+  telephone: string | null;
+  email: string | null;
+  ville: string | null;
+  quartier: string | null;
+  situation: string;
+  situation_label: string;
+  dispose_montant: boolean;
+  commentaire: string | null;
+  created_at: string;
+}
+
 export interface ServiceConsulaire {
   id: number;
   code: string;
