@@ -312,9 +312,11 @@ export function AdminActualites() {
             <TableBody>
               {filtered.map((a) => (
                 <TableRow key={a.id} className="cursor-pointer" onClick={() => setViewing(a)}>
-                  <TableCell>
-                    <div className="font-medium text-slate-900 line-clamp-1">{a.titre}</div>
-                    <div className="text-xs text-slate-400 line-clamp-1">{a.description}</div>
+                  {/* max-w-0 + w-full : la colonne prend la place restante et le texte
+                      est coupé (…) au lieu d'élargir le tableau. */}
+                  <TableCell className="max-w-0 w-full">
+                    <div className="font-medium text-slate-900 truncate">{a.titre}</div>
+                    <div className="text-xs text-slate-400 truncate">{a.description}</div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                     <Badge variant="secondary">{TYPE_LABELS[a.type]}</Badge>

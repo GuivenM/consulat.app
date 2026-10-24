@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, Phone, Mail, MapPin, BadgeCheck, Pencil, Save } from 'lucide-react';
+import { Loader2, BookUser, ChevronLeft, ChevronRight, Search, Download, Phone, Mail, MapPin, BadgeCheck, Pencil, Save, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { api, ApiError, downloadFile, openFile } from '../../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../../components/ui/badge';
@@ -59,6 +59,31 @@ const STATUT_COULEUR: Record<StatutRessortissant, string> = {
   suspendu: 'bg-brand-red-50 text-brand-red-700 border-brand-red-200',
 };
 
+type TriRegistre = 'numero_registre' | 'nom' | 'ville' | 'statut' | 'created_at';
+
+function SortableHeader({
+  label,
+  active,
+  dir,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  dir: 'asc' | 'desc';
+  onClick: () => void;
+}) {
+  return (
+    <button onClick={onClick} className="flex items-center gap-1 hover:text-slate-900">
+      {label}
+      {active ? (
+        dir === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
+      ) : (
+        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+      )}
+    </button>
+  );
+}
+
 export function AdminRegistre() {
   const [ressortissants, setRessortissants] = useState<Ressortissant[] | null>(null);
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -68,6 +93,9 @@ export function AdminRegistre() {
   const [ville, setVille] = useState<string | null>(null);
   const [recherche, setRecherche] = useState('');
   const [rechercheDebounced, setRechercheDebounced] = useState('');
+  // Tri côté serveur (le registre est paginé) : par défaut, derniers inscrits d'abord.
+  const [tri, setTri] = useState<TriRegistre>('created_at');
+  const [ordre, setOrdre] = useState<'asc' | 'desc'>('desc');
 
   const [viewing, setViewing] = useState<Ressortissant | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -91,12 +119,21 @@ export function AdminRegistre() {
 
   useEffect(() => {
     setPage(1);
-  }, [statut, ville, rechercheDebounced]);
+  }, [statut, ville, rechercheDebounced, tri, ordre]);
 
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statut, ville, rechercheDebounced]);
+  }, [page, statut, ville, rechercheDebounced, tri, ordre]);
+
+  function basculerTri(colonne: TriRegistre) {
+    if (tri === colonne) {
+      setOrdre((o) => (o === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setTri(colonne);
+      setOrdre('asc');
+    }
+  }
 
   async function load() {
     setRessortissants(null);
@@ -106,6 +143,8 @@ export function AdminRegistre() {
       if (statut !== 'tous') params.set('statut', statut);
       if (ville) params.set('ville', ville);
       if (rechercheDebounced) params.set('recherche', rechercheDebounced);
+      params.set('tri', tri);
+      params.set('ordre', ordre);
 
       const res = await api.get<{ items: Ressortissant[]; meta: Meta }>(
         `/v1/admin/ressortissants?${params.toString()}`
@@ -239,12 +278,24 @@ export function AdminRegistre() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>N° registre</TableHead>
-                <TableHead>Nom complet</TableHead>
-                <TableHead>Ville / Quartier</TableHead>
+                <TableHead>
+                  <SortableHeader label="N° registre" active={tri === 'numero_registre'} dir={ordre} onClick={() => basculerTri('numero_registre')} />
+                </TableHead>
+                <TableHead>
+                  <SortableHeader label="Nom complet" active={tri === 'nom'} dir={ordre} onClick={() => basculerTri('nom')} />
+                </TableHead>
+                <TableHead>
+                  <SortableHeader label="Ville / Quartier" active={tri === 'ville'} dir={ordre} onClick={() => basculerTri('ville')} />
+                </TableHead>
                 <TableHead>Contact</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="text-right">Inscrit le</TableHead>
+                <TableHead>
+                  <SortableHeader label="Statut" active={tri === 'statut'} dir={ordre} onClick={() => basculerTri('statut')} />
+                </TableHead>
+                <TableHead>
+                  <div className="flex justify-end">
+                    <SortableHeader label="Inscrit le" active={tri === 'created_at'} dir={ordre} onClick={() => basculerTri('created_at')} />
+                  </div>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
