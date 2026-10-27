@@ -594,3 +594,36 @@ export interface DemandeDocumentAdmin {
   verifie_at: string | null;
   created_at: string;
 }
+
+export interface AppelCandidature {
+  id: number;
+  titre: string;
+  description: string | null;
+  affiche: string | null;
+  affiche_url: string | null;
+  date_limite: string | null;
+  est_actif: boolean;
+  est_ouvert: boolean;
+  candidatures_count?: number;
+  candidatures_retenues_count?: number;
+  candidatures_nouvelles_count?: number;
+}
+
+export interface Candidature {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  ville: string | null;
+  domaine: string;
+  domaine_label: string;
+  discipline: string | null;
+  presentation: string;
+  lien_portfolio: string | null;
+  fichier_disponible: boolean;
+  fichier_nom: string | null;
+  statut: string;
+  statut_label: string;
+  created_at: string;
+}

@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Music, Palette, UtensilsCrossed } from 'lucide-react';
 import { RealisationsGrid } from '../components/RealisationsGrid';
+import { AppelsCandidatures } from '../components/AppelsCandidatures';
 
 export function CulturePatrimoine() {
   return (
@@ -53,6 +54,9 @@ export function CulturePatrimoine() {
             </motion.div>
           ))}
         </div>
+
+        {/* Appels à candidatures ouverts (gérés depuis l'admin) */}
+        <AppelsCandidatures />
 
         {/* Éléments de culture & patrimoine (gérés depuis l'admin) */}
         <RealisationsGrid

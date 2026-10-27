@@ -11,6 +11,7 @@ import { Communaute } from './pages/Communaute';
 import { RealisationDetail } from './pages/RealisationDetail';
 import { Campagnes } from './ressortissant/Campagnes';
 import { AdminCampagnes } from './admin/pages/AdminCampagnes';
+import { AdminAppels } from './admin/pages/AdminAppels';
 import { CulturePatrimoine } from './pages/Culture';
 import { Agenda } from './pages/Agenda';
 import { Faq } from './pages/Faq';
@@ -112,6 +113,7 @@ export default function App() {
               <Route path="partenaires" element={<AdminPartenaires />} />
               <Route path="realisations" element={<AdminRealisations />} />
               <Route path="campagnes" element={<AdminCampagnes />} />
+              <Route path="appels" element={<AdminAppels />} />
               <Route element={<ProtectedRoute roles={['super_admin']} />}>
                 <Route path="utilisateurs" element={<AdminUtilisateurs />} />
                 <Route path="journal" element={<AdminJournal />} />
